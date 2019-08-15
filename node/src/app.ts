@@ -9,6 +9,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.get("/api", (req, res, next) => res.end("Hello!"));
 app.use(express.static(path.join(__dirname, "public")));
 
 module.exports = app;

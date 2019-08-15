@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "build": "tsc -b && cp -R ./src/public ./out",
+    "debug": "nodemon --inspect-brk ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -38,6 +40,7 @@
     "@types/cookie-parser": "^1.4.1",
     "@types/express": "^4.17.0",
     "@types/morgan": "^1.7.36",
+    "nodemon": "^1.19.1",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   }
