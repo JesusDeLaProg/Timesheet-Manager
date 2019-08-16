@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "build": "tsc -b && cp -R ./src/public ./out",
+    "build": "tsc -b ./src && cp -R ./src/public ./out",
+    "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "nodemon --inspect-brk ./bin/www"
   },
   "dependencies": {
