@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "lint": "tslint -p ./src/tsconfig.json",
+    "lint": "prettier --write \"src/{,**/}!(*.d.ts|*.d.ts.map)\" && tslint -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "nodemon --inspect-brk ./bin/www"

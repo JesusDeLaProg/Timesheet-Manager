@@ -2,13 +2,7 @@
   "name": "tm",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "start": "node ./bin/www",
-    "lint": "tslint -p ./src/tsconfig.json",
-    "build": "tsc -b ./src && cp -R ./src/public ./out",
-    "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
-    "debug": "nodemon --inspect-brk ./bin/www"
-  },
+  "scripts": {},
   "dependencies": {},
   "description": "Timesheet-Manager.",
   "repository": {
