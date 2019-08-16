@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "lint": "tslint -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "nodemon --inspect-brk ./bin/www"
@@ -13,6 +14,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "inversify": "^5.0.1",
+    "mongoose": "^5.6.9",
     "morgan": "~1.9.1",
     "reflect-metadata": "^0.1.13"
   },
@@ -40,8 +42,10 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.1",
     "@types/express": "^4.17.0",
+    "@types/mongoose": "^5.5.12",
     "@types/morgan": "^1.7.36",
     "nodemon": "^1.19.1",
+    "prettier": "1.18.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   }
