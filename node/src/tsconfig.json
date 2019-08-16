@@ -4,10 +4,6 @@
     "declarationDir": "./types",
     "outDir": "../out"
   },
-  "files": [
-    "./app.ts"
-  ],
-  "references": [
-    { "path": "./routes" }
-  ]
+  "files": ["./app.ts"],
+  "references": [{ "path": "./routes" }]
 }

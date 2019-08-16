@@ -1,10 +1,8 @@
 {
-    "extends": "../../base.tsconfig.json",
-    "compilerOptions": {
-        "declarationDir": "./types",
-        "outDir": "../../out/routes"
-    },
-    "include": [
-        "./**/*.ts"
-    ]
+  "extends": "../../base.tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "../../out/routes"
+  },
+  "include": ["./**/*.ts"]
 }
