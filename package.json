@@ -1,0 +1,46 @@
+{
+  "name": "tm",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "lint": "tslint -p ./src/tsconfig.json",
+    "build": "tsc -b ./src && cp -R ./src/public ./out",
+    "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
+    "debug": "nodemon --inspect-brk ./bin/www"
+  },
+  "dependencies": {},
+  "description": "Timesheet-Manager.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JesusDeLaProg/Timesheet-Manager.git"
+  },
+  "keywords": [
+    "timesheet",
+    "manager",
+    "timesheet-manager"
+  ],
+  "author": "Maxime Charland",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JesusDeLaProg/Timesheet-Manager/issues"
+  },
+  "homepage": "https://github.com/JesusDeLaProg/Timesheet-Manager#readme",
+  "devDependencies": {
+    "husky": "^3.0.3",
+    "lint-staged": "^9.2.1",
+    "prettier": "1.18.2",
+    "tslint": "^5.18.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "node/src/{,**/}!(*.d.ts|*.d.ts.map)": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
