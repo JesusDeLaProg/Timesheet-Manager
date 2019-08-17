@@ -5,5 +5,9 @@
     "outDir": "../out"
   },
   "files": ["./app.ts"],
-  "references": [{ "path": "./routes" }, { "path": "./infrastructure" }]
+  "references": [
+    { "path": "./routes" },
+    { "path": "./infrastructure" },
+    { "path": "./controllers" }
+  ]
 }

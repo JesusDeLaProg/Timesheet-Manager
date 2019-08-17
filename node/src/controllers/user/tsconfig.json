@@ -1,0 +1,9 @@
+{
+  "extends": "../../../base.tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "../../../out/controllers/user"
+  },
+  "files": ["./index.ts"],
+  "references": [{ "path": "../../constants/symbols/models" }]
+}
