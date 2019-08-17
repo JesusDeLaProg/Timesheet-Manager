@@ -2,7 +2,9 @@
   "name": "tm",
   "version": "0.1.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "pretty": "prettier --write \"node/src/{,**/}!(*.d.ts|*.d.ts.map)\""
+  },
   "dependencies": {},
   "description": "Timesheet-Manager.",
   "repository": {

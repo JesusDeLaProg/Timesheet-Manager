@@ -9,6 +9,7 @@
             "request": "launch",
             "name": "nodemon",
             "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/nodemon",
+            "cwd": "${workspaceFolder}/node",
             "program": "${workspaceFolder}/node/bin/www",
             "restart": true,
             "console": "integratedTerminal",

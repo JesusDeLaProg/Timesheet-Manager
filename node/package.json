@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "lint": "prettier --write \"src/{,**/}!(*.d.ts|*.d.ts.map)\" && tslint -p ./src/tsconfig.json",
+    "lint": "tslint -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "nodemon --inspect-brk ./bin/www"
@@ -12,6 +12,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^8.0.0",
     "express": "~4.16.1",
     "inversify": "^5.0.1",
     "mongoose": "^5.6.9",
@@ -41,6 +42,7 @@
   "homepage": "https://github.com/JesusDeLaProg/Timesheet-Manager#readme",
   "devDependencies": {
     "@types/cookie-parser": "^1.4.1",
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.0",
     "@types/mongoose": "^5.5.12",
     "@types/morgan": "^1.7.36",
