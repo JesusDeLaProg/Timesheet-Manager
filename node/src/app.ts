@@ -5,6 +5,8 @@ import path from "path";
 
 import { message } from "./routes/user";
 
+import "./infrastructure/database/mongoose";
+
 const app = express();
 
 app.use(logger("dev"));
