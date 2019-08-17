@@ -2,7 +2,7 @@
 // Project : Timesheet Manager
 // Definitions by : Maxime Charland
 
-declare type StringId = string;
+export type StringId = string;
 
 export interface IUser {
     nomUsager: string;
@@ -41,7 +41,7 @@ export interface IProject<TClient = StringId> {
 export interface ITimesheet<
 TUser = StringId,
 TTimesheetLine = ITimesheetLine,
-TRoadsheetLine = StringId> {
+TRoadsheetLine = IRoadsheetLine> {
     user: TUser;
     begin: Date;
     end: Date;
