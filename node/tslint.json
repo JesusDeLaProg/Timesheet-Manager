@@ -3,6 +3,9 @@
     "extends": [
         "tslint:recommended"
     ],
+    "linterOptions": {
+        "exclude": ["bin/www"]
+    },
     "jsRules": {},
     "rules": {},
     "rulesDirectory": []
