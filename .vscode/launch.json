@@ -13,7 +13,7 @@
             "program": "${workspaceFolder}/node/bin/www",
             "restart": true,
             "console": "integratedTerminal",
-            "internalConsoleOptions": "openOnSessionStart"
+            "internalConsoleOptions": "openOnFirstSessionStart"
         }
     ]
 }
