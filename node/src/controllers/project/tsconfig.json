@@ -2,7 +2,7 @@
   "extends": "../../../base.tsconfig.json",
   "compilerOptions": {
     "declarationDir": "./types",
-    "outDir": "../../../out/controllers/user"
+    "outDir": "../../../out/controllers/project"
   },
   "files": ["./index.ts"],
   "references": [

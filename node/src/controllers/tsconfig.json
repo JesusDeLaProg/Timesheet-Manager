@@ -6,6 +6,13 @@
   },
   "files": ["./index.ts"],
   "references": [
+    { "path": "./abstract" },
+    { "path": "./activity" },
+    { "path": "./auth" },
+    { "path": "./client" },
+    { "path": "./phase" },
+    { "path": "./project" },
+    { "path": "./timesheet" },
     { "path": "./user" },
     { "path": "../constants/symbols/controllers" }
   ]

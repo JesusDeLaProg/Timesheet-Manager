@@ -14,5 +14,5 @@ if (process.env.DB_AUTH_DB) {
 
 mongoose
   .connect(dbString, { useNewUrlParser: true })
-  .then(() => console.debug("Mongoose connected."))
-  .catch(console.error.bind(console, "connection error:"));
+  .then(() => console.debug("Mongoose connected.")) // tslint:disable-line:no-console
+  .catch(console.error.bind(console, "connection error:")); // tslint:disable-line:no-console
