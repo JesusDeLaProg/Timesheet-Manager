@@ -14,6 +14,26 @@
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "openOnFirstSessionStart"
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Current File",
+            "program": "${workspaceFolder}/node/node_modules/.bin/mocha",
+            "args": [
+              "--timeout",
+              "60000",
+              "--colors",
+              "${file}",
+              "--require",
+              "ts-node/register"
+            ],
+            "env": {
+                "TS_NODE_PROJECT": "${fileDirname}/tsconfig.json"
+            },
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen"
+      }
     ]
 }

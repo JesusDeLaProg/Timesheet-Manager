@@ -1,0 +1,14 @@
+{
+  "extends": "../../../test.tsconfig.json",
+  "files": ["./index.ts"],
+  "references": [
+    { "path": "../abstract/test" },
+    { "path": "../activity/test" },
+    { "path": "../auth/test" },
+    { "path": "../client/test" },
+    { "path": "../phase/test" },
+    { "path": "../project/test" },
+    { "path": "../timesheet/test" },
+    { "path": "../user/test" }
+  ]
+}

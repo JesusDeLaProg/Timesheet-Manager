@@ -4,5 +4,5 @@
     "declarationDir": "./types",
     "outDir": "../../../out/infrastructure/database"
   },
-  "include": ["./**/*.ts"]
+  "files": ["./mongoose.ts"]
 }
