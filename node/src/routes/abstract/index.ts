@@ -14,6 +14,8 @@ export abstract class AbstractRouter {
         .type("json")
         .status(200)
         .send(result);
+    } else {
+      next(result);
     }
   }
 
