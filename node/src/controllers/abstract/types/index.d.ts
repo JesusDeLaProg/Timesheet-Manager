@@ -1,13 +1,14 @@
 import { Document, Error, Model as ModelType } from "mongoose";
-import { CrudResult, QueryOptions, IController } from "../../interfaces/controllers";
-export declare abstract class AbstractController<T extends Document> implements IController<T> {
+import { QueryOptions, IController } from "../../interfaces/controllers";
+import { IViewInterface, CrudResult } from "../../../../types/viewmodels";
+export declare abstract class AbstractController<T extends IViewInterface> implements IController<T> {
     private Model;
-    constructor(Model: ModelType<T>);
-    getById(id: string): CrudResult<T>;
-    getAll(options?: QueryOptions): CrudResult<T[]>;
-    count(): CrudResult<number>;
-    validate(document: T): CrudResult<Error.ValidationError>;
-    save(document: T): CrudResult<T | Error.ValidationError>;
-    deleteById(id: string): CrudResult;
+    constructor(Model: ModelType<T & Document>);
+    getById(id: string): Promise<CrudResult<T>>;
+    getAll(options?: QueryOptions): Promise<CrudResult<T[]>>;
+    count(): Promise<CrudResult<number>>;
+    validate(document: T): Promise<CrudResult<Error.ValidationError>>;
+    save(document: T): Promise<CrudResult<T | Error.ValidationError>>;
+    deleteById(id: string): Promise<CrudResult>;
 }
 //# sourceMappingURL=index.d.ts.map

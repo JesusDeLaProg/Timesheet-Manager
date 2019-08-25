@@ -1,6 +1,4 @@
-if (!Reflect.hasOwnMetadata) {
-  require("reflect-metadata");
-}
+import "reflect-metadata";
 import "../../../infrastructure/database/testing";
 
 import should from "should";

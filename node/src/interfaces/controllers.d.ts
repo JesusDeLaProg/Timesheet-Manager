@@ -1,6 +1,6 @@
 import { Document, Error } from "mongoose";
+import { IViewInterface, IViewActivity, IViewPhase, IViewClient, IViewProject, IViewTimesheet, IViewUser, CrudResult } from "../../../types/viewmodels";
 import { StringId, ITimesheetLine, IRoadsheetLine } from "../../../types/datamodels";
-import { ClientDocument, ActivityDocument, PhaseDocument, ProjectDocument, TimesheetDocument, UserDocument } from "./models";
 
 export interface QueryOptions {
     sort?: string;
@@ -8,44 +8,40 @@ export interface QueryOptions {
     limit?: number;
 }
 
-export interface CrudResult<T = any> {
-    success: boolean;
-    message?: string;
-    result?: T;
-}
-
 declare type JwtSignedToken = string;
 
 export interface IAuthController {
-    login(username: string, password: string): CrudResult<JwtSignedToken>;
+    login(username: string, password: string): Promise<CrudResult<JwtSignedToken>>;
 }
 
-export interface IController<T extends Document> {
-    getById(id: StringId): CrudResult<T>;
-    getAll(options?: QueryOptions): CrudResult<T[]>;
-    count(): CrudResult<number>;
-    validate(document: T): CrudResult<Error.ValidationError>;
-    save(document: T): CrudResult<T | Error.ValidationError>;
-    deleteById(id: StringId): CrudResult;
+export interface IController<T extends IViewInterface> {
+    getById(id: StringId): Promise<CrudResult<T>>;
+    getAll(options?: QueryOptions): Promise<CrudResult<T[]>>;
+    count(): Promise<CrudResult<number>>;
+    validate(document: T): Promise<CrudResult<Error.ValidationError>>;
+    save(document: T): Promise<CrudResult<T | Error.ValidationError>>;
+    deleteById(id: StringId): Promise<CrudResult>;
 }
 
-export interface IActivityController extends IController<ActivityDocument> {}
+export interface IActivityController extends IController<IViewActivity> {}
 
-export interface IPhaseController extends IController<PhaseDocument> {
-    getAllPopulated(options?: QueryOptions): CrudResult<PhaseDocument<ActivityDocument>[]>;
+export interface IPhaseController extends IController<IViewPhase> {
+    getAllPopulated(options?: QueryOptions): Promise<CrudResult<IViewPhase<IViewActivity>[]>>;
 }
 
-export interface IClientController extends IController<ClientDocument> {
-    getAllByName(name: string, options?: QueryOptions): CrudResult<ClientDocument[]>;
+export interface IClientController extends IController<IViewClient> {
+    getAllByName(name: string, options?: QueryOptions): Promise<CrudResult<IViewClient[]>>;
 }
 
-export interface IProjectController extends IController<ProjectDocument> {
-    getAllByCode(code: string, options?: QueryOptions): CrudResult<ProjectDocument[]>;
+export interface IProjectController extends IController<IViewProject> {
+    getAllByCode(code: string, options?: QueryOptions): Promise<CrudResult<IViewProject[]>>;
 }
 
-export interface ITimesheetController extends IController<TimesheetDocument> {
-    getAllByUserId(userId: StringId, options?: QueryOptions): CrudResult<TimesheetDocument[]>;
-    getByIdPopulated(id: StringId): CrudResult<TimesheetDocument<StringId, ITimesheetLine<ProjectDocument>>[]>;
+export interface ITimesheetController extends IController<IViewTimesheet> {
+    getAllByUserId(userId: StringId, options?: QueryOptions): Promise<CrudResult<IViewTimesheet[]>>;
+    getByIdPopulated(id: StringId): Promise<CrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>[]>>;
 }
 
-export interface IUserController extends IController<UserDocument> {}
+export interface IUserController extends IController<IViewUser> {
+    validate(document: IViewUser, authenticatedUserId?: StringId): Promise<CrudResult<Error.ValidationError>>;
+}

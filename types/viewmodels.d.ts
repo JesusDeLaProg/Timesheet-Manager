@@ -4,13 +4,27 @@
 
 import * as DataModels from "./datamodels";
 
-interface IViewInterface {
-    _id: StringId;
+export interface CrudResult<T = any> {
+    success: boolean;
+    message?: string;
+    result?: T;
 }
 
-export type IViewActivity =  DataModels.IActivity & IViewInterface;
-export type IViewPhase =     DataModels.IPhase & IViewInterface;
-export type IViewClient =    DataModels.IClient & IViewInterface;
-export type IViewProject =   DataModels.IProject & IViewInterface;
-export type IViewTimesheet = DataModels.ITimesheet & IViewInterface;
-export type IViewUser =      DataModels.IUser & IViewInterface;
+interface IViewInterface {
+    _id: DataModels.StringId;
+}
+
+export type IViewActivity = DataModels.IActivity & IViewInterface;
+
+export type IViewPhase<TActivity = any> = DataModels.IPhase<TActivity> & IViewInterface;
+
+export type IViewClient = DataModels.IClient & IViewInterface;
+
+export type IViewProject<TClient = any> = DataModels.IProject<TClient> & IViewInterface;
+
+export type IViewTimesheet<
+TUser = any,
+TTimesheetLine = DataModels.ITimesheetLine,
+TRoadsheetLine = DataModels.IRoadsheetLine> = DataModels.ITimesheet<TUser, TTimesheetLine, TRoadsheetLine> & IViewInterface;
+
+export type IViewUser = DataModels.IUser & IViewInterface;

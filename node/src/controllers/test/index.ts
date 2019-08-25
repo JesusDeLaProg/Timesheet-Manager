@@ -1,6 +1,4 @@
-if (!Reflect.hasOwnMetadata) {
-  require("reflect-metadata");
-}
+import "reflect-metadata";
 
 describe("Controllers", () => {
   require("../abstract/test");

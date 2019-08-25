@@ -2,16 +2,13 @@ import { injectable, inject } from "inversify";
 import { Error } from "mongoose";
 
 import { AbstractController } from "../abstract";
-import {
-  CrudResult,
-  IClientController,
-  QueryOptions
-} from "../../interfaces/controllers";
-import { ClientModel, ClientDocument } from "../../interfaces/models";
+import { IClientController, QueryOptions } from "../../interfaces/controllers";
+import { ClientModel } from "../../interfaces/models";
 import Models from "../../constants/symbols/models";
+import { IViewClient, CrudResult } from "../../../../types/viewmodels";
 
 @injectable()
-export class ClientController extends AbstractController<ClientDocument>
+export class ClientController extends AbstractController<IViewClient>
   implements IClientController {
   constructor(@inject(Models.Client) private Client: ClientModel) {
     super(Client);
@@ -20,27 +17,29 @@ export class ClientController extends AbstractController<ClientDocument>
   getAllByName(
     name: string,
     options?: QueryOptions | undefined
-  ): CrudResult<ClientDocument[]> {
+  ): Promise<CrudResult<IViewClient[]>> {
     throw new Error("Method not implemented.");
   }
-  getById(id: string): CrudResult<ClientDocument> {
+  getById(id: string): Promise<CrudResult<IViewClient>> {
     throw new Error("Method not implemented.");
   }
-  getAll(options?: QueryOptions | undefined): CrudResult<ClientDocument[]> {
+  getAll(
+    options?: QueryOptions | undefined
+  ): Promise<CrudResult<IViewClient[]>> {
     throw new Error("Method not implemented.");
   }
-  count(): CrudResult<number> {
+  count(): Promise<CrudResult<number>> {
     throw new Error("Method not implemented.");
   }
-  validate(document: ClientDocument): CrudResult<Error.ValidationError> {
+  validate(document: IViewClient): Promise<CrudResult<Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
   save(
-    document: ClientDocument
-  ): CrudResult<ClientDocument | Error.ValidationError> {
+    document: IViewClient
+  ): Promise<CrudResult<IViewClient | Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  deleteById(id: string): CrudResult<any> {
+  deleteById(id: string): Promise<CrudResult<any>> {
     throw new Error("Method not implemented.");
   }
 }

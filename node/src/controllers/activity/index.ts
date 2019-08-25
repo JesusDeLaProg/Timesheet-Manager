@@ -4,42 +4,44 @@ import { Error } from "mongoose";
 import { AbstractController } from "../abstract";
 import {
   IActivityController,
-  CrudResult,
   QueryOptions
 } from "../../interfaces/controllers";
-import { ActivityModel, ActivityDocument } from "../../interfaces/models";
+import { ActivityModel } from "../../interfaces/models";
 import Models from "../../constants/symbols/models";
+import { IViewActivity, CrudResult } from "../../../../types/viewmodels";
 
 @injectable()
-export class ActivityController extends AbstractController<ActivityDocument>
+export class ActivityController extends AbstractController<IViewActivity>
   implements IActivityController {
   constructor(@inject(Models.Activity) private Activity: ActivityModel) {
     super(Activity);
   }
 
-  getById(id: string): CrudResult<ActivityDocument> {
+  getById(id: string): Promise<CrudResult<IViewActivity>> {
     throw new Error("Method not implemented.");
   }
 
-  getAll(options?: QueryOptions): CrudResult<ActivityDocument[]> {
+  getAll(options?: QueryOptions): Promise<CrudResult<IViewActivity[]>> {
     throw new Error("Method not implemented.");
   }
 
-  count(): CrudResult<number> {
+  count(): Promise<CrudResult<number>> {
     throw new Error("Method not implemented.");
   }
 
-  validate(document: ActivityDocument): CrudResult<Error.ValidationError> {
+  validate(
+    document: IViewActivity
+  ): Promise<CrudResult<Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
 
   save(
-    document: ActivityDocument
-  ): CrudResult<ActivityDocument | Error.ValidationError> {
+    document: IViewActivity
+  ): Promise<CrudResult<IViewActivity | Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
 
-  deleteById(id: string): CrudResult {
+  deleteById(id: string): Promise<CrudResult> {
     throw new Error("Method not implemented.");
   }
 }

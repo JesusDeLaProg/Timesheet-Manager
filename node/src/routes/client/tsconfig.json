@@ -1,0 +1,12 @@
+{
+  "extends": "../../../base.tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "../../out/routes/client"
+  },
+  "files": ["index.ts"],
+  "references": [
+    { "path": "../abstract" },
+    { "path": "../../constants/symbols/controllers" }
+  ]
+}
