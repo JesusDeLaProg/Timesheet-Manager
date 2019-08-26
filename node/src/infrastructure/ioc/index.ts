@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Container, ContainerModule } from "inversify";
 
 export default function initializeContainer(modules: ContainerModule[]) {

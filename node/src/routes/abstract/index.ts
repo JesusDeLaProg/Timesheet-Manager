@@ -3,8 +3,8 @@ import { NextFunction, Response, Request } from "express";
 import { CrudResult } from "../../../../types/viewmodels";
 import { QueryOptions } from "../../interfaces/controllers";
 
-export abstract class AbstractRouter {
-  protected sendResultOrGiveToErrorHandler(
+export default {
+  sendResultOrGiveToErrorHandler(
     result: CrudResult,
     res: Response,
     next: NextFunction
@@ -17,21 +17,21 @@ export abstract class AbstractRouter {
     } else {
       next(result);
     }
-  }
+  },
 
-  protected buildErrorCrudResultFromError(error: any): CrudResult {
+  buildErrorCrudResultFromError(error: any): CrudResult {
     return {
       success: false,
       message: error.message,
       result: error
     };
-  }
+  },
 
-  protected buildQueryOptionsFromRequest(req: Request): QueryOptions {
+  buildQueryOptionsFromRequest(req: Request): QueryOptions {
     return {
       limit: +((req.params || {}).limit || 0),
       skip: +((req.params || {}).skip || 0),
       sort: (req.params || {}).sort || ""
     };
   }
-}
+};

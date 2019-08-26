@@ -1,0 +1,12 @@
+{
+  "extends": "../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "../../../out/infrastructure/database/models"
+  },
+  "files": ["./index.ts"],
+  "references": [
+    { "path": "../schemas" },
+    { "path": "../../../constants/symbols/models" }
+  ]
+}

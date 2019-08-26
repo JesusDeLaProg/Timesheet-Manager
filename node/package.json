@@ -7,7 +7,8 @@
     "lint": "tslint -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
-    "debug": "nodemon --inspect-brk ./bin/www"
+    "debug": "nodemon --inspect-brk ./bin/www",
+    "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -49,11 +50,13 @@
     "@types/mongoose": "^5.5.12",
     "@types/morgan": "^1.7.36",
     "@types/ms": "^0.7.30",
+    "@types/set-cookie-parser": "0.0.5",
     "@types/should": "^13.0.0",
     "@types/supertest": "^2.0.8",
     "mocha": "^6.2.0",
     "mongodb-memory-server": "^5.2.0",
     "nodemon": "^1.19.1",
+    "set-cookie-parser": "^2.4.0",
     "should": "^13.2.3",
     "supertest": "^4.0.2",
     "ts-node": "^8.3.0",

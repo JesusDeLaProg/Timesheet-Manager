@@ -1,4 +1,5 @@
 declare const _default: {
+    ApiRouter: symbol;
     AuthRouter: symbol;
     UserRouter: symbol;
     ActivityRouter: symbol;

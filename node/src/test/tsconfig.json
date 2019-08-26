@@ -1,0 +1,9 @@
+{
+  "extends": "../../test.tsconfig.json",
+  "files": ["./index.ts"],
+  "references": [
+    { "path": "../controllers/test" },
+    { "path": "../routes/test" },
+    { "path": "../" }
+  ]
+}

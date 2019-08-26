@@ -4,20 +4,19 @@ import ms from "ms";
 
 import Controllers from "../../constants/symbols/controllers";
 import { IAuthController } from "../../interfaces/controllers";
-import { AbstractRouter } from "../abstract";
+import utils from "../abstract";
 import { CrudResult } from "../../../../types/viewmodels";
 
 const tokenCookieName = "SESSIONID";
 
 @injectable()
-export class AuthRouter extends AbstractRouter {
+export class AuthRouter {
   readonly router = Router();
 
   constructor(
     @inject(Controllers.AuthController)
     private _authController: IAuthController
   ) {
-    super();
     this._init();
   }
 
@@ -44,7 +43,7 @@ export class AuthRouter extends AbstractRouter {
           .status(200)
           .send(result);
       } catch (err) {
-        this.buildErrorCrudResultFromError(err);
+        next(utils.buildErrorCrudResultFromError(err));
       }
     });
 

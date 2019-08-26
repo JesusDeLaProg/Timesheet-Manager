@@ -1,4 +1,4 @@
-import { ContainerModule, inject } from "inversify";
+import { ContainerModule, inject, injectable } from "inversify";
 
 import Routers from "../constants/symbols/routers";
 import { ActivityRouter } from "./activity";
@@ -10,6 +10,7 @@ import { TimesheetRouter } from "./timesheet";
 import { UserRouter } from "./user";
 import { Router } from "express";
 
+@injectable()
 export class ApiRouter {
   readonly router = Router();
 
@@ -19,7 +20,8 @@ export class ApiRouter {
     @inject(Routers.ClientRouter) private _clientRouter: ClientRouter,
     @inject(Routers.PhaseRouter) private _phaseRouter: PhaseRouter,
     @inject(Routers.ProjectRouter) private _projectRouter: ProjectRouter,
-    @inject(Routers.TimesheetRouter) private _timesheetRouter: TimesheetRouter
+    @inject(Routers.TimesheetRouter) private _timesheetRouter: TimesheetRouter,
+    @inject(Routers.UserRouter) private _userRouter: UserRouter
   ) {
     this._init();
   }
@@ -31,6 +33,7 @@ export class ApiRouter {
     this.router.use("/phase", this._phaseRouter.router);
     this.router.use("/project", this._projectRouter.router);
     this.router.use("/timesheet", this._timesheetRouter.router);
+    this.router.use("/user", this._userRouter.router);
   }
 }
 

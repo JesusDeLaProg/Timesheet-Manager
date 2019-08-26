@@ -1,16 +1,4 @@
-import cookieParser from "cookie-parser";
-import express from "express";
-import logger from "morgan";
-import path from "path";
-
 import "./infrastructure/database/mongoose";
+import { createExpressApp } from "./create-app";
 
-const app = express();
-
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-module.exports = app;
+export const app = createExpressApp();

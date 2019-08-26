@@ -6,6 +6,7 @@
   },
   "files": ["index.ts"],
   "references": [
+    { "path": "../constants/symbols/routers" },
     { "path": "./abstract" },
     { "path": "./activity" },
     { "path": "./auth" },

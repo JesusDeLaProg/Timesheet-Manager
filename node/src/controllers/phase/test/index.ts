@@ -1,59 +1,60 @@
+import { Container } from "inversify";
 import "reflect-metadata";
-import "../../../infrastructure/database/testing";
-
 import should from "should";
-import { model, Schema } from "mongoose";
 
+import Models from "../../../constants/symbols/models";
+import { ModelModule } from "../../../infrastructure/database/testing";
 import { PhaseController } from "../index";
-import { PhaseDocument } from "../../../interfaces/models";
+import { PhaseModel } from "../../../interfaces/models";
 
-// TODO : Inject PhaseController
-const schema = new Schema({
-  name: String
-});
-const Phase = model<PhaseDocument>("Phase", schema);
+export default function buildTestSuite() {
+  describe(PhaseController.name, function() {
+    let Phase: PhaseModel;
+    let controller: PhaseController;
 
-describe(PhaseController.name, function() {
-  let controller: PhaseController;
+    this.beforeAll(function() {
+      const container = new Container();
+      container.load(ModelModule);
+      container.bind<PhaseController>(PhaseController).toSelf();
+      controller = container.get(PhaseController);
+      Phase = container.get(Models.Phase);
+    });
 
-  this.beforeAll(function() {
-    controller = new PhaseController(Phase);
+    it("should have a getById function.", function() {
+      should.throws(() => controller.getById(""), "Method not implemented.");
+    });
+
+    it("should have a getAll function.", function() {
+      should.throws(() => controller.getAll(), "Method not implemented.");
+    });
+
+    it("should have a getAllPopulated function.", function() {
+      should.throws(
+        () => controller.getAllPopulated(),
+        "Method not implemented."
+      );
+    });
+
+    it("should have a count function.", function() {
+      should.throws(() => controller.count(), "Method not implemented.");
+    });
+
+    it("should have a validate function.", function() {
+      should.throws(
+        () => controller.validate(new Phase()),
+        "Method not implemented."
+      );
+    });
+
+    it("should have a save function.", function() {
+      should.throws(
+        () => controller.save(new Phase()),
+        "Method not implemented."
+      );
+    });
+
+    it("should have a deleteById function.", function() {
+      should.throws(() => controller.deleteById(""), "Method not implemented.");
+    });
   });
-
-  it("should have a getById function.", function() {
-    should.throws(() => controller.getById(""), "Method not implemented.");
-  });
-
-  it("should have a getAll function.", function() {
-    should.throws(() => controller.getAll(), "Method not implemented.");
-  });
-
-  it("should have a getAllPopulated function.", function() {
-    should.throws(
-      () => controller.getAllPopulated(),
-      "Method not implemented."
-    );
-  });
-
-  it("should have a count function.", function() {
-    should.throws(() => controller.count(), "Method not implemented.");
-  });
-
-  it("should have a validate function.", function() {
-    should.throws(
-      () => controller.validate(new Phase()),
-      "Method not implemented."
-    );
-  });
-
-  it("should have a save function.", function() {
-    should.throws(
-      () => controller.save(new Phase()),
-      "Method not implemented."
-    );
-  });
-
-  it("should have a deleteById function.", function() {
-    should.throws(() => controller.deleteById(""), "Method not implemented.");
-  });
-});
+}

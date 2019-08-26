@@ -2,7 +2,7 @@
   "extends": "../../../base.tsconfig.json",
   "compilerOptions": {
     "declarationDir": "./types",
-    "outDir": "../../out/routes/activity"
+    "outDir": "../../out/routes/abstract"
   },
   "files": ["index.ts"]
 }

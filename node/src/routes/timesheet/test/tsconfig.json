@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../test.tsconfig.json",
+  "files": ["./index.ts"],
+  "references": [{ "path": "../" }]
+}

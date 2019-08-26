@@ -4,5 +4,6 @@
     "declarationDir": "./types",
     "outDir": "../../../out/infrastructure/database"
   },
-  "files": ["./mongoose.ts"]
+  "files": ["./mongoose.ts"],
+  "references": [{ "path": "./schemas" }, { "path": "./models" }]
 }

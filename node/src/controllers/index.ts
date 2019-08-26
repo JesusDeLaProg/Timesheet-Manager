@@ -8,16 +8,24 @@ import { PhaseController } from "./phase";
 import { ProjectController } from "./project";
 import { TimesheetController } from "./timesheet";
 import { UserController } from "./user";
+import {
+  IActivityController,
+  IAuthController,
+  IClientController,
+  IPhaseController,
+  IProjectController,
+  ITimesheetController
+} from "../interfaces/controllers";
 
 export const ControllerModule = new ContainerModule(bind => {
-  bind<ActivityController>(Controllers.ActivityController).to(
+  bind<IActivityController>(Controllers.ActivityController).to(
     ActivityController
   );
-  bind<AuthController>(Controllers.AuthController).to(AuthController);
-  bind<ClientController>(Controllers.ClientController).to(ClientController);
-  bind<PhaseController>(Controllers.PhaseController).to(PhaseController);
-  bind<ProjectController>(Controllers.ProjectController).to(ProjectController);
-  bind<TimesheetController>(Controllers.TimesheetController).to(
+  bind<IAuthController>(Controllers.AuthController).to(AuthController);
+  bind<IClientController>(Controllers.ClientController).to(ClientController);
+  bind<IPhaseController>(Controllers.PhaseController).to(PhaseController);
+  bind<IProjectController>(Controllers.ProjectController).to(ProjectController);
+  bind<ITimesheetController>(Controllers.TimesheetController).to(
     TimesheetController
   );
   bind<UserController>(Controllers.UserController).to(UserController);

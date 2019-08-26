@@ -18,18 +18,19 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Mocha Current File",
+            "name": "Mocha On Project",
             "program": "${workspaceFolder}/node/node_modules/.bin/mocha",
             "args": [
+              "--exit",
               "--timeout",
               "60000",
               "--colors",
-              "${file}",
+              "${workspaceFolder}/node/src/test/index.ts",
               "--require",
               "ts-node/register"
             ],
             "env": {
-                "TS_NODE_PROJECT": "${fileDirname}/tsconfig.json"
+                "TS_NODE_PROJECT": "${workspaceFolder}/node/src/test/tsconfig.json"
             },
             "console": "integratedTerminal",
             "sourceMaps": true,

@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+export { ModelModule } from "../models";
 
 export const mongoServer = new MongoMemoryServer();
 

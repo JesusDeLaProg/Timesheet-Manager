@@ -1,8 +1,10 @@
+import { injectable } from "inversify";
 import { Document, Error, Model as ModelType } from "mongoose";
 
 import { QueryOptions, IController } from "../../interfaces/controllers";
 import { IViewInterface, CrudResult } from "../../../../types/viewmodels";
 
+@injectable()
 export abstract class AbstractController<T extends IViewInterface>
   implements IController<T> {
   constructor(private Model: ModelType<T & Document>) {}

@@ -4,7 +4,7 @@
     "declarationDir": "./types",
     "outDir": "../out"
   },
-  "files": ["./app.ts"],
+  "files": ["./app.ts", "./create-app.ts"],
   "references": [
     { "path": "./routes" },
     { "path": "./infrastructure" },
