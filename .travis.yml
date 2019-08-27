@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - 10
+  - 12
+install:
+  - npm install
+  - cd node && npm install && cd ..
+script:
+  - cd node
+  - npm lint
+  - npm test
+  - cd ..
