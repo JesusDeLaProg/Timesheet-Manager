@@ -1,5 +1,6 @@
 import { IActivityController } from "../../interfaces/controllers";
-export declare class ActivityRouter {
+import { HasRouter } from "../../interfaces/routers";
+export declare class ActivityRouter implements HasRouter {
     private _activityController;
     readonly router: import("express-serve-static-core").Router;
     constructor(_activityController: IActivityController);

@@ -1,5 +1,6 @@
 import { IClientController } from "../../interfaces/controllers";
-export declare class ClientRouter {
+import { HasRouter } from "../../interfaces/routers";
+export declare class ClientRouter implements HasRouter {
     private _clientController;
     readonly router: import("express-serve-static-core").Router;
     constructor(_clientController: IClientController);

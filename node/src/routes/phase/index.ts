@@ -2,11 +2,12 @@ import { inject, injectable } from "inversify";
 import { Router } from "express";
 
 import Controllers from "../../constants/symbols/controllers";
+import { HasRouter } from "../../interfaces/routers";
 import { IPhaseController } from "../../interfaces/controllers";
 import utils from "../abstract";
 
 @injectable()
-export class PhaseRouter {
+export class PhaseRouter implements HasRouter {
   readonly router = Router();
 
   constructor(

@@ -4,13 +4,14 @@ import ms from "ms";
 
 import Controllers from "../../constants/symbols/controllers";
 import { IAuthController } from "../../interfaces/controllers";
+import { HasRouter } from "../../interfaces/routers";
 import utils from "../abstract";
 import { CrudResult } from "../../../../types/viewmodels";
 
 const tokenCookieName = "SESSIONID";
 
 @injectable()
-export class AuthRouter {
+export class AuthRouter implements HasRouter {
   readonly router = Router();
 
   constructor(

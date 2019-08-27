@@ -1,5 +1,6 @@
 import { IUserController } from "../../interfaces/controllers";
-export declare class UserRouter {
+import { HasRouter } from "../../interfaces/routers";
+export declare class UserRouter implements HasRouter {
     private _userController;
     readonly router: import("express-serve-static-core").Router;
     constructor(_userController: IUserController);

@@ -3,10 +3,11 @@ import { Router } from "express";
 
 import Controllers from "../../constants/symbols/controllers";
 import { IActivityController } from "../../interfaces/controllers";
+import { HasRouter } from "../../interfaces/routers";
 import utils from "../abstract";
 
 @injectable()
-export class ActivityRouter {
+export class ActivityRouter implements HasRouter {
   readonly router = Router();
 
   constructor(

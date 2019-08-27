@@ -6,6 +6,7 @@ import path from "path";
 import initializeContainer from "./infrastructure/ioc";
 import Routers from "./constants/symbols/routers";
 import { ModelModule } from "./infrastructure/database/models";
+import { HasRouter } from "./interfaces/routers";
 import { ControllerModule } from "./controllers";
 import { RouterModule, ApiRouter } from "./routes";
 
@@ -22,7 +23,7 @@ export function createExpressApp() {
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, "public")));
-  app.use("/api", iocContainer.get<ApiRouter>(Routers.ApiRouter).router);
+  app.use("/api", iocContainer.get<HasRouter>(Routers.ApiRouter).router);
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     res
       .status(500)

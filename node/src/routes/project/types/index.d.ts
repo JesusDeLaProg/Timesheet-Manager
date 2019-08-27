@@ -1,5 +1,6 @@
 import { IProjectController } from "../../interfaces/controllers";
-export declare class ProjectRouter {
+import { HasRouter } from "../../interfaces/routers";
+export declare class ProjectRouter implements HasRouter {
     private _projectController;
     readonly router: import("express-serve-static-core").Router;
     constructor(_projectController: IProjectController);
