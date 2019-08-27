@@ -1,7 +1,15 @@
 import { Model, Document } from "mongoose";
 import DataModels from "../../../types/datamodels";
 
-export type UserDocument = DataModels.IUser & Document;
+export interface IUserExt {
+  // Virtuals
+  plainTextPassword: string
+
+  // Instance methods
+  checkPasswords(password: string): boolean;
+}
+
+export type UserDocument = DataModels.IUser & IUserExt & Document;
 
 export type ActivityDocument = DataModels.IActivity & Document;
 

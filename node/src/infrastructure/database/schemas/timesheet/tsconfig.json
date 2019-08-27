@@ -4,5 +4,6 @@
     "declarationDir": "./types",
     "outDir": "../../../out/infrastructure/database"
   },
-  "files": ["./index.ts"]
+  "files": ["./index.ts", "./roadsheet.ts"],
+  "references": [{ "path": "../../validators" }]
 }
