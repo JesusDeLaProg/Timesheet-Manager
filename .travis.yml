@@ -4,9 +4,11 @@ node_js:
   - 12
 install:
   - npm install
-  - cd node && npm install && cd ..
+  - cd node
+  - npm install
+  - cd ..
 script:
   - cd node
-  - npm lint
+  - npm run lint
   - npm test
   - cd ..
