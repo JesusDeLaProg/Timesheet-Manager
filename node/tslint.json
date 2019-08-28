@@ -7,6 +7,10 @@
         "exclude": ["bin/www"]
     },
     "jsRules": {},
-    "rules": {},
+    "rules": {
+        "trailing-comma": {
+            "severity": "off"
+        }
+    },
     "rulesDirectory": []
 }
