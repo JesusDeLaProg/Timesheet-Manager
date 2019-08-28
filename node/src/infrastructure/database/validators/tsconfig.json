@@ -1,0 +1,9 @@
+{
+  "extends": "../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "../../../../out/infrastructure/database/validators"
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["./types"]
+}

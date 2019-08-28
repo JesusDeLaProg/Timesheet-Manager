@@ -9,10 +9,32 @@
             "request": "launch",
             "name": "nodemon",
             "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/nodemon",
+            "cwd": "${workspaceFolder}/node",
             "program": "${workspaceFolder}/node/bin/www",
             "restart": true,
             "console": "integratedTerminal",
-            "internalConsoleOptions": "openOnSessionStart"
-        }
+            "internalConsoleOptions": "openOnFirstSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha On Project",
+            "program": "${workspaceFolder}/node/node_modules/.bin/mocha",
+            "args": [
+              "--exit",
+              "--timeout",
+              "60000",
+              "--colors",
+              "${workspaceFolder}/node/src/test/index.ts",
+              "--require",
+              "ts-node/register"
+            ],
+            "env": {
+                "TS_NODE_PROJECT": "${workspaceFolder}/node/src/test/tsconfig.json"
+            },
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen"
+      }
     ]
 }
