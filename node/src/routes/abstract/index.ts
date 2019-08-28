@@ -21,9 +21,9 @@ export default {
 
   buildErrorCrudResultFromError(error: any): CrudResult {
     return {
-      success: false,
       message: error.message,
-      result: error
+      result: error,
+      success: false
     };
   },
 

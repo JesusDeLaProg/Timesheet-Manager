@@ -6,8 +6,8 @@ export default function unique(
   message: string
 ): SchemaTypeOpts.AsyncPromiseValidationOpts {
   return {
-    type: "UniqueValidator",
     msg: message,
+    type: "UniqueValidator",
     async validator(this: Document, value: any) {
       if (mongoose.modelNames().indexOf(modelName) === -1) {
         throw new Error(`modelName "${modelName}" does not exist.`);

@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-sort-keys */
 import mongoose, { Schema, Types } from "mongoose";
 
 import moment from "moment";
@@ -45,7 +46,7 @@ function lineInternalUniquenessValidator() {
 
       const lines = this.parentArray() as unknown[];
       const filtered = (lines as ITimesheetLine[]).filter(
-        line =>
+        (line) =>
           project.equals(line.project) &&
           phase.equals(line.phase) &&
           activity.equals(line.activity) &&

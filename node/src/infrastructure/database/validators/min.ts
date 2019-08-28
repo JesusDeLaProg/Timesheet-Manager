@@ -1,15 +1,15 @@
 import { SchemaTypeOpts } from "mongoose";
 
 export default function min(
-  number: number,
+  minimum: number,
   message: string,
   equal: boolean = false
 ): SchemaTypeOpts.ValidateOpts {
   return {
-    type: "NumberMinimumValidator",
     msg: message,
+    type: "NumberMinimumValidator",
     validator(value: number) {
-      return equal ? value >= number : value > number;
+      return equal ? value >= minimum : value > minimum;
     }
   };
 }

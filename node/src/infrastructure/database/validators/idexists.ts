@@ -5,8 +5,8 @@ export default function idexists(
   message: string
 ): SchemaTypeOpts.AsyncPromiseValidationOpts {
   return {
-    type: "IdExistsValidator",
     msg: message,
+    type: "IdExistsValidator",
     async validator(this: Document, value: string | Types.ObjectId) {
       if (mongoose.modelNames().indexOf(modelName) === -1) {
         throw new Error(`modelName "${modelName} does not exist.`);

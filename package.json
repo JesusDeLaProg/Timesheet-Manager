@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "pretty": "prettier --write \"node/src/{,**/}!(*.d.ts|*.d.ts.map)\""
+    "pretty": "prettier --arrow-parens always --write \"node/src/{,**/}!(*.d.ts|*.d.ts.map)\""
   },
   "dependencies": {},
   "description": "Timesheet-Manager.",
@@ -35,7 +35,7 @@
   },
   "lint-staged": {
     "node/src/{,**/}!(*.d.ts|*.d.ts.map)": [
-      "prettier --write",
+      "prettier --arrow-parens always --write",
       "git add"
     ]
   }

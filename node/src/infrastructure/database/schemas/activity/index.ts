@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-sort-keys */
 import { Schema } from "mongoose";
 
 import unique from "../../validators/unique";

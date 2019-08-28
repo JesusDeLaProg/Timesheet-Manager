@@ -43,7 +43,7 @@ export default function buildTestSuite(
         .get(baseUrl + "/logout")
         .set("Accept", "application/json")
         .send()
-        .expect(response => {
+        .expect((response) => {
           const cookies = parseCookies(response.get("Set-Cookie"), {
             map: true
           });

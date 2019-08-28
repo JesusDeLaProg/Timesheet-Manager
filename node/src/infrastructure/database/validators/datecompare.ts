@@ -8,8 +8,8 @@ export default function datecompare(
   message: string
 ): SchemaTypeOpts.ValidateOpts {
   return {
-    type: "DateComparisonValidator",
     msg: message,
+    type: "DateComparisonValidator",
     validator(this: Types.Embedded, value: Date) {
       return moment(value).isBetween(
         startDate(this.ownerDocument() as any),

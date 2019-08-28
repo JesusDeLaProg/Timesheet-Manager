@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-sort-keys */
 import base64url from "base64url";
 import crypto from "crypto";
 import { Schema } from "mongoose";
@@ -87,7 +88,7 @@ export const UserSchema = new Schema({
           const parts = value.split(".");
           return (
             parts.length === 5 &&
-            parts.every(part => isLength(part, { min: 1 }))
+            parts.every((part) => isLength(part, { min: 1 }))
           );
         }
       }
@@ -110,7 +111,7 @@ function encryptPassword(
   encryptionFunction = encryptionFunction || (process.env.ENCFUNC as string);
   iterationCount =
     iterationCount || parseInt(process.env.ITERCOUNT as string, 10);
-  outLength = outLength || parseInt(process.env.OUTLENGTH as string);
+  outLength = outLength || parseInt(process.env.OUTLENGTH as string, 10);
 
   return [
     base64url.encode(iterationCount.toString(16)),
@@ -132,9 +133,7 @@ function encryptPassword(
 }
 
 UserSchema.virtual("plainTextPassword")
-  .get(function() {
-    return "";
-  })
+  .get(() => "")
   .set(function(this: IUser, plainTextPassword: string) {
     if (!isLength(plainTextPassword, { min: 3 })) {
       this.motDePasse = ".".repeat((plainTextPassword || { length: 0 }).length);

@@ -5,7 +5,7 @@ export { ModelModule } from "../models";
 export const mongoServer = new MongoMemoryServer();
 
 mongoServer.getConnectionString().then(
-  mongoConnectionString =>
+  (mongoConnectionString) =>
     mongoose
       .connect(mongoConnectionString, { useNewUrlParser: true })
       .then(() => console.debug("Mongoose connected.")) // tslint:disable-line:no-console

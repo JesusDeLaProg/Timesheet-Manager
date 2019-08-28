@@ -17,7 +17,7 @@ import { ProjectController } from "./project";
 import { TimesheetController } from "./timesheet";
 import { UserController } from "./user";
 
-export const ControllerModule = new ContainerModule(bind => {
+export const ControllerModule = new ContainerModule((bind) => {
   bind<IActivityController>(Controllers.ActivityController).to(
     ActivityController
   );

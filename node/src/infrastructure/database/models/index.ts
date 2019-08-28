@@ -25,7 +25,7 @@ import {
   UserSchema
 } from "../schemas";
 
-export const ModelModule = new ContainerModule(bind => {
+export const ModelModule = new ContainerModule((bind) => {
   bind<ActivityModel>(Models.Activity).toConstantValue(
     model<ActivityDocument>("Activity", ActivitySchema)
   );

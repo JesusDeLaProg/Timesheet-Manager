@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-sort-keys */
 import { Schema, Types } from "mongoose";
 
 import {
@@ -37,8 +38,9 @@ const TravelSchema = new Schema({
     required: [
       function(this: ITravel) {
         return (
-          this.expenses.filter(expense => expense.amount && expense.description)
-            .length === 0
+          this.expenses.filter(
+            (expense) => expense.amount && expense.description
+          ).length === 0
         );
       },
       "Vous devez entrer un point de départ si vous n'entrez pas de dépenses."
@@ -49,8 +51,9 @@ const TravelSchema = new Schema({
     required: [
       function(this: ITravel) {
         return (
-          this.expenses.filter(expense => expense.amount && expense.description)
-            .length === 0
+          this.expenses.filter(
+            (expense) => expense.amount && expense.description
+          ).length === 0
         );
       },
       "Vous devez entrer un point d'arrivée si vous n'entrez pas de dépenses."
@@ -61,8 +64,9 @@ const TravelSchema = new Schema({
     required: [
       function(this: ITravel) {
         return (
-          this.expenses.filter(expense => expense.amount && expense.description)
-            .length === 0
+          this.expenses.filter(
+            (expense) => expense.amount && expense.description
+          ).length === 0
         );
       },
       "Vous devez entrer une distance si vous n'entrez pas de dépenses."
@@ -94,7 +98,7 @@ export const RoadsheetLineSchema = new Schema({
               ? (value as Types.ObjectId)
               : new Types.ObjectId(value);
           const lines = this.parentArray() as unknown[]; // Wide cast for next cast to IRoadsheetLine[]
-          const filtered = (lines as IRoadsheetLine[]).filter(line =>
+          const filtered = (lines as IRoadsheetLine[]).filter((line) =>
             id.equals(line.project)
           );
           return filtered.length === 1;

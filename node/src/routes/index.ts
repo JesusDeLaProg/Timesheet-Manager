@@ -39,7 +39,7 @@ export class ApiRouter implements HasRouter {
   }
 }
 
-export const RouterModule = new ContainerModule(bind => {
+export const RouterModule = new ContainerModule((bind) => {
   bind<HasRouter>(Routers.ApiRouter).to(ApiRouter);
   bind<HasRouter>(Routers.ActivityRouter).to(ActivityRouter);
   bind<HasRouter>(Routers.AuthRouter).to(AuthRouter);
