@@ -1,15 +1,15 @@
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { Error } from "mongoose";
 
-import { AbstractController } from "../abstract";
-import {
-  QueryOptions,
-  ITimesheetController
-} from "../../interfaces/controllers";
-import { TimesheetModel, ProjectDocument } from "../../interfaces/models";
-import Models from "../../constants/symbols/models";
 import { ITimesheetLine, StringId } from "../../../../types/datamodels";
-import { IViewTimesheet, CrudResult } from "../../../../types/viewmodels";
+import { CrudResult, IViewTimesheet } from "../../../../types/viewmodels";
+import Models from "../../constants/symbols/models";
+import {
+  ITimesheetController,
+  QueryOptions
+} from "../../interfaces/controllers";
+import { ProjectDocument, TimesheetModel } from "../../interfaces/models";
+import { AbstractController } from "../abstract";
 
 @injectable()
 export class TimesheetController extends AbstractController<IViewTimesheet>
@@ -18,41 +18,41 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     super(Timesheet);
   }
 
-  getAllByUserId(
+  public getAllByUserId(
     userId: string,
     options?: QueryOptions | undefined
   ): Promise<CrudResult<IViewTimesheet[]>> {
     throw new Error("Method not implemented.");
   }
-  getByIdPopulated(
+  public getByIdPopulated(
     id: string
   ): Promise<
-    CrudResult<IViewTimesheet<StringId, ITimesheetLine<ProjectDocument>>[]>
+    CrudResult<Array<IViewTimesheet<StringId, ITimesheetLine<ProjectDocument>>>>
   > {
     throw new Error("Method not implemented.");
   }
-  getById(id: string): Promise<CrudResult<IViewTimesheet>> {
+  public getById(id: string): Promise<CrudResult<IViewTimesheet>> {
     throw new Error("Method not implemented.");
   }
-  getAll(
+  public getAll(
     options?: QueryOptions | undefined
   ): Promise<CrudResult<IViewTimesheet[]>> {
     throw new Error("Method not implemented.");
   }
-  count(): Promise<CrudResult<number>> {
+  public count(): Promise<CrudResult<number>> {
     throw new Error("Method not implemented.");
   }
-  validate(
+  public validate(
     document: IViewTimesheet
   ): Promise<CrudResult<Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  save(
+  public save(
     document: IViewTimesheet
   ): Promise<CrudResult<IViewTimesheet | Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  deleteById(id: string): Promise<CrudResult<any>> {
+  public deleteById(id: string): Promise<CrudResult<any>> {
     throw new Error("Method not implemented.");
   }
 }

@@ -1,15 +1,15 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+import moment from "moment";
 import {
   ITimesheet,
-  ITimesheetLine,
-  ITimesheetEntry
+  ITimesheetEntry,
+  ITimesheetLine
 } from "../../../../../../types/datamodels";
 import { IViewTimesheet } from "../../../../../../types/viewmodels";
 import datecompare from "../../validators/datecompare";
 import idexists from "../../validators/idexists";
 import min from "../../validators/min";
-import moment from "moment";
 import { RoadsheetLineSchema } from "./roadsheet";
 
 function lineInternalUniquenessValidator() {
@@ -17,7 +17,7 @@ function lineInternalUniquenessValidator() {
     type: "InternalUniquenessValidator",
     msg:
       "Une seule ligne peut avoir la même combinaison de projet/phase/activité/divers.",
-    validator: function(
+    validator(
       this: Types.Embedded &
         ITimesheetLine<
           string | Types.ObjectId,
@@ -26,7 +26,9 @@ function lineInternalUniquenessValidator() {
         >,
       value: string | Types.ObjectId
     ) {
-      if (!value || !this.phase || !this.activity) return true; // Only validate if all values are set
+      if (!value || !this.phase || !this.activity) {
+        return true;
+      } // Only validate if all values are set
 
       const project =
         value instanceof Types.ObjectId
@@ -59,8 +61,10 @@ function periodUniquenessValidator() {
     type: "UniqueValidator",
     msg:
       "Un employé ne peut avoir qu'une seule feuille de temps pour une même période.",
-    validator: async function(this: IViewTimesheet, value: Date) {
-      if (!value || !this.end || !this.user) return true; // Validate only if values are set.
+    async validator(this: IViewTimesheet, value: Date) {
+      if (!value || !this.end || !this.user) {
+        return true;
+      } // Validate only if values are set.
       const result = await mongoose.model("Timesheet").countDocuments({
         _id: { $ne: this._id },
         user: this.user,
@@ -141,7 +145,7 @@ const TimesheetLineSchema = new Schema({
       type: "ListLenghtValidator",
       msg:
         "Vous devez entrer le nombre d'entrées indiqué par les dates de début et de fin de la feuille de temps.",
-      validator: function(this: Types.Embedded, value: ITimesheetEntry[]) {
+      validator(this: Types.Embedded, value: ITimesheetEntry[]) {
         const timesheet = (this.ownerDocument() as unknown) as ITimesheet;
         const numberOfDays =
           moment
@@ -171,8 +175,10 @@ export const TimesheetSchema = new Schema(
         {
           type: "DateMinimumValidator",
           msg: "La date de début doit être avant la date de fin.",
-          validator: function(this: ITimesheet, value: Date) {
-            if (!value || !this.end) return true; // Validate only if values are set.
+          validator(this: ITimesheet, value: Date) {
+            if (!value || !this.end) {
+              return true;
+            } // Validate only if values are set.
             return moment(value).isBefore(this.end);
           }
         },
@@ -186,8 +192,10 @@ export const TimesheetSchema = new Schema(
         {
           type: "DateMaximumValidator",
           msg: "La date de fin doit être après la date de début.",
-          validator: function(this: ITimesheet, value: Date) {
-            if (!value || !this.begin) return true; // Validate only if values are set.
+          validator(this: ITimesheet, value: Date) {
+            if (!value || !this.begin) {
+              return true;
+            } // Validate only if values are set.
             return moment(value).isAfter(this.begin);
           }
         },
@@ -205,7 +213,7 @@ export const TimesheetSchema = new Schema(
           type: "ListLenghtValidator",
           msg:
             "Vous devez entrer au moins une ligne sur cette feuille de temps.",
-          validator: function(value: ITimesheetLine[]) {
+          validator(value: ITimesheetLine[]) {
             return value.length > 0;
           }
         }

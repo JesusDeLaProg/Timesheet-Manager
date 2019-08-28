@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 
-import unique from "../../validators/unique";
 import idexists from "../../validators/idexists";
+import unique from "../../validators/unique";
 
 export const PhaseSchema = new Schema(
   {

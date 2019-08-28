@@ -10,7 +10,7 @@ export default function datecompare(
   return {
     type: "DateComparisonValidator",
     msg: message,
-    validator: function(this: Types.Embedded, value: Date) {
+    validator(this: Types.Embedded, value: Date) {
       return moment(value).isBetween(
         startDate(this.ownerDocument() as any),
         endDate(this.ownerDocument() as any),

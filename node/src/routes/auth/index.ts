@@ -2,17 +2,17 @@ import { Router } from "express";
 import { inject, injectable } from "inversify";
 import ms from "ms";
 
+import { CrudResult } from "../../../../types/viewmodels";
 import Controllers from "../../constants/symbols/controllers";
 import { IAuthController } from "../../interfaces/controllers";
 import { HasRouter } from "../../interfaces/routers";
 import utils from "../abstract";
-import { CrudResult } from "../../../../types/viewmodels";
 
 const tokenCookieName = "SESSIONID";
 
 @injectable()
 export class AuthRouter implements HasRouter {
-  readonly router = Router();
+  public readonly router = Router();
 
   constructor(
     @inject(Controllers.AuthController)
@@ -53,7 +53,7 @@ export class AuthRouter implements HasRouter {
       res
         .type("json")
         .status(200)
-        .send(<CrudResult>{ success: true, message: "" });
+        .send({ success: true, message: "" } as CrudResult);
     });
   }
 }

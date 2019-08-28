@@ -1,9 +1,9 @@
 export default {
-  AuthController: Symbol.for("AuthController"),
-  UserController: Symbol.for("UserController"),
   ActivityController: Symbol.for("ActivityController"),
+  AuthController: Symbol.for("AuthController"),
+  ClientController: Symbol.for("ClientController"),
   PhaseController: Symbol.for("PhaseController"),
   ProjectController: Symbol.for("ProjectController"),
-  ClientController: Symbol.for("ClientController"),
-  TimesheetController: Symbol.for("TimesheetController")
+  TimesheetController: Symbol.for("TimesheetController"),
+  UserController: Symbol.for("UserController")
 };

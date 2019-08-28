@@ -8,7 +8,7 @@ export default function min(
   return {
     type: "NumberMinimumValidator",
     msg: message,
-    validator: function(value: number) {
+    validator(value: number) {
       return equal ? value >= number : value > number;
     }
   };

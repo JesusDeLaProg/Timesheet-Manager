@@ -1,5 +1,5 @@
-import { inject, injectable } from "inversify";
 import { Router } from "express";
+import { inject, injectable } from "inversify";
 
 import Controllers from "../../constants/symbols/controllers";
 import { ITimesheetController } from "../../interfaces/controllers";
@@ -8,7 +8,7 @@ import utils from "../abstract";
 
 @injectable()
 export class TimesheetRouter implements HasRouter {
-  readonly router = Router();
+  public readonly router = Router();
 
   constructor(
     @inject(Controllers.TimesheetController)

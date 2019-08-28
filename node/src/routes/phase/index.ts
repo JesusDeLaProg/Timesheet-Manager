@@ -1,14 +1,14 @@
-import { inject, injectable } from "inversify";
 import { Router } from "express";
+import { inject, injectable } from "inversify";
 
 import Controllers from "../../constants/symbols/controllers";
-import { HasRouter } from "../../interfaces/routers";
 import { IPhaseController } from "../../interfaces/controllers";
+import { HasRouter } from "../../interfaces/routers";
 import utils from "../abstract";
 
 @injectable()
 export class PhaseRouter implements HasRouter {
-  readonly router = Router();
+  public readonly router = Router();
 
   constructor(
     @inject(Controllers.PhaseController)

@@ -1,11 +1,11 @@
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { Error } from "mongoose";
 
-import { AbstractController } from "../abstract";
-import { QueryOptions, IUserController } from "../../interfaces/controllers";
-import { UserModel } from "../../interfaces/models";
+import { CrudResult, IViewUser } from "../../../../types/viewmodels";
 import Models from "../../constants/symbols/models";
-import { IViewUser, CrudResult } from "../../../../types/viewmodels";
+import { IUserController, QueryOptions } from "../../interfaces/controllers";
+import { UserModel } from "../../interfaces/models";
+import { AbstractController } from "../abstract";
 
 @injectable()
 export class UserController extends AbstractController<IViewUser>
@@ -14,24 +14,28 @@ export class UserController extends AbstractController<IViewUser>
     super(User);
   }
 
-  getById(id: string): Promise<CrudResult<IViewUser>> {
+  public getById(id: string): Promise<CrudResult<IViewUser>> {
     throw new Error("Method not implemented.");
   }
-  getAll(options?: QueryOptions | undefined): Promise<CrudResult<IViewUser[]>> {
+  public getAll(
+    options?: QueryOptions | undefined
+  ): Promise<CrudResult<IViewUser[]>> {
     throw new Error("Method not implemented.");
   }
-  count(): Promise<CrudResult<number>> {
+  public count(): Promise<CrudResult<number>> {
     throw new Error("Method not implemented.");
   }
-  validate(document: IViewUser): Promise<CrudResult<Error.ValidationError>> {
+  public validate(
+    document: IViewUser
+  ): Promise<CrudResult<Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  save(
+  public save(
     document: IViewUser
   ): Promise<CrudResult<IViewUser | Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  deleteById(id: string): Promise<CrudResult<any>> {
+  public deleteById(id: string): Promise<CrudResult<any>> {
     throw new Error("Method not implemented.");
   }
 }

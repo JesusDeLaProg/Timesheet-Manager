@@ -1,14 +1,14 @@
 import cookieParser from "cookie-parser";
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import logger from "morgan";
 import path from "path";
 
-import initializeContainer from "./infrastructure/ioc";
 import Routers from "./constants/symbols/routers";
-import { ModelModule } from "./infrastructure/database/models";
-import { HasRouter } from "./interfaces/routers";
 import { ControllerModule } from "./controllers";
-import { RouterModule, ApiRouter } from "./routes";
+import { ModelModule } from "./infrastructure/database/models";
+import initializeContainer from "./infrastructure/ioc";
+import { HasRouter } from "./interfaces/routers";
+import { RouterModule } from "./routes";
 
 export function createExpressApp() {
   const app = express();

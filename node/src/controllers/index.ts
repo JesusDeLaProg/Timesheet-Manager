@@ -1,13 +1,6 @@
 import { ContainerModule } from "inversify";
 
 import Controllers from "../constants/symbols/controllers";
-import { ActivityController } from "./activity";
-import { AuthController } from "./auth";
-import { ClientController } from "./client";
-import { PhaseController } from "./phase";
-import { ProjectController } from "./project";
-import { TimesheetController } from "./timesheet";
-import { UserController } from "./user";
 import {
   IActivityController,
   IAuthController,
@@ -16,6 +9,13 @@ import {
   IProjectController,
   ITimesheetController
 } from "../interfaces/controllers";
+import { ActivityController } from "./activity";
+import { AuthController } from "./auth";
+import { ClientController } from "./client";
+import { PhaseController } from "./phase";
+import { ProjectController } from "./project";
+import { TimesheetController } from "./timesheet";
+import { UserController } from "./user";
 
 export const ControllerModule = new ContainerModule(bind => {
   bind<IActivityController>(Controllers.ActivityController).to(

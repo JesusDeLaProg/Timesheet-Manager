@@ -84,11 +84,10 @@ export const RoadsheetLineSchema = new Schema({
         type: "InternalUniquenessValidator",
         msg:
           "Vous ne pouvez pas utiliser plusieurs fois le même projet sur une même feuille de route",
-        validator: function(
-          this: Types.Embedded,
-          value: string | Types.ObjectId
-        ) {
-          if (!value) return true; // Only validate if value is set.
+        validator(this: Types.Embedded, value: string | Types.ObjectId) {
+          if (!value) {
+            return true;
+          } // Only validate if value is set.
 
           const id =
             value instanceof Types.ObjectId

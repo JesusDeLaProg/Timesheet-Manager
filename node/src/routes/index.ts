@@ -2,6 +2,7 @@ import { ContainerModule, inject, injectable } from "inversify";
 
 import { HasRouter } from "../interfaces/routers";
 
+import { Router } from "express";
 import Routers from "../constants/symbols/routers";
 import { ActivityRouter } from "./activity";
 import { AuthRouter } from "./auth";
@@ -10,11 +11,10 @@ import { PhaseRouter } from "./phase";
 import { ProjectRouter } from "./project";
 import { TimesheetRouter } from "./timesheet";
 import { UserRouter } from "./user";
-import { Router } from "express";
 
 @injectable()
 export class ApiRouter implements HasRouter {
-  readonly router = Router();
+  public readonly router = Router();
 
   constructor(
     @inject(Routers.ActivityRouter) private _activityRouter: ActivityRouter,

@@ -3,18 +3,18 @@ import { model } from "mongoose";
 
 import Models from "../../../constants/symbols/models";
 import {
-  ActivityModel,
   ActivityDocument,
-  ClientModel,
+  ActivityModel,
   ClientDocument,
+  ClientModel,
   PhaseDocument,
-  ProjectDocument,
-  TimesheetDocument,
-  UserDocument,
-  UserModel,
   PhaseModel,
+  ProjectDocument,
   ProjectModel,
-  TimesheetModel
+  TimesheetDocument,
+  TimesheetModel,
+  UserDocument,
+  UserModel
 } from "../../../interfaces/models";
 import {
   ActivitySchema,

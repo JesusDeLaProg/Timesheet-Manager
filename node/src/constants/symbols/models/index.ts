@@ -1,8 +1,8 @@
 export default {
-  User: Symbol.for("UserModel"),
   Activity: Symbol.for("ActivityModel"),
+  Client: Symbol.for("ClientModel"),
   Phase: Symbol.for("PhaseModel"),
   Project: Symbol.for("ProjectModel"),
-  Client: Symbol.for("ClientModel"),
-  Timesheet: Symbol.for("TimesheetModel")
+  Timesheet: Symbol.for("TimesheetModel"),
+  User: Symbol.for("UserModel")
 };

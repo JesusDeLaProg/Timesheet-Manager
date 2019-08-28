@@ -1,6 +1,6 @@
-import { Schema } from "mongoose";
 import base64url from "base64url";
 import crypto from "crypto";
+import { Schema } from "mongoose";
 import isEmail from "validator/lib/isEmail";
 import isLength from "validator/lib/isLength";
 
@@ -18,7 +18,7 @@ export const UserSchema = new Schema({
       {
         type: "StringLengthValidator",
         msg: "Le nom d'usager doit avoir au moins 3 caractères.",
-        validator: function(value: string) {
+        validator(value: string) {
           return !!value && isLength(value, { min: 3 });
         }
       }
@@ -57,7 +57,7 @@ export const UserSchema = new Schema({
       {
         type: "EmailValidator",
         msg: "Vous devez entrer un courriel valide.",
-        validator: function(value: string) {
+        validator(value: string) {
           return !value || isEmail(value);
         }
       }
@@ -71,7 +71,7 @@ export const UserSchema = new Schema({
         type: "StringLengthValidator",
         msg:
           "Votre mot de passe doit avoir une longueur d'au moins 3 caractères.",
-        validator: function(value: string) {
+        validator(value: string) {
           return !!value && isLength(value, { min: 3 });
         }
       },
@@ -79,8 +79,10 @@ export const UserSchema = new Schema({
         type: "PasswordEncryptionValidation",
         msg:
           "Une erreur est survenue lors de la sauvegarde de votre mot de passe.",
-        validator: function(value: string) {
-          if (!value || !isLength(value, { min: 3 })) return true; // Only validate if the password was encrypted.
+        validator(value: string) {
+          if (!value || !isLength(value, { min: 3 })) {
+            return true;
+          } // Only validate if the password was encrypted.
 
           const parts = value.split(".");
           return (
@@ -142,7 +144,9 @@ UserSchema.virtual("plainTextPassword")
   });
 
 UserSchema.methods.checkPasswords = function(this: IUser, password: string) {
-  if (!password) return false;
+  if (!password) {
+    return false;
+  }
 
   const parts = (this.motDePasse as string).split(".");
   const iterationCount = parseInt(base64url.decode(parts[0]), 16);

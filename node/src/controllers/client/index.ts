@@ -1,11 +1,11 @@
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { Error } from "mongoose";
 
-import { AbstractController } from "../abstract";
+import { CrudResult, IViewClient } from "../../../../types/viewmodels";
+import Models from "../../constants/symbols/models";
 import { IClientController, QueryOptions } from "../../interfaces/controllers";
 import { ClientModel } from "../../interfaces/models";
-import Models from "../../constants/symbols/models";
-import { IViewClient, CrudResult } from "../../../../types/viewmodels";
+import { AbstractController } from "../abstract";
 
 @injectable()
 export class ClientController extends AbstractController<IViewClient>
@@ -14,32 +14,34 @@ export class ClientController extends AbstractController<IViewClient>
     super(Client);
   }
 
-  getAllByName(
+  public getAllByName(
     name: string,
     options?: QueryOptions | undefined
   ): Promise<CrudResult<IViewClient[]>> {
     throw new Error("Method not implemented.");
   }
-  getById(id: string): Promise<CrudResult<IViewClient>> {
+  public getById(id: string): Promise<CrudResult<IViewClient>> {
     throw new Error("Method not implemented.");
   }
-  getAll(
+  public getAll(
     options?: QueryOptions | undefined
   ): Promise<CrudResult<IViewClient[]>> {
     throw new Error("Method not implemented.");
   }
-  count(): Promise<CrudResult<number>> {
+  public count(): Promise<CrudResult<number>> {
     throw new Error("Method not implemented.");
   }
-  validate(document: IViewClient): Promise<CrudResult<Error.ValidationError>> {
+  public validate(
+    document: IViewClient
+  ): Promise<CrudResult<Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  save(
+  public save(
     document: IViewClient
   ): Promise<CrudResult<IViewClient | Error.ValidationError>> {
     throw new Error("Method not implemented.");
   }
-  deleteById(id: string): Promise<CrudResult<any>> {
+  public deleteById(id: string): Promise<CrudResult<any>> {
     throw new Error("Method not implemented.");
   }
 }

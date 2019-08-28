@@ -1,10 +1,10 @@
 export default {
+  ActivityRouter: Symbol.for("ActivityRouter"),
   ApiRouter: Symbol.for("ApiRouter"),
   AuthRouter: Symbol.for("AuthRouter"),
-  UserRouter: Symbol.for("UserRouter"),
-  ActivityRouter: Symbol.for("ActivityRouter"),
+  ClientRouter: Symbol.for("ClientRouter"),
   PhaseRouter: Symbol.for("PhaseRouter"),
   ProjectRouter: Symbol.for("ProjectRouter"),
-  ClientRouter: Symbol.for("ClientRouter"),
-  TimesheetRouter: Symbol.for("TimesheetRouter")
+  TimesheetRouter: Symbol.for("TimesheetRouter"),
+  UserRouter: Symbol.for("UserRouter")
 };
