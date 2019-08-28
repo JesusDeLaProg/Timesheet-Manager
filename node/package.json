@@ -4,19 +4,25 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "lint": "prettier --write \"src/{,**/}!(*.d.ts|*.d.ts.map)\" && tslint -p ./src/tsconfig.json",
+    "lint": "tslint -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
-    "debug": "nodemon --inspect-brk ./bin/www"
+    "debug": "nodemon --inspect-brk ./bin/www",
+    "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"
   },
   "dependencies": {
+    "base64url": "^3.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^8.0.0",
     "express": "~4.16.1",
     "inversify": "^5.0.1",
+    "moment": "^2.24.0",
     "mongoose": "^5.6.9",
     "morgan": "~1.9.1",
-    "reflect-metadata": "^0.1.13"
+    "ms": "^2.1.2",
+    "reflect-metadata": "^0.1.13",
+    "validator": "^11.1.0"
   },
   "description": "Express server for Timesheet-Manager.",
   "main": "app.js",
@@ -41,11 +47,24 @@
   "homepage": "https://github.com/JesusDeLaProg/Timesheet-Manager#readme",
   "devDependencies": {
     "@types/cookie-parser": "^1.4.1",
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.0",
+    "@types/mocha": "^5.2.7",
+    "@types/moment": "^2.13.0",
     "@types/mongoose": "^5.5.12",
     "@types/morgan": "^1.7.36",
+    "@types/ms": "^0.7.30",
+    "@types/set-cookie-parser": "0.0.5",
+    "@types/should": "^13.0.0",
+    "@types/supertest": "^2.0.8",
+    "@types/validator": "^10.11.3",
+    "mocha": "^6.2.0",
+    "mongodb-memory-server": "^5.2.0",
     "nodemon": "^1.19.1",
-    "prettier": "1.18.2",
+    "set-cookie-parser": "^2.4.0",
+    "should": "^13.2.3",
+    "supertest": "^4.0.2",
+    "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   }
