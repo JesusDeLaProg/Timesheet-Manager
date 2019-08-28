@@ -10,4 +10,5 @@ install:
 script:
   - cd node
   - npm run lint
+  - npm test
   - cd ..
