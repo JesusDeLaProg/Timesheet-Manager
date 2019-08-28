@@ -1,6 +1,6 @@
 import { Document, Error, Model as ModelType } from "mongoose";
-import { QueryOptions, IController } from "../../interfaces/controllers";
-import { IViewInterface, CrudResult } from "../../../../types/viewmodels";
+import { CrudResult, IViewInterface } from "../../../../types/viewmodels";
+import { IController, QueryOptions } from "../../interfaces/controllers";
 export declare abstract class AbstractController<T extends IViewInterface> implements IController<T> {
     private Model;
     constructor(Model: ModelType<T & Document>);

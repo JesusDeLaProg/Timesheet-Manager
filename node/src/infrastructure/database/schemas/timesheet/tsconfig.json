@@ -2,7 +2,7 @@
   "extends": "../../../../../base.tsconfig.json",
   "compilerOptions": {
     "declarationDir": "./types",
-    "outDir": "../../../out/infrastructure/database"
+    "outDir": "../../../../../out/infrastructure/database/schemas/timesheet"
   },
   "files": ["./index.ts", "./roadsheet.ts"],
   "references": [{ "path": "../../validators" }]

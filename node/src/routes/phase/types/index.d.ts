@@ -1,5 +1,5 @@
-import { HasRouter } from "../../interfaces/routers";
 import { IPhaseController } from "../../interfaces/controllers";
+import { HasRouter } from "../../interfaces/routers";
 export declare class PhaseRouter implements HasRouter {
     private _phaseController;
     readonly router: import("express-serve-static-core").Router;

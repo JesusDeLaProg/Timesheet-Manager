@@ -5,7 +5,7 @@
  */
 
 require("../out/infrastructure/environment/setup");
-const app = require("../out/app");
+const app = require("../out/app").app;
 const debug = require("debug")("node:server");
 const http = require("http");
 

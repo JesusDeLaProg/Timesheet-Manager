@@ -1,6 +1,6 @@
+import { CrudResult } from "../../../../types/viewmodels";
 import { IAuthController } from "../../interfaces/controllers";
 import { UserModel } from "../../interfaces/models";
-import { CrudResult } from "../../../../types/viewmodels";
 export declare class AuthController implements IAuthController {
     private User;
     constructor(User: UserModel);

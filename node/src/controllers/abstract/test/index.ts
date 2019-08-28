@@ -1,8 +1,8 @@
 import "../../../infrastructure/database/testing";
 
 import { ContainerModule } from "inversify";
-import should from "should";
 import { Document, model, Schema } from "mongoose";
+import should from "should";
 
 import { AbstractController } from "../index";
 

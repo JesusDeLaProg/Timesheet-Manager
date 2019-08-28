@@ -1,8 +1,8 @@
 import { Error } from "mongoose";
-import { AbstractController } from "../abstract";
+import { CrudResult, IViewActivity } from "../../../../types/viewmodels";
 import { IActivityController, QueryOptions } from "../../interfaces/controllers";
 import { ActivityModel } from "../../interfaces/models";
-import { IViewActivity, CrudResult } from "../../../../types/viewmodels";
+import { AbstractController } from "../abstract";
 export declare class ActivityController extends AbstractController<IViewActivity> implements IActivityController {
     private Activity;
     constructor(Activity: ActivityModel);

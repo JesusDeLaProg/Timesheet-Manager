@@ -1,8 +1,8 @@
 import { Error } from "mongoose";
-import { AbstractController } from "../abstract";
-import { QueryOptions, IUserController } from "../../interfaces/controllers";
+import { CrudResult, IViewUser } from "../../../../types/viewmodels";
+import { IUserController, QueryOptions } from "../../interfaces/controllers";
 import { UserModel } from "../../interfaces/models";
-import { IViewUser, CrudResult } from "../../../../types/viewmodels";
+import { AbstractController } from "../abstract";
 export declare class UserController extends AbstractController<IViewUser> implements IUserController {
     private User;
     constructor(User: UserModel);

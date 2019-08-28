@@ -2,7 +2,7 @@
   "extends": "../../../base.tsconfig.json",
   "compilerOptions": {
     "declarationDir": "./types",
-    "outDir": "../../out/routes/client"
+    "outDir": "../../../out/routes/client"
   },
   "files": ["index.ts"],
   "references": [

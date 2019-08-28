@@ -1,12 +1,12 @@
 declare const _default: {
+    ActivityRouter: symbol;
     ApiRouter: symbol;
     AuthRouter: symbol;
-    UserRouter: symbol;
-    ActivityRouter: symbol;
+    ClientRouter: symbol;
     PhaseRouter: symbol;
     ProjectRouter: symbol;
-    ClientRouter: symbol;
     TimesheetRouter: symbol;
+    UserRouter: symbol;
 };
 export default _default;
 //# sourceMappingURL=index.d.ts.map

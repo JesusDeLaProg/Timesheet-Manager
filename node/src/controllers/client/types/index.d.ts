@@ -1,8 +1,8 @@
 import { Error } from "mongoose";
-import { AbstractController } from "../abstract";
+import { CrudResult, IViewClient } from "../../../../types/viewmodels";
 import { IClientController, QueryOptions } from "../../interfaces/controllers";
 import { ClientModel } from "../../interfaces/models";
-import { IViewClient, CrudResult } from "../../../../types/viewmodels";
+import { AbstractController } from "../abstract";
 export declare class ClientController extends AbstractController<IViewClient> implements IClientController {
     private Client;
     constructor(Client: ClientModel);

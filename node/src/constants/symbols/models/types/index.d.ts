@@ -1,10 +1,10 @@
 declare const _default: {
-    User: symbol;
     Activity: symbol;
+    Client: symbol;
     Phase: symbol;
     Project: symbol;
-    Client: symbol;
     Timesheet: symbol;
+    User: symbol;
 };
 export default _default;
 //# sourceMappingURL=index.d.ts.map
