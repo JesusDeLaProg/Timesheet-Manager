@@ -10,6 +10,14 @@
     "rules": {
         "trailing-comma": {
             "severity": "off"
+        },
+        "variable-name": {
+            "options": [
+                "check-format",
+                "allow-leading-underscore",
+                "allow-pascal-case",
+                "ban-keywords"
+            ]
         }
     },
     "rulesDirectory": []
