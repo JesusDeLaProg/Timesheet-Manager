@@ -19,7 +19,7 @@
             "type": "node",
             "request": "launch",
             "name": "Mocha On Project",
-            "program": "${workspaceFolder}/node/node_modules/.bin/mocha",
+            "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/mocha",
             "args": [
               "--exit",
               "--timeout",

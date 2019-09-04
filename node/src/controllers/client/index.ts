@@ -1,8 +1,9 @@
 import { inject, injectable } from "inversify";
-import { Error } from "mongoose";
+import escapeRegExp from "lodash.escaperegexp";
 
-import { CrudResult, IViewClient } from "../../../../types/viewmodels";
+import { ICrudResult, IViewClient } from "../../../../types/viewmodels";
 import Models from "../../constants/symbols/models";
+import { CrudResult } from "../../infrastructure/utils/crud-result";
 import { IClientController, QueryOptions } from "../../interfaces/controllers";
 import { ClientModel } from "../../interfaces/models";
 import { AbstractController } from "../abstract";
@@ -14,34 +15,13 @@ export class ClientController extends AbstractController<IViewClient>
     super(Client);
   }
 
-  public getAllByName(
+  public async getAllByName(
     name: string,
     options?: QueryOptions | undefined
-  ): Promise<CrudResult<IViewClient[]>> {
-    throw new Error("Method not implemented.");
-  }
-  public getById(id: string): Promise<CrudResult<IViewClient>> {
-    throw new Error("Method not implemented.");
-  }
-  public getAll(
-    options?: QueryOptions | undefined
-  ): Promise<CrudResult<IViewClient[]>> {
-    throw new Error("Method not implemented.");
-  }
-  public count(): Promise<CrudResult<number>> {
-    throw new Error("Method not implemented.");
-  }
-  public validate(
-    document: IViewClient
-  ): Promise<CrudResult<Error.ValidationError>> {
-    throw new Error("Method not implemented.");
-  }
-  public save(
-    document: IViewClient
-  ): Promise<CrudResult<IViewClient | Error.ValidationError>> {
-    throw new Error("Method not implemented.");
-  }
-  public deleteById(id: string): Promise<CrudResult<any>> {
-    throw new Error("Method not implemented.");
+  ): Promise<ICrudResult<IViewClient[]>> {
+    let query = this.Client.find({ name: new RegExp(escapeRegExp(name), "i") });
+    query = this.applyQueryOptions(query, options);
+    const result = await query;
+    return CrudResult.Success(result);
   }
 }

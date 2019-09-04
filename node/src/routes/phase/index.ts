@@ -42,18 +42,6 @@ export class PhaseRouter implements HasRouter {
       }
     });
 
-    this.router.delete("/:id", async (req, res, next) => {
-      try {
-        utils.sendResultOrGiveToErrorHandler(
-          await this._phaseController.deleteById(req.params.id || ""),
-          res,
-          next
-        );
-      } catch (err) {
-        next(utils.buildErrorCrudResultFromError(err));
-      }
-    });
-
     this.router.get("/populated", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(

@@ -21,40 +21,45 @@ export default function buildTestSuite() {
     });
 
     it("should have a getById function.", function() {
-      should.throws(() => controller.getById(""), "Method not implemented.");
+      should.throws(
+        async () => await controller.getById(""),
+        "Method not implemented."
+      );
     });
 
     it("should have a getAll function.", function() {
-      should.throws(() => controller.getAll(), "Method not implemented.");
+      should.throws(
+        async () => await controller.getAll(),
+        "Method not implemented."
+      );
     });
 
     it("should have a getAllPopulated function.", function() {
       should.throws(
-        () => controller.getAllPopulated(),
+        async () => await controller.getAllPopulated(),
         "Method not implemented."
       );
     });
 
     it("should have a count function.", function() {
-      should.throws(() => controller.count(), "Method not implemented.");
+      should.throws(
+        async () => await controller.count(),
+        "Method not implemented."
+      );
     });
 
     it("should have a validate function.", function() {
       should.throws(
-        () => controller.validate(new Phase()),
+        async () => await controller.validate(new Phase()),
         "Method not implemented."
       );
     });
 
     it("should have a save function.", function() {
       should.throws(
-        () => controller.save(new Phase()),
+        async () => await controller.save(new Phase()),
         "Method not implemented."
       );
-    });
-
-    it("should have a deleteById function.", function() {
-      should.throws(() => controller.deleteById(""), "Method not implemented.");
     });
   });
 }

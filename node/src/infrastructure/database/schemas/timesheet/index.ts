@@ -8,6 +8,7 @@ import {
   ITimesheetLine
 } from "../../../../../../types/datamodels";
 import { IViewTimesheet } from "../../../../../../types/viewmodels";
+import arrayLength from "../../validators/arraylength";
 import datecompare from "../../validators/datecompare";
 import idexists from "../../validators/idexists";
 import min from "../../validators/min";
@@ -210,14 +211,11 @@ export const TimesheetSchema = new Schema(
         "Vous devez entrer une liste de ligne sur cette feuille de temps."
       ],
       validate: [
-        {
-          type: "ListLenghtValidator",
-          msg:
-            "Vous devez entrer au moins une ligne sur cette feuille de temps.",
-          validator(value: ITimesheetLine[]) {
-            return value.length > 0;
-          }
-        }
+        arrayLength(
+          1,
+          null,
+          "Vous devez entrer au moins une ligne sur cette feuille de temps."
+        )
       ]
     },
     roadsheetLines: {

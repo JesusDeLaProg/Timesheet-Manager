@@ -1,7 +1,8 @@
 import { inject, injectable } from "inversify";
 
-import { CrudResult } from "../../../../types/viewmodels";
+import { ICrudResult } from "../../../../types/viewmodels";
 import Models from "../../constants/symbols/models";
+import { CrudResult } from "../../infrastructure/utils/crud-result";
 import { IAuthController } from "../../interfaces/controllers";
 import { UserModel } from "../../interfaces/models";
 
@@ -9,10 +10,25 @@ import { UserModel } from "../../interfaces/models";
 export class AuthController implements IAuthController {
   constructor(@inject(Models.User) private User: UserModel) {}
 
-  public login(
+  public async login(
     username: string,
     password: string
-  ): Promise<CrudResult<string>> {
-    throw new Error("Method not implemented.");
+  ): Promise<ICrudResult<string>> {
+    const user = await this.User.findOne({ nomUsager: username });
+    if (!user || !user.checkPassword(password)) {
+      throw CrudResult.Failure(
+        new Error("Nom d'usager ou mot de passe invalide.")
+      );
+    }
+    if (!user.isActive) {
+      throw CrudResult.Failure(
+        new Error(
+          "Ce compte utilisateur est désactivé. " +
+            "Veuillez réactiver ce compte ou vous connecter avec un autre compte."
+        )
+      );
+    }
+    // Create and sign JWT.
+    return CrudResult.Success(null /* JWT */);
   }
 }

@@ -42,18 +42,6 @@ export class ActivityRouter implements HasRouter {
       }
     });
 
-    this.router.delete("/:id", async (req, res, next) => {
-      try {
-        utils.sendResultOrGiveToErrorHandler(
-          await this._activityController.deleteById(req.params.id || ""),
-          res,
-          next
-        );
-      } catch (err) {
-        next(utils.buildErrorCrudResultFromError(err));
-      }
-    });
-
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(

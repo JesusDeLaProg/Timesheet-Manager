@@ -22,7 +22,9 @@ export default function buildTestSuite(
     });
 
     this.afterEach(function() {
-      if (server) server.close();
+      if (server) {
+        server.close();
+      }
     });
 
     it("should have GET /", function(done) {
@@ -31,7 +33,9 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send()
         .expect(500, /Method not implemented/, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });
@@ -42,7 +46,9 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send()
         .expect(500, /Method not implemented/, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });
@@ -53,7 +59,9 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send({})
         .expect(500, /Method not implemented/, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });
@@ -64,7 +72,9 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send({})
         .expect(500, /Method not implemented/, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });

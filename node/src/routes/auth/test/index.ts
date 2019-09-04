@@ -33,7 +33,9 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send({ username: "username", password: "password" })
         .expect(500, /Method not implemented/, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });
@@ -50,7 +52,9 @@ export default function buildTestSuite(
           should(cookies["SESSIONID"].value).be.empty();
         })
         .expect(200, function(error: any) {
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
           done();
         });
     });

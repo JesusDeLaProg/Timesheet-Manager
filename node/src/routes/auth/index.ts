@@ -2,7 +2,7 @@ import { Router } from "express";
 import { inject, injectable } from "inversify";
 import ms from "ms";
 
-import { CrudResult } from "../../../../types/viewmodels";
+import { ICrudResult } from "../../../../types/viewmodels";
 import Controllers from "../../constants/symbols/controllers";
 import { IAuthController } from "../../interfaces/controllers";
 import { HasRouter } from "../../interfaces/routers";
@@ -53,7 +53,7 @@ export class AuthRouter implements HasRouter {
       res
         .type("json")
         .status(200)
-        .send({ success: true, message: "" } as CrudResult);
+        .send({ success: true, message: "", result: null });
     });
   }
 }

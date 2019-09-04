@@ -17,7 +17,10 @@ export default function buildTestSuite() {
     });
 
     it("should have a login function.", function() {
-      should.throws(() => controller.login("", ""), "Method not implemented.");
+      should.throws(
+        async () => await controller.login("", ""),
+        "Method not implemented."
+      );
     });
   });
 }

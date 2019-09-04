@@ -4,13 +4,26 @@
 
 export type StringId = string;
 
+export interface IBillingRate {
+    begin: Date;
+    end?: Date;
+    rate: number;
+    jobTitle: string;
+}
+
+export interface IBillingGroup {
+    projectType: string;
+    timeline: IBillingRate[];
+}
+
 export interface IUser {
-    nomUsager: string;
-    prenom: string;
-    nom: string;
+    username: string;
+    firstName: string;
+    lastName: string;
     role: number;
-    courriel: string;
-    motDePasse?: string;
+    email: string;
+    password?: string;
+    billingRates: IBillingGroup[];
     isActive: boolean;
 }
 
@@ -33,8 +46,7 @@ export interface IProject<TClient = StringId> {
     code: string;
     name: string;
     client: TClient;
-    fees: number;
-    method: string;
+    type: string;
     isActive: boolean;
 }
 
