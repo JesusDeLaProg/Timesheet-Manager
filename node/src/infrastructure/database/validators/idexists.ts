@@ -1,3 +1,4 @@
+import { ObjectId } from "bson";
 import mongoose, { Document, SchemaTypeOpts, Types } from "mongoose";
 
 export default function idexists(
@@ -14,10 +15,8 @@ export default function idexists(
 
       if (!value) {
         return true;
-      } // Empty ID is valid.
-
-      const id =
-        value instanceof Types.ObjectId ? value : new Types.ObjectId(value);
+      } // Do not validate if there is no id.
+      const id = value instanceof ObjectId ? value : new ObjectId(value);
 
       const result = await mongoose
         .model(modelName)

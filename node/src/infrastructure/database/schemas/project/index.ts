@@ -29,20 +29,24 @@ export const ProjectSchema = new Schema(
     client: {
       type: Schema.Types.ObjectId,
       ref: "Client",
+      required: [true, "Vous devez entrer un client."],
       validate: [idexists("Client", "Ce client n'existe pas.")]
     },
     type: {
       type: String,
+      required: [true, "Vous devez entrer un type de projet."],
       enum: {
         values: $enum(ProjectType).getValues(),
         message: `Le type de projet doit être dans [${$enum(
           ProjectType
         ).getValues()}].`
-      }
+      },
+      default: ProjectType.Public
     },
     isActive: {
       type: Boolean,
-      required: [true, "Vous devez entrer un statut pour ce projet."]
+      required: [true, "Vous devez entrer un statut pour ce projet."],
+      default: true
     }
   },
   {

@@ -53,7 +53,11 @@ export class UserController extends AbstractController<IViewUser>
       };
       return CrudResult.Failure(error);
     } else {
-      return super.save(input);
+      const result = await super.save(input);
+      if (result.success) {
+        (result.result as IViewUser).password = undefined;
+      }
+      return result;
     }
   }
 
@@ -80,7 +84,9 @@ export class UserController extends AbstractController<IViewUser>
     }
     const newPassword = input.password;
     input.password = undefined;
-    const result = (super.objectToDocument(input) as unknown) as UserDocument; // Missing IUserExt
+    const result = (await (super.objectToDocument(
+      input
+    ) as unknown)) as UserDocument; // Missing IUserExt
     if (newPassword) {
       result.plainTextPassword = newPassword;
     }

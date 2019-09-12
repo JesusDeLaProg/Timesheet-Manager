@@ -1,4 +1,3 @@
-import { Container } from "inversify";
 import "reflect-metadata";
 
 import abstractTestSuite from "../abstract/test";

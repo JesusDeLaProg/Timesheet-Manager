@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import moment from "moment";
 import { Error as MongooseError } from "mongoose";
 
 import { ITimesheetLine, StringId } from "../../../../types/datamodels";
@@ -99,6 +100,36 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     } else {
       return super.save(input);
     }
+  }
+
+  protected async objectToDocument(
+    input: IViewTimesheet
+  ): Promise<TimesheetDocument> {
+    input.begin = moment(input.begin)
+      .startOf("day")
+      .toDate();
+    input.end = moment(input.end)
+      .endOf("day")
+      .toDate();
+    input.lines = input.lines.map((line) => {
+      line.entries = line.entries.map((entry) => {
+        entry.date = moment(entry.date)
+          .startOf("day")
+          .toDate();
+        return entry;
+      });
+      return line;
+    });
+    input.roadsheetLines = input.roadsheetLines.map((rline) => {
+      rline.travels = rline.travels.map((travel) => {
+        travel.date = moment(travel.date)
+          .startOf("day")
+          .toDate();
+        return travel;
+      });
+      return rline;
+    });
+    return super.objectToDocument(input);
   }
 
   private async getAuthenticatedUser(

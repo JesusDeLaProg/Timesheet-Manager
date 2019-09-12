@@ -2,7 +2,7 @@ import { Error as MongooseError } from "mongoose";
 import { ITimesheetLine, StringId } from "../../../../types/datamodels";
 import { ICrudResult, IViewProject, IViewTimesheet } from "../../../../types/viewmodels";
 import { ITimesheetController, QueryOptions } from "../../interfaces/controllers";
-import { TimesheetModel, UserModel } from "../../interfaces/models";
+import { TimesheetDocument, TimesheetModel, UserModel } from "../../interfaces/models";
 import { AbstractController } from "../abstract";
 export declare class TimesheetController extends AbstractController<IViewTimesheet> implements ITimesheetController {
     private Timesheet;
@@ -12,6 +12,7 @@ export declare class TimesheetController extends AbstractController<IViewTimeshe
     getByIdPopulated(id: string): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
     validate(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<MongooseError.ValidationError>>;
     save(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<IViewTimesheet | MongooseError.ValidationError>>;
+    protected objectToDocument(input: IViewTimesheet): Promise<TimesheetDocument>;
     private getAuthenticatedUser;
     private validatePrivileges;
     private checkUpdatePrivileges;

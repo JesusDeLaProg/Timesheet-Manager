@@ -71,6 +71,21 @@ export const BillingRateSchema = new Schema({
     ],
     validate: [
       {
+        type: "FirstElementValidator",
+        msg: "Le premier taux horaire doit débuter le 1er janvier 1970.",
+        validator(this: IBillingRate & Types.Embedded, value: Date) {
+          const sortedBillingRates = sortBy(
+            (this.parentArray() as unknown) as IBillingRate[],
+            "begin"
+          );
+          if (sortedBillingRates.indexOf(this) === 0) {
+            return moment([1970, 0, 1]).isSame(value, "day");
+          } else {
+            return true;
+          }
+        }
+      },
+      {
         type: "DateMinimumValidator",
         msg: "La date de début doit se situer avant la date de fin.",
         validator(this: IBillingRate, value: Date) {
@@ -85,7 +100,18 @@ export const BillingRateSchema = new Schema({
   },
   end: {
     type: Date,
-    required: [true, "Vous devez entrer une date de fin pour ce taux horaire."],
+    required: [
+      function(this: IBillingRate & Types.Embedded) {
+        const sortedBillingRates = sortBy(
+          (this.parentArray() as unknown) as IBillingRate[],
+          "begin"
+        );
+        return (
+          sortedBillingRates.indexOf(this) !== sortedBillingRates.length - 1
+        );
+      },
+      "Vous devez entrer une date de fin pour ce taux horaire."
+    ],
     validate: [
       ...timelineDensityValidators(),
       {

@@ -14,7 +14,7 @@ export class AuthController implements IAuthController {
     username: string,
     password: string
   ): Promise<ICrudResult<string>> {
-    const user = await this.User.findOne({ nomUsager: username });
+    const user = await this.User.findOne({ username });
     if (!user || !user.checkPassword(password)) {
       throw CrudResult.Failure(
         new Error("Nom d'usager ou mot de passe invalide.")
