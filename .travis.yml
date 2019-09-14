@@ -12,3 +12,12 @@ script:
   - npm run lint
   - npm test
   - cd ..
+env:
+  - SALTSIZE=256
+  - ENCFUNC=sha512
+  - ITERCOUNT=100000
+  - OUTLENGTH=64
+  - APPNAME="Timesheet Manager"
+  - JWTALGO=RS256
+  - SESSIONTIMEOUT=1h
+  - ROADSHEET_DISTANCE_RATE=0.48

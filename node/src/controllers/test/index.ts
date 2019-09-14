@@ -10,7 +10,7 @@ import timesheetTestSuite from "../timesheet/test";
 import userTestSuite from "../user/test";
 
 export default function buildTestSuite() {
-  describe.skip("Controllers", function() {
+  describe("Controllers", function() {
     abstractTestSuite();
     activityTestSuite();
     authTestSuite();
