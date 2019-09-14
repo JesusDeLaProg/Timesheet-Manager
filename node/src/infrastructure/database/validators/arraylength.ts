@@ -6,8 +6,8 @@ export default function arrayLength(
   message: string
 ): SchemaTypeOpts.ValidateOpts {
   return {
-    type: "ArrayLengthValidator",
     msg: message,
+    type: "ArrayLengthValidator",
     validator(value: any[]) {
       let test = !!value;
       if (test && min !== null) {

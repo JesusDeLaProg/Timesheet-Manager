@@ -38,7 +38,7 @@ export class AuthRouter implements HasRouter {
           maxAge: sessionTimeout
         });
         res.header("X-Token-Expiration", sessionTimeout.toString());
-        delete result.result;
+        result.result = null;
         res
           .type("json")
           .status(200)
