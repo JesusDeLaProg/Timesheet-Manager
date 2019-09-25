@@ -1,4 +1,6 @@
-import { Document, Error } from "mongoose";
+import { Document, Error, Types } from "mongoose";
+
+import { JWTPayload } from "./routers";
 import { IViewInterface, IViewActivity, IViewPhase, IViewClient, IViewProject, IViewTimesheet, IViewUser, ICrudResult } from "../../../types/viewmodels";
 import { StringId, ITimesheetLine, IRoadsheetLine } from "../../../types/datamodels";
 
@@ -12,6 +14,7 @@ declare type JwtSignedToken = string;
 
 export interface IAuthController {
     login(username: string, password: string): Promise<ICrudResult<JwtSignedToken>>;
+    createJWT(payload: JWTPayload): JwtSignedToken;
 }
 
 export interface IController<T extends IViewInterface> {
@@ -37,13 +40,14 @@ export interface IProjectController extends IController<IViewProject> {
 }
 
 export interface ITimesheetController extends IController<IViewTimesheet> {
-    getAllByUserId(userId: StringId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
-    getByIdPopulated(id: StringId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
-    save(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<IViewTimesheet | Error.ValidationError>>;
-    validate(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<Error.ValidationError>>;
+    getById(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet>>;
+    getAllByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
+    getByIdPopulated(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
+    save(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet | Error.ValidationError>>;
+    validate(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<Error.ValidationError>>;
 }
 
 export interface IUserController extends IController<IViewUser> {
-    save(input: IViewUser, authenticatedUserId?: StringId): Promise<ICrudResult<IViewUser | Error.ValidationError>>;
-    validate(input: IViewUser, authenticatedUserId?: StringId): Promise<ICrudResult<Error.ValidationError>>;
+    save(input: IViewUser, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewUser | Error.ValidationError>>;
+    validate(input: IViewUser, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<Error.ValidationError>>;
 }

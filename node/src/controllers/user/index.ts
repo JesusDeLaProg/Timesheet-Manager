@@ -1,11 +1,13 @@
 import { inject, injectable } from "inversify";
 import moment from "moment";
-import { Error as MongooseError } from "mongoose";
+import { Error as MongooseError, Types } from "mongoose";
 
 import { StringId } from "../../../../types/datamodels";
 import { ICrudResult, IViewUser } from "../../../../types/viewmodels";
+import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { CrudResult } from "../../infrastructure/utils/crud-result";
+import { HasHttpCode } from "../../infrastructure/utils/has-http-code";
 import { IUserController } from "../../interfaces/controllers";
 import { UserDocument, UserModel } from "../../interfaces/models";
 import { AbstractController } from "../abstract";
@@ -21,17 +23,23 @@ export class UserController extends AbstractController<IViewUser>
     input: IViewUser,
     authenticatedUserId?: StringId
   ): Promise<ICrudResult<MongooseError.ValidationError>> {
-    if (!(await this.validatePrivileges(input, authenticatedUserId))) {
-      const error = new MongooseError.ValidationError();
-      error.message = "Privilèges utilisateurs insuffisants.";
-      error.errors = {
-        user: new MongooseError.ValidatorError({
-          message:
-            "Seulement les superutilisateurs peuvent créer un utilisateur " +
-            "spécial ou modifier le rôle d'un utilisateur."
-        })
-      };
-      return CrudResult.Failure(error);
+    let privilegesError: MongooseError.ValidationError | null;
+    if (input._id) {
+      privilegesError = await this._validatePrivileges(
+        "update",
+        authenticatedUserId,
+        input
+      );
+    } else {
+      privilegesError = await this._validatePrivileges(
+        "create",
+        authenticatedUserId,
+        input
+      );
+    }
+
+    if (privilegesError) {
+      return CrudResult.Failure(privilegesError);
     } else {
       return super.validate(input);
     }
@@ -41,31 +49,35 @@ export class UserController extends AbstractController<IViewUser>
     input: IViewUser,
     authenticatedUserId?: StringId
   ): Promise<ICrudResult<IViewUser | MongooseError.ValidationError>> {
-    if (!(await this.validatePrivileges(input, authenticatedUserId))) {
-      const error = new MongooseError.ValidationError();
-      error.message = "Privilèges utilisateurs insuffisants.";
-      error.errors = {
-        user: new MongooseError.ValidatorError({
-          message:
-            "Seulement les superutilisateurs peuvent créer ou " +
-            "modifier la feuille de temps d'un autre employé."
-        })
-      };
-      return CrudResult.Failure(error);
+    let privilegesError: MongooseError.ValidationError | null;
+    if (input._id) {
+      privilegesError = await this._validatePrivileges(
+        "update",
+        authenticatedUserId,
+        input
+      );
+    } else {
+      privilegesError = await this._validatePrivileges(
+        "create",
+        authenticatedUserId,
+        input
+      );
+    }
+
+    if (privilegesError) {
+      return CrudResult.Failure(privilegesError);
     } else {
       const result = await super.save(input);
-      if (result.success) {
-        (result.result as IViewUser).password = undefined;
-      }
+      (result.result as IViewUser).password = undefined;
       return result;
     }
   }
 
   protected async objectToDocument(input: IViewUser): Promise<UserDocument> {
-    if (input.billingRates) {
-      input.billingRates = input.billingRates.map((billingRate) => {
-        if (billingRate.timeline) {
-          billingRate.timeline = billingRate.timeline.map((rate) => {
+    if (input.billingGroups) {
+      input.billingGroups = input.billingGroups.map((group) => {
+        if (group.timeline) {
+          group.timeline = group.timeline.map((rate) => {
             if (rate.begin) {
               rate.begin = moment(rate.begin)
                 .startOf("day")
@@ -79,7 +91,7 @@ export class UserController extends AbstractController<IViewUser>
             return rate;
           });
         }
-        return billingRate;
+        return group;
       });
     }
     const newPassword = input.password;
@@ -93,56 +105,80 @@ export class UserController extends AbstractController<IViewUser>
     return result;
   }
 
-  private async getAuthenticatedUser(
-    authenticatedUserId: StringId
+  private async _getUser(
+    authenticatedUserId?: StringId | Types.ObjectId
   ): Promise<UserDocument> {
     const result = await this.User.findById(authenticatedUserId);
     return result as UserDocument;
   }
 
-  private async validatePrivileges(
-    input: IViewUser,
-    authenticatedUserId?: StringId
-  ): Promise<boolean> {
+  private async _validatePrivileges(
+    operation: "create" | "update",
+    authenticatedUserId: StringId | Types.ObjectId | undefined,
+    input: IViewUser
+  ): Promise<MongooseError.ValidationError | null> {
     if (!authenticatedUserId) {
-      throw CrudResult.Failure(new Error("No user is authenticated."));
+      const error = new Error("No user is authenticated.");
+      (error as HasHttpCode).code = 401;
+      throw error;
     }
-    const authenticatedUser = await this.getAuthenticatedUser(
-      authenticatedUserId
-    );
-    if (input._id) {
+    const authenticatedUser = await this._getUser(authenticatedUserId);
+
+    const updateOrCreateError = new MongooseError.ValidationError();
+    (updateOrCreateError as HasHttpCode).code = 400;
+    updateOrCreateError.message = "Privilèges utilisateurs insuffisants.";
+    updateOrCreateError.errors = {
+      role: new MongooseError.ValidatorError({
+        message:
+          "Seulement les superutilisateurs peuvent créer ou " +
+          "modifier la feuille de temps d'un autre employé."
+      })
+    };
+
+    if (operation === "create") {
+      return this._checkCreatePrivileges(input, authenticatedUser)
+        ? null
+        : updateOrCreateError;
+    } else {
       const originaldocument = await this.User.findById(input._id);
 
       if (!originaldocument) {
-        throw CrudResult.Failure(
-          new Error(`Cannot find user with _id "${input._id}"`)
-        );
+        const error = new Error(`Cannot find user with _id "${input._id}"`);
+        (error as HasHttpCode).code = 401;
+        throw error;
       }
 
-      return this.checkUpdatePrivileges(
+      return this._checkUpdatePrivileges(
         originaldocument,
         input,
         authenticatedUser
-      );
-    } else {
-      return this.checkCreatePrivileges(input, authenticatedUser);
+      )
+        ? null
+        : updateOrCreateError;
     }
   }
 
-  private checkUpdatePrivileges(
-    originalTimesheet: UserDocument,
-    newTimesheet: IViewUser,
+  private _checkUpdatePrivileges(
+    originalUser: UserDocument,
+    newUser: IViewUser,
     authenticatedUser: UserDocument
   ) {
-    // Only superusers can modify another user's role (Only if other user is less privileged).
-    return true;
+    // Only superadmins can modify another user's role (Only if other user is less privileged).
+    return (
+      originalUser.role === newUser.role ||
+      (authenticatedUser.role === UserRole.Superadmin &&
+        originalUser.role < UserRole.Superadmin)
+    );
   }
 
-  private checkCreatePrivileges(
-    newTimesheet: IViewUser,
+  private _checkCreatePrivileges(
+    newUser: IViewUser,
     authenticatedUser: UserDocument
   ) {
     // Only superadmins can create a special user.
-    return true;
+    return (
+      newUser.role === UserRole.Everyone ||
+      authenticatedUser.role === UserRole.Superadmin
+    );
   }
 }

@@ -10,9 +10,9 @@ export declare class UserController extends AbstractController<IViewUser> implem
     validate(input: IViewUser, authenticatedUserId?: StringId): Promise<ICrudResult<MongooseError.ValidationError>>;
     save(input: IViewUser, authenticatedUserId?: StringId): Promise<ICrudResult<IViewUser | MongooseError.ValidationError>>;
     protected objectToDocument(input: IViewUser): Promise<UserDocument>;
-    private getAuthenticatedUser;
-    private validatePrivileges;
-    private checkUpdatePrivileges;
-    private checkCreatePrivileges;
+    private _getUser;
+    private _validatePrivileges;
+    private _checkUpdatePrivileges;
+    private _checkCreatePrivileges;
 }
 //# sourceMappingURL=index.d.ts.map

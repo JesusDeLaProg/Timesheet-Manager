@@ -1,21 +1,23 @@
 import { inject, injectable } from "inversify";
 import moment from "moment";
-import { Error as MongooseError } from "mongoose";
+import { Error as MongooseError, Types } from "mongoose";
 
+import { ObjectId } from "bson";
 import { ITimesheetLine, StringId } from "../../../../types/datamodels";
 import {
   ICrudResult,
   IViewProject,
   IViewTimesheet
 } from "../../../../types/viewmodels";
+import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { CrudResult } from "../../infrastructure/utils/crud-result";
+import { HasHttpCode } from "../../infrastructure/utils/has-http-code";
 import {
   ITimesheetController,
   QueryOptions
 } from "../../interfaces/controllers";
 import {
-  ProjectDocument,
   TimesheetDocument,
   TimesheetModel,
   UserDocument,
@@ -33,10 +35,31 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     super(Timesheet);
   }
 
+  public async getById(
+    id: StringId,
+    authenticatedUserId?: StringId | Types.ObjectId
+  ): Promise<ICrudResult<IViewTimesheet>> {
+    const result = await super.getById(id);
+    if (!result.result) {
+      const error = new Error("getById returned no object.");
+      (error as HasHttpCode).code = 400;
+      throw error;
+    }
+    await this._validatePrivileges(
+      "read",
+      authenticatedUserId,
+      result.result.user
+    );
+    return result;
+  }
+
   public async getAllByUserId(
-    userId: string,
+    userId: StringId,
+    authenticatedUserId?: StringId,
     options?: QueryOptions | undefined
   ): Promise<ICrudResult<IViewTimesheet[]>> {
+    await this._validatePrivileges("read", authenticatedUserId, userId);
+
     let query = this.Timesheet.find({
       user: userId
     });
@@ -46,7 +69,8 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
   }
 
   public async getByIdPopulated(
-    id: string
+    id: string,
+    authenticatedUserId?: StringId | Types.ObjectId
   ): Promise<
     ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>
   > {
@@ -55,10 +79,13 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
       "lines.project"
     )) as unknown) as IViewTimesheet<StringId, ITimesheetLine<IViewProject>>;
     if (!result) {
-      throw CrudResult.Failure(
-        new Error(`Cannot find Timesheet with _id ${id}`)
-      );
+      const error = new Error(`Cannot find Timesheet with _id ${id}`);
+      (error as HasHttpCode).code = 400;
+      throw error;
     }
+
+    await this._validatePrivileges("read", authenticatedUserId, result.user);
+
     return CrudResult.Success(result);
   }
 
@@ -66,17 +93,22 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     input: IViewTimesheet,
     authenticatedUserId?: StringId
   ): Promise<ICrudResult<MongooseError.ValidationError>> {
-    if (!(await this.validatePrivileges(input, authenticatedUserId))) {
-      const error = new MongooseError.ValidationError();
-      error.message = "Privilèges utilisateurs insuffisants.";
-      error.errors = {
-        user: new MongooseError.ValidatorError({
-          message:
-            "Seulement les superutilisateurs peuvent créer ou " +
-            "modifier la feuille de temps d'un autre employé."
-        })
-      };
-      return CrudResult.Failure(error);
+    let privilegesError: MongooseError.ValidationError | null;
+    if (input._id) {
+      privilegesError = await this._validatePrivileges(
+        "update",
+        authenticatedUserId,
+        input
+      );
+    } else {
+      privilegesError = await this._validatePrivileges(
+        "create",
+        authenticatedUserId,
+        input
+      );
+    }
+    if (privilegesError) {
+      return CrudResult.Failure(privilegesError);
     } else {
       return super.validate(input);
     }
@@ -86,17 +118,22 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     input: IViewTimesheet,
     authenticatedUserId?: StringId
   ): Promise<ICrudResult<IViewTimesheet | MongooseError.ValidationError>> {
-    if (!(await this.validatePrivileges(input, authenticatedUserId))) {
-      const error = new MongooseError.ValidationError();
-      error.message = "Privilèges utilisateurs insuffisants.";
-      error.errors = {
-        user: new MongooseError.ValidatorError({
-          message:
-            "Seulement les superutilisateurs peuvent créer ou " +
-            "modifier la feuille de temps d'un autre employé."
-        })
-      };
-      return CrudResult.Failure(error);
+    let privilegesError: MongooseError.ValidationError | null;
+    if (input._id) {
+      privilegesError = await this._validatePrivileges(
+        "update",
+        authenticatedUserId,
+        input
+      );
+    } else {
+      privilegesError = await this._validatePrivileges(
+        "create",
+        authenticatedUserId,
+        input
+      );
+    }
+    if (privilegesError) {
+      return CrudResult.Failure(privilegesError);
     } else {
       return super.save(input);
     }
@@ -132,57 +169,124 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     return super.objectToDocument(input);
   }
 
-  private async getAuthenticatedUser(
-    authenticatedUserId: StringId
+  private async _getUser(
+    userId: StringId | Types.ObjectId
   ): Promise<UserDocument> {
-    const result = await this.User.findById(authenticatedUserId);
+    const result = await this.User.findById(userId);
     return result as UserDocument;
   }
 
-  private async validatePrivileges(
-    input: IViewTimesheet,
-    authenticatedUserId?: StringId
-  ): Promise<boolean> {
+  private _validatePrivileges(
+    operation: "read",
+    authenticatedUserId: StringId | Types.ObjectId | undefined,
+    requestedUserId: StringId | Types.ObjectId
+  ): Promise<void>;
+  private _validatePrivileges(
+    operation: "update" | "create",
+    authenticatedUserId: StringId | Types.ObjectId | undefined,
+    input: IViewTimesheet
+  ): Promise<MongooseError.ValidationError | null>;
+
+  private async _validatePrivileges(
+    operation: "read" | "update" | "create",
+    authenticatedUserId: StringId | Types.ObjectId | undefined,
+    inputOrRequestedUserId: IViewTimesheet | StringId | Types.ObjectId
+  ): Promise<MongooseError.ValidationError | null | void> {
     if (!authenticatedUserId) {
-      throw CrudResult.Failure(new Error("No user is authenticated."));
+      const error = new Error("No user is authenticated.");
+      (error as HasHttpCode).code = 401;
+      throw error;
     }
-    const authenticatedUser = await this.getAuthenticatedUser(
-      authenticatedUserId
-    );
-    if (input._id) {
-      const originaldocument = await this.Timesheet.findById(input._id);
+    const authenticatedUser = await this._getUser(authenticatedUserId);
 
-      if (!originaldocument) {
-        throw CrudResult.Failure(
-          new Error(`Cannot find timesheet with _id "${input._id}"`)
+    const updateOrCreateError = new MongooseError.ValidationError();
+    (updateOrCreateError as HasHttpCode).code = 400;
+    updateOrCreateError.message = "Privilèges utilisateurs insuffisants.";
+    updateOrCreateError.errors = {
+      user: new MongooseError.ValidatorError({
+        message:
+          "Seulement les superutilisateurs peuvent créer ou " +
+          "modifier la feuille de temps d'un autre employé."
+      })
+    };
+
+    switch (operation) {
+      case "read":
+        const userId = inputOrRequestedUserId as StringId | Types.ObjectId;
+        const requestedUser = await this._getUser(userId);
+        if (!this._checkReadPrivileges(requestedUser, authenticatedUser)) {
+          const error = new Error(
+            "Privilèges utilisateurs insuffisants. " +
+              "Les utilisateurs ordinaires peuvent seulement voir leurs propres feuilles de temps."
+          );
+          (error as HasHttpCode).code = 403;
+          throw error;
+        } else {
+          return;
+        }
+
+      case "update":
+        const updateInput = inputOrRequestedUserId as IViewTimesheet;
+        const originalTimesheet = await this.Timesheet.findById(
+          updateInput._id
         );
-      }
+        if (!originalTimesheet) {
+          const error = new Error(
+            `Cannot find timesheet with _id "${updateInput._id}"`
+          );
+          (error as HasHttpCode).code = 400;
+          throw error;
+        }
+        if (
+          !this._checkUpdatePrivileges(originalTimesheet, authenticatedUser)
+        ) {
+          return updateOrCreateError;
+        } else {
+          return null;
+        }
 
-      return this.checkUpdatePrivileges(
-        originaldocument,
-        input,
-        authenticatedUser
-      );
-    } else {
-      return this.checkCreatePrivileges(input, authenticatedUser);
+      case "create":
+        const createInput = inputOrRequestedUserId as IViewTimesheet;
+        if (!this._checkCreatePrivileges(createInput, authenticatedUser)) {
+          return updateOrCreateError;
+        } else {
+          return null;
+        }
     }
   }
 
-  private checkUpdatePrivileges(
-    originalTimesheet: TimesheetDocument,
-    newTimesheet: IViewTimesheet,
+  private _checkReadPrivileges(
+    requestedUser: UserDocument,
     authenticatedUser: UserDocument
   ) {
-    // Only Superadmins can modify a timesheet's owner.
-    // Normal users can only modify their own timesheets.
-    return true;
+    // Normal users can only request their own timesheets
+    return (
+      (authenticatedUser._id as Types.ObjectId).equals(requestedUser._id) ||
+      authenticatedUser.role > UserRole.Everyone
+    );
   }
 
-  private checkCreatePrivileges(
+  private _checkUpdatePrivileges(
+    originalTimesheet: TimesheetDocument,
+    authenticatedUser: UserDocument
+  ) {
+    const originalTimesheetOwner = new ObjectId(originalTimesheet.user);
+    // Only Superadmins can modify others' timesheets.
+    return (
+      originalTimesheetOwner.equals(authenticatedUser._id) ||
+      authenticatedUser.role === UserRole.Superadmin
+    );
+  }
+
+  private _checkCreatePrivileges(
     newTimesheet: IViewTimesheet,
     authenticatedUser: UserDocument
   ) {
+    const newTimesheetOwner = new ObjectId(newTimesheet.user);
     // Only superadmins can create timesheets for other users.
-    return true;
+    return (
+      newTimesheetOwner.equals(authenticatedUser._id) ||
+      authenticatedUser.role === UserRole.Superadmin
+    );
   }
 }

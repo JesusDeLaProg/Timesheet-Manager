@@ -36,7 +36,7 @@ function validUser(): IViewUser {
     email: "test@test.com",
     isActive: true,
     role: UserRole.Everyone,
-    billingRates: [
+    billingGroups: [
       {
         projectType: ProjectType.Public,
         timeline: [
@@ -271,7 +271,8 @@ export default function buildTestSuite() {
 
     it("should have a getById function.", async function() {
       const timesheets = await createTimesheets(1);
-      const result = await controller.getById(timesheets[0]._id);
+      const user = await User.findById(timesheets[0].user);
+      const result = await controller.getById(timesheets[0]._id, user!._id);
       should(result.success).be.true();
       should(result.result).match({ _id: timesheets[0]._id });
     });
@@ -367,9 +368,14 @@ export default function buildTestSuite() {
 
     it("should have a getAllByUserId function.", async function() {
       const timesheets = await createTimesheets(3);
+      const user = await User.findById(timesheets[0].user);
+      const otherUser = new User(validUser());
+      otherUser.username = "otheruser";
+      otherUser.plainTextPassword = "password";
+      await otherUser.save();
       const results = [
-        await controller.getAllByUserId(timesheets[0].user),
-        await controller.getAllByUserId(new ObjectId().toHexString())
+        await controller.getAllByUserId(timesheets[0].user, user!._id),
+        await controller.getAllByUserId(otherUser._id, otherUser._id)
       ];
       should(results).match([{ success: true }, { success: true }]);
       should(results[0].result).have.length(3);
@@ -395,7 +401,10 @@ export default function buildTestSuite() {
         ITimesheetLine<IViewProject>
       >;
       expectedTimesheet.lines[0].project = projects[0].toObject();
-      const result = await controller.getByIdPopulated(expectedTimesheet._id);
+      const result = await controller.getByIdPopulated(
+        expectedTimesheet._id,
+        testUser._id
+      );
       should(result).match({
         success: true,
         result: expectedTimesheet

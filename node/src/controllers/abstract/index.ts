@@ -46,6 +46,7 @@ export abstract class AbstractController<T extends IViewInterface>
       return CrudResult.Success(null);
     } catch (error) {
       if (error instanceof MongooseError.ValidationError) {
+        (error as MongooseError.ValidationError & { code: number }).code = 400;
         return CrudResult.Failure(error);
       } else {
         throw error;
@@ -62,6 +63,7 @@ export abstract class AbstractController<T extends IViewInterface>
       return CrudResult.Success(result);
     } catch (error) {
       if (error instanceof MongooseError.ValidationError) {
+        (error as MongooseError.ValidationError & { code: number }).code = 400;
         return CrudResult.Failure(error);
       } else {
         throw error;

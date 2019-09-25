@@ -7,6 +7,9 @@
   "files": ["index.ts"],
   "references": [
     { "path": "../abstract" },
-    { "path": "../../constants/symbols/controllers" }
+    { "path": "../../constants/enums" },
+    { "path": "../../constants/symbols/controllers" },
+    { "path": "../../infrastructure/auth" },
+    { "path": "../../infrastructure/utils" }
   ]
 }

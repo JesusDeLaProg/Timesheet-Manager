@@ -5,7 +5,6 @@ import sortBy from "lodash.sortby";
 import moment from "moment";
 import { Schema, SchemaTypeOpts, Types } from "mongoose";
 import { $enum } from "ts-enum-util";
-import isAfter from "validator/lib/isAfter";
 import isEmail from "validator/lib/isEmail";
 import isLength from "validator/lib/isLength";
 
@@ -92,7 +91,7 @@ export const BillingRateSchema = new Schema({
           if (!value || !this.end) {
             return true;
           }
-          return isAfter(this.end.toISOString(), value.toISOString());
+          return moment(this.end).isAfter(value);
         }
       },
       ...timelineDensityValidators()
@@ -150,7 +149,7 @@ export const BillingGroupSchema = new Schema({
     type: String,
     required: [
       true,
-      "Vous devez entrer un type de projet pour ce taux horaire."
+      "Vous devez entrer un type de projet pour ce groupe de taux horaire."
     ],
     enum: {
       values: $enum(ProjectType).getValues(),
@@ -281,7 +280,7 @@ export const UserSchema = new Schema({
     type: Boolean,
     required: [true, "Vous devez entrer un statut pour cet utilisateur."]
   },
-  billingRates: {
+  billingGroups: {
     type: [BillingGroupSchema],
     required: [
       true,

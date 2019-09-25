@@ -39,7 +39,7 @@ function validUser(): IViewUser {
     email: "test@test.com",
     isActive: true,
     role: UserRole.Everyone,
-    billingRates: [
+    billingGroups: [
       {
         projectType: ProjectType.Public,
         timeline: [
@@ -264,10 +264,14 @@ export default function buildTestSuite(
       User = container.get(models.User);
     });
 
-    this.beforeEach(function() {
+    this.beforeEach(async function() {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
+      const authResponse = await agent
+        .post("/api/auth/login")
+        .send({ username: "admin", password: "admin" });
+      agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
     this.afterEach(async function() {
@@ -280,7 +284,7 @@ export default function buildTestSuite(
         Client.deleteMany({}),
         Phase.deleteMany({}),
         Activity.deleteMany({}),
-        User.deleteMany({})
+        User.deleteMany({ username: { $ne: "admin" } })
       ]);
     });
 
@@ -392,11 +396,39 @@ export default function buildTestSuite(
         .set("Accept", "application/json")
         .send(timesheet)
         .expect(200);
+      timesheet.begin = moment(timesheet.begin)
+        .startOf("day")
+        .toDate();
+      timesheet.end = moment(timesheet.end)
+        .endOf("day")
+        .toDate();
+      timesheet.lines = timesheet.lines.map((line) => {
+        line.entries = line.entries.map((entry) => {
+          entry.date = moment(entry.date)
+            .startOf("day")
+            .toDate();
+          return entry;
+        });
+        return line;
+      });
+      timesheet.roadsheetLines = timesheet.roadsheetLines.map((line) => {
+        line.travels = line.travels.map((travel) => {
+          travel.date = moment(travel.date)
+            .startOf("day")
+            .toDate();
+          return travel;
+        });
+        return line;
+      });
+      const expectedTimesheet = JSON.parse(
+        JSON.stringify(timesheet)
+      ) as IViewTimesheet;
       should(response.body).match({
         message: "",
-        result: JSON.parse(JSON.stringify(timesheet)),
         success: true
       });
+      const resultTimesheet = response.body.result as IViewTimesheet;
+      should(resultTimesheet).match(expectedTimesheet);
     });
   });
 }

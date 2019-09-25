@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
 
+import authorize from "../../infrastructure/auth/authorize";
+
+import { UserRole } from "../../constants/enums/user-role";
 import Controllers from "../../constants/symbols/controllers";
 import { ITimesheetController } from "../../interfaces/controllers";
 import { HasRouter } from "../../interfaces/routers";
@@ -20,8 +23,9 @@ export class TimesheetRouter implements HasRouter {
   private _init() {
     this.router.post("/validate", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.validate(req.body || {}),
+          await this._timesheetController.validate(req.body || {}, userId),
           res,
           next
         );
@@ -32,8 +36,9 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.post("/save", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.save(req.body || {}),
+          await this._timesheetController.save(req.body || {}, userId),
           res,
           next
         );
@@ -44,9 +49,11 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/byUserId/:id", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.getAllByUserId(
             req.params.id || "",
+            userId,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,
@@ -59,8 +66,12 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/populated/:id", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.getByIdPopulated(req.params.id || ""),
+          await this._timesheetController.getByIdPopulated(
+            req.params.id || "",
+            userId
+          ),
           res,
           next
         );
@@ -71,8 +82,9 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/:id", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.getById(req.params.id || ""),
+          await this._timesheetController.getById(req.params.id || "", userId),
           res,
           next
         );
@@ -84,9 +96,15 @@ export class TimesheetRouter implements HasRouter {
     this.router.get("/", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.getAll(
-            utils.buildQueryOptionsFromRequest(req)
-          ),
+          req.user && req.user.role === UserRole.Everyone
+            ? await this._timesheetController.getAllByUserId(
+                req.user._id.toHexString(),
+                req.user._id,
+                utils.buildQueryOptionsFromRequest(req)
+              )
+            : await this._timesheetController.getAll(
+                utils.buildQueryOptionsFromRequest(req)
+              ),
           res,
           next
         );

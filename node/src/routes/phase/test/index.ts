@@ -29,10 +29,14 @@ export default function buildTestSuite(
       Phase = container.get(Models.Phase);
     });
 
-    this.beforeEach(function() {
+    this.beforeEach(async function() {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
+      const authResponse = await agent
+        .post("/api/auth/login")
+        .send({ username: "admin", password: "admin" });
+      agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
     this.afterEach(async function() {

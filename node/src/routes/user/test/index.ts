@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, json } from "express";
 import { Server } from "http";
 import { Container } from "inversify";
 import "reflect-metadata";
@@ -6,6 +6,7 @@ import should from "should";
 import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
+import moment from "moment";
 import { UserRouter } from "../";
 import { IViewUser } from "../../../../../types/viewmodels";
 import { ProjectType } from "../../../constants/enums/project-type";
@@ -32,7 +33,7 @@ export default function buildTestSuite(
       email: "test@test.com",
       isActive: true,
       role: UserRole.Everyone,
-      billingRates: [
+      billingGroups: [
         {
           projectType: ProjectType.Public,
           timeline: [
@@ -78,17 +79,21 @@ export default function buildTestSuite(
       User = container.get(Models.User);
     });
 
-    this.beforeEach(function() {
+    this.beforeEach(async function() {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
+      const authResponse = await agent
+        .post("/api/auth/login")
+        .send({ username: "admin", password: "admin" });
+      agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
     this.afterEach(async function() {
       if (server) {
         server.close();
       }
-      await User.deleteMany({});
+      await User.deleteMany({ username: { $ne: "admin" } });
     });
 
     it("should have GET /", async function() {
@@ -102,7 +107,10 @@ export default function buildTestSuite(
         .expect(200);
       should(response.body).match({
         message: "",
-        result: [JSON.parse(JSON.stringify(user))],
+        result: [
+          { username: "admin", isActive: true, role: UserRole.Superadmin },
+          JSON.parse(JSON.stringify(user))
+        ],
         success: true
       });
     });
@@ -124,10 +132,12 @@ export default function buildTestSuite(
     });
 
     it("should have POST /validate", async function() {
+      const user = validUser();
+      user.password = "password";
       const response = await agent
         .post(baseUrl + "/validate")
         .set("Accept", "application/json")
-        .send(validUser())
+        .send(user)
         .expect(200);
       should(response.body).match({
         message: "",
@@ -145,9 +155,26 @@ export default function buildTestSuite(
         .send(user)
         .expect(200);
       user.password = undefined;
+      user.billingGroups = user.billingGroups.map((group) => {
+        group.timeline = group.timeline.map((rate) => {
+          rate.begin =
+            rate.begin &&
+            moment(rate.begin)
+              .startOf("day")
+              .toDate();
+          rate.end =
+            rate.end &&
+            moment(rate.end)
+              .endOf("day")
+              .toDate();
+          return rate;
+        });
+        return group;
+      });
+      const expectedUser = JSON.parse(JSON.stringify(user)) as IViewUser;
       should(response.body).match({
         message: "",
-        result: user,
+        result: expectedUser,
         success: true
       });
       should(response.body.result.password).be.undefined();

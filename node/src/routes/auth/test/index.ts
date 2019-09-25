@@ -24,7 +24,7 @@ function validUser(): IViewUser {
     email: "test@test.com",
     isActive: true,
     role: UserRole.Superadmin,
-    billingRates: [
+    billingGroups: [
       {
         projectType: ProjectType.Public,
         timeline: [
@@ -79,7 +79,7 @@ export default function buildTestSuite(
       User = container.get(Models.User);
     });
 
-    this.beforeEach(function() {
+    this.beforeEach(async function() {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -87,7 +87,7 @@ export default function buildTestSuite(
 
     this.afterEach(async function() {
       server.close();
-      await User.deleteMany({});
+      await User.deleteMany({ username: { $ne: "admin" } });
     });
 
     it("should have POST /login", async function() {

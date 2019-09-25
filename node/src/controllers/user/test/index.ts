@@ -20,7 +20,7 @@ function validUser(): IViewUser {
     email: "test@test.com",
     isActive: true,
     role: UserRole.Superadmin,
-    billingRates: [
+    billingGroups: [
       {
         projectType: ProjectType.Public,
         timeline: [

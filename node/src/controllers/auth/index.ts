@@ -1,14 +1,25 @@
+import fs from "fs";
 import { inject, injectable } from "inversify";
+import jwt from "jsonwebtoken";
+import ms from "ms";
+import path from "path";
 
 import { ICrudResult } from "../../../../types/viewmodels";
 import Models from "../../constants/symbols/models";
 import { CrudResult } from "../../infrastructure/utils/crud-result";
 import { IAuthController } from "../../interfaces/controllers";
 import { UserModel } from "../../interfaces/models";
+import { JWTPayload } from "../../interfaces/routers";
 
 @injectable()
 export class AuthController implements IAuthController {
-  constructor(@inject(Models.User) private User: UserModel) {}
+  private readonly _jwtKeyOrSecret: string | Buffer;
+
+  constructor(@inject(Models.User) private User: UserModel) {
+    this._jwtKeyOrSecret =
+      process.env.JWTSECRET ||
+      fs.readFileSync(path.resolve(process.cwd(), "keys/jwt/key"));
+  }
 
   public async login(
     username: string,
@@ -28,7 +39,17 @@ export class AuthController implements IAuthController {
         )
       );
     }
-    // Create and sign JWT.
-    return CrudResult.Success(null /* JWT */);
+    const jwtoken = this.createJWT({
+      user: user.id
+    });
+    return CrudResult.Success(jwtoken);
+  }
+
+  public createJWT(payload: JWTPayload): string {
+    return jwt.sign(payload, this._jwtKeyOrSecret, {
+      algorithm: process.env.JWTALGO,
+      expiresIn: process.env.SESSIONTIMEOUT,
+      issuer: process.env.APPNAME
+    });
   }
 }

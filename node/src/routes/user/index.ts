@@ -20,8 +20,9 @@ export class UserRouter implements HasRouter {
   private _init() {
     this.router.post("/validate", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._userController.validate(req.body || {}),
+          await this._userController.validate(req.body || {}, userId),
           res,
           next
         );
@@ -32,8 +33,9 @@ export class UserRouter implements HasRouter {
 
     this.router.post("/save", async (req, res, next) => {
       try {
+        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._userController.save(req.body || {}),
+          await this._userController.save(req.body || {}, userId),
           res,
           next
         );
