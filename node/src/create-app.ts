@@ -7,6 +7,8 @@ import Routers from "./constants/symbols/routers";
 import { ControllerModule } from "./controllers";
 import { ModelModule } from "./infrastructure/database/models";
 import initializeContainer from "./infrastructure/ioc";
+import { CrudResult } from "./infrastructure/utils/crud-result";
+import { HasHttpCode } from "./infrastructure/utils/has-http-code";
 import { HasRouter } from "./interfaces/routers";
 import { RouterModule } from "./routes";
 
@@ -25,10 +27,17 @@ export function createExpressApp() {
   app.use(express.static(path.join(__dirname, "public")));
   app.use("/api", iocContainer.get<HasRouter>(Routers.ApiRouter).router);
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    res
-      .status(500)
-      .type("json")
-      .send(err);
+    if (err instanceof CrudResult) {
+      return res
+        .status((err.result as HasHttpCode).code || 500)
+        .type("json")
+        .send(err);
+    } else {
+      res
+        .status(err.code || 500)
+        .type("json")
+        .send(err);
+    }
   });
 
   return app;

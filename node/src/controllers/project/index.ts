@@ -1,8 +1,9 @@
 import { inject, injectable } from "inversify";
-import { Error } from "mongoose";
+import escapeRegExp from "lodash.escaperegexp";
 
-import { CrudResult, IViewProject } from "../../../../types/viewmodels";
+import { ICrudResult, IViewProject } from "../../../../types/viewmodels";
 import Models from "../../constants/symbols/models";
+import { CrudResult } from "../../infrastructure/utils/crud-result";
 import { IProjectController, QueryOptions } from "../../interfaces/controllers";
 import { ProjectModel } from "../../interfaces/models";
 import { AbstractController } from "../abstract";
@@ -14,34 +15,16 @@ export class ProjectController extends AbstractController<IViewProject>
     super(Project);
   }
 
-  public getAllByCode(
+  public async getAllByCode(
     code: string,
     options?: QueryOptions | undefined
-  ): Promise<CrudResult<Array<IViewProject<string>>>> {
-    throw new Error("Method not implemented.");
-  }
-  public getById(id: string): Promise<CrudResult<IViewProject<string>>> {
-    throw new Error("Method not implemented.");
-  }
-  public getAll(
-    options?: QueryOptions | undefined
-  ): Promise<CrudResult<Array<IViewProject<string>>>> {
-    throw new Error("Method not implemented.");
-  }
-  public count(): Promise<CrudResult<number>> {
-    throw new Error("Method not implemented.");
-  }
-  public validate(
-    document: IViewProject<string>
-  ): Promise<CrudResult<Error.ValidationError>> {
-    throw new Error("Method not implemented.");
-  }
-  public save(
-    document: IViewProject<string>
-  ): Promise<CrudResult<IViewProject<string> | Error.ValidationError>> {
-    throw new Error("Method not implemented.");
-  }
-  public deleteById(id: string): Promise<CrudResult<any>> {
-    throw new Error("Method not implemented.");
+  ): Promise<ICrudResult<Array<IViewProject<string>>>> {
+    let query = this.Project.find({
+      code: new RegExp(escapeRegExp(code), "i"),
+      isActive: true
+    });
+    query = this.applyQueryOptions(query, options);
+    const result = await query;
+    return CrudResult.Success(result);
   }
 }

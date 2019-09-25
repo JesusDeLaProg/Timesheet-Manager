@@ -1,58 +1,240 @@
 /* tslint:disable:object-literal-sort-keys */
 import base64url from "base64url";
 import crypto from "crypto";
-import { Schema } from "mongoose";
+import sortBy from "lodash.sortby";
+import moment from "moment";
+import { Schema, SchemaTypeOpts, Types } from "mongoose";
+import { $enum } from "ts-enum-util";
 import isEmail from "validator/lib/isEmail";
 import isLength from "validator/lib/isLength";
 
-import { IUser } from "../../../../../../types/datamodels";
+import {
+  IBillingGroup,
+  IBillingRate,
+  IUser
+} from "../../../../../../types/datamodels";
+import { ProjectType } from "../../../../constants/enums/project-type";
+import { UserRole } from "../../../../constants/enums/user-role";
+import min from "../../validators/min";
 import unique from "../../validators/unique";
 
-export const UserSchema = new Schema({
-  nomUsager: {
+function timelineDensityValidators(): SchemaTypeOpts.ValidateOpts[] {
+  return [
+    {
+      type: "TimelineDensityValidator",
+      msg: "Un taux horaire doit être actif en tout temps.",
+      validator(this: IBillingRate & Types.Embedded, value: Date) {
+        const sortedBillingRates = sortBy(
+          (this.parentArray() as unknown) as IBillingRate[],
+          "begin"
+        );
+        for (let i = 0; i < sortedBillingRates.length - 1; ++i) {
+          const end = sortedBillingRates[i].end;
+          const nextBegin = sortedBillingRates[i + 1].begin;
+          if (
+            moment.duration(moment(end).diff(nextBegin)).asMilliseconds() > 1
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+    },
+    {
+      type: "TimelineNoOverlapValidator",
+      msg: "Un seul taux horaire doit être actif en tout temps.",
+      validator(this: IBillingRate & Types.Embedded, value: Date) {
+        const sortedBillingRates = sortBy(
+          (this.parentArray() as unknown) as IBillingRate[],
+          "begin"
+        );
+        for (let i = 0; i < sortedBillingRates.length - 1; ++i) {
+          const end = sortedBillingRates[i].end;
+          const nextBegin = sortedBillingRates[i + 1].begin;
+          if (moment(end).isSameOrAfter(nextBegin, "day")) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+  ];
+}
+
+export const BillingRateSchema = new Schema({
+  begin: {
+    type: Date,
+    required: [
+      true,
+      "Vous devez entrer une date de début pour ce taux horaire."
+    ],
+    validate: [
+      {
+        type: "FirstElementValidator",
+        msg: "Le premier taux horaire doit débuter le 1er janvier 1970.",
+        validator(this: IBillingRate & Types.Embedded, value: Date) {
+          const sortedBillingRates = sortBy(
+            (this.parentArray() as unknown) as IBillingRate[],
+            "begin"
+          );
+          if (sortedBillingRates.indexOf(this) === 0) {
+            return moment([1970, 0, 1]).isSame(value, "day");
+          } else {
+            return true;
+          }
+        }
+      },
+      {
+        type: "DateMinimumValidator",
+        msg: "La date de début doit se situer avant la date de fin.",
+        validator(this: IBillingRate, value: Date) {
+          if (!value || !this.end) {
+            return true;
+          }
+          return moment(this.end).isAfter(value);
+        }
+      },
+      ...timelineDensityValidators()
+    ]
+  },
+  end: {
+    type: Date,
+    required: [
+      function(this: IBillingRate & Types.Embedded) {
+        const sortedBillingRates = sortBy(
+          (this.parentArray() as unknown) as IBillingRate[],
+          "begin"
+        );
+        return (
+          sortedBillingRates.indexOf(this) !== sortedBillingRates.length - 1
+        );
+      },
+      "Vous devez entrer une date de fin pour ce taux horaire."
+    ],
+    validate: [
+      ...timelineDensityValidators(),
+      {
+        type: "LastElementValidator",
+        msg: "Le dernier taux horaire ne doit pas avoir de date de fin.",
+        validator(this: IBillingRate & Types.Embedded, value: Date) {
+          const sortedBillingRates = sortBy(
+            (this.parentArray() as unknown) as IBillingRate[],
+            "begin"
+          );
+          if (
+            sortedBillingRates.indexOf(this) ===
+            sortedBillingRates.length - 1
+          ) {
+            return value == null;
+          } else {
+            return true;
+          }
+        }
+      }
+    ]
+  },
+  rate: {
+    type: Number,
+    required: [true, "Vous devez entrer un montant pour ce taux horaire."],
+    validate: [min(0, "Vous devez entrer un montant supérieur à 0.")]
+  },
+  jobTitle: {
     type: String,
-    required: [true, "Vous devez entrer un nom d'usager unique."],
+    required: [true, "Vous devez entrer un nom de poste pour ce taux horaire."]
+  }
+});
+
+export const BillingGroupSchema = new Schema({
+  projectType: {
+    type: String,
+    required: [
+      true,
+      "Vous devez entrer un type de projet pour ce groupe de taux horaire."
+    ],
+    enum: {
+      values: $enum(ProjectType).getValues(),
+      message: `Le type de projet doit être dans [${$enum(
+        ProjectType
+      ).getValues()}].`
+    }
+  },
+  timeline: {
+    type: [BillingRateSchema],
+    required: [
+      true,
+      "Vous devez entrer une liste de taux horaire pour ce type de projet."
+    ],
+    validate: [
+      {
+        type: "ArrayLengthValidator",
+        msg:
+          "Vous devez entrer au moins un taux horaire pour ce type de projet.",
+        validator(value: IBillingRate[]) {
+          return value && value.length > 0;
+        }
+      }
+    ]
+  }
+});
+
+export const UserSchema = new Schema({
+  username: {
+    type: String,
+    required: [true, "Vous devez entrer un nom d'utilisateur unique."],
     unique: true,
     trim: true,
     validate: [
-      unique("User", "nomUsager", "Vous devez entrer un nom d'usager unique."),
+      unique(
+        "User",
+        "username",
+        "Vous devez entrer un nom d'utilisateur unique."
+      ),
       {
         type: "StringLengthValidator",
-        msg: "Le nom d'usager doit avoir au moins 3 caractères.",
+        msg: "Le nom d'utilisateur doit avoir au moins 3 caractères.",
         validator(value: string) {
           return !!value && isLength(value, { min: 3 });
         }
       }
     ]
   },
-  prenom: {
+  firstName: {
     type: String,
     trim: true,
     required: [
       function(this: IUser) {
         return (
-          !!(this.prenom || this.nom) && (this.prenom.trim() || this.nom.trim())
+          !!(this.firstName || this.lastName) &&
+          (this.firstName.trim() || this.lastName.trim())
         );
       },
       "Vous devez entrer au moins soit un prénom, soit un nom de famille."
     ]
   },
-  nom: {
+  lastName: {
     type: String,
     trim: true,
     required: [
       function(this: IUser) {
         return (
-          !!(this.prenom || this.nom) && (this.prenom.trim() || this.nom.trim())
+          !!(this.firstName || this.lastName) &&
+          (this.firstName.trim() || this.lastName.trim())
         );
       },
       "Vous devez entrer au moins soit un prénom, soit un nom de famille."
     ]
   },
   role: {
-    type: Number
+    type: Number,
+    required: [true, "Vous devez entrer un rôle pour cet utilisateur."],
+    enum: {
+      values: $enum(UserRole).getValues(),
+      message: `Le rôle de l'utilisateur doit être dans [${$enum(
+        UserRole
+      ).getValues()}].`
+    }
   },
-  courriel: {
+  email: {
     type: String,
     validate: [
       {
@@ -64,7 +246,7 @@ export const UserSchema = new Schema({
       }
     ]
   },
-  motDePasse: {
+  password: {
     type: String,
     required: [true, "Vous devez entrer un mot de passe."],
     validate: [
@@ -90,6 +272,36 @@ export const UserSchema = new Schema({
             parts.length === 5 &&
             parts.every((part) => isLength(part, { min: 1 }))
           );
+        }
+      }
+    ]
+  },
+  isActive: {
+    type: Boolean,
+    required: [true, "Vous devez entrer un statut pour cet utilisateur."]
+  },
+  billingGroups: {
+    type: [BillingGroupSchema],
+    required: [
+      true,
+      "Vous devez entrer une liste de taux horaire pour cet employé."
+    ],
+    validate: [
+      {
+        type: "ProjectTypeCoverageValidator",
+        msg:
+          "Vous devez entrer une et une seule liste de taux horaire pour chaque type de projet.",
+        validator(value: IBillingGroup[]) {
+          let projectTypes = $enum(ProjectType).getValues();
+          for (const billingGroup of value) {
+            if (projectTypes.length === 0) {
+              return false;
+            }
+            projectTypes = projectTypes.filter(
+              (projectType) => projectType !== billingGroup.projectType
+            );
+          }
+          return projectTypes.length === 0;
         }
       }
     ]
@@ -136,25 +348,25 @@ UserSchema.virtual("plainTextPassword")
   .get(() => "")
   .set(function(this: IUser, plainTextPassword: string) {
     if (!isLength(plainTextPassword, { min: 3 })) {
-      this.motDePasse = ".".repeat((plainTextPassword || { length: 0 }).length);
+      this.password = ".".repeat((plainTextPassword || { length: 0 }).length);
     } else {
-      this.motDePasse = encryptPassword(plainTextPassword);
+      this.password = encryptPassword(plainTextPassword);
     }
   });
 
-UserSchema.methods.checkPasswords = function(this: IUser, password: string) {
+UserSchema.methods.checkPassword = function(this: IUser, password: string) {
   if (!password) {
     return false;
   }
 
-  const parts = (this.motDePasse as string).split(".");
+  const parts = (this.password as string).split(".");
   const iterationCount = parseInt(base64url.decode(parts[0]), 16);
   const encryptionFunction = base64url.decode(parts[1]);
   const outLength = parseInt(base64url.decode(parts[2]), 16);
   const salt = base64url.decode(parts[3]);
 
   return (
-    this.motDePasse ===
+    this.password ===
     encryptPassword(
       password,
       salt,

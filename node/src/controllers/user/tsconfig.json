@@ -7,6 +7,7 @@
   "files": ["./index.ts"],
   "references": [
     { "path": "../abstract" },
+    { "path": "../../constants/enums" },
     { "path": "../../constants/symbols/models" }
   ]
 }

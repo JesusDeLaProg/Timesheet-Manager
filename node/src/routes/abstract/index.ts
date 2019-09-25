@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
-import { CrudResult } from "../../../../types/viewmodels";
+import { ICrudResult } from "../../../../types/viewmodels";
 import { QueryOptions } from "../../interfaces/controllers";
 
 export default {
   sendResultOrGiveToErrorHandler(
-    result: CrudResult,
+    result: ICrudResult,
     res: Response,
     next: NextFunction
   ) {
@@ -19,7 +19,7 @@ export default {
     }
   },
 
-  buildErrorCrudResultFromError(error: any): CrudResult {
+  buildErrorCrudResultFromError(error: any): ICrudResult {
     return {
       message: error.message,
       result: error,

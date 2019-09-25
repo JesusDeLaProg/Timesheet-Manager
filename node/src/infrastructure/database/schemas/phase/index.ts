@@ -27,8 +27,7 @@ export const PhaseSchema = new Schema(
     activities: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Activity",
-        validate: [idexists("Activity", "Cette activité n'existe pas.")]
+        ref: "Activity"
       }
     ]
   },

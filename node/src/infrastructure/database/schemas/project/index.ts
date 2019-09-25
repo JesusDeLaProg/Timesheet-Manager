@@ -1,6 +1,8 @@
 /* tslint:disable:object-literal-sort-keys */
 import { Schema } from "mongoose";
+import { $enum } from "ts-enum-util";
 
+import { ProjectType } from "../../../../constants/enums/project-type";
 import idexists from "../../validators/idexists";
 import unique from "../../validators/unique";
 
@@ -27,21 +29,24 @@ export const ProjectSchema = new Schema(
     client: {
       type: Schema.Types.ObjectId,
       ref: "Client",
+      required: [true, "Vous devez entrer un client."],
       validate: [idexists("Client", "Ce client n'existe pas.")]
     },
-    fees: {
-      type: Number
-    },
-    method: {
+    type: {
       type: String,
+      required: [true, "Vous devez entrer un type de projet."],
       enum: {
-        values: ["Forfait", "Horaire avec budget"],
-        message: "Cette méthode de paiement n'existe pas."
-      }
+        values: $enum(ProjectType).getValues(),
+        message: `Le type de projet doit être dans [${$enum(
+          ProjectType
+        ).getValues()}].`
+      },
+      default: ProjectType.Public
     },
     isActive: {
       type: Boolean,
-      required: [true, "Vous devez entrer un statut pour ce projet."]
+      required: [true, "Vous devez entrer un statut pour ce projet."],
+      default: true
     }
   },
   {

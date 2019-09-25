@@ -1,8 +1,11 @@
+import { Router } from "express";
 import { ContainerModule, inject, injectable } from "inversify";
+
+import authorize from "../infrastructure/auth/authorize";
 
 import { HasRouter } from "../interfaces/routers";
 
-import { Router } from "express";
+import { UserRole } from "../constants/enums/user-role";
 import Routers from "../constants/symbols/routers";
 import { ActivityRouter } from "./activity";
 import { AuthRouter } from "./auth";
@@ -29,13 +32,51 @@ export class ApiRouter implements HasRouter {
   }
 
   private _init() {
-    this.router.use("/activity", this._activityRouter.router);
     this.router.use("/auth", this._authRouter.router);
-    this.router.use("/client", this._clientRouter.router);
-    this.router.use("/phase", this._phaseRouter.router);
-    this.router.use("/project", this._projectRouter.router);
+
+    this.router.use(this._authRouter.authenticationMiddlewares);
+
+    this.router.use(
+      "/activity",
+      authorize({
+        allow: [UserRole.Superadmin]
+      }),
+      this._activityRouter.router
+    );
+
+    this.router.use(
+      "/client",
+      authorize({
+        block: [UserRole.Everyone]
+      }),
+      this._clientRouter.router
+    );
+
+    this.router.use(
+      "/phase",
+      authorize({
+        allow: [UserRole.Superadmin]
+      }),
+      this._phaseRouter.router
+    );
+
+    this.router.use(
+      "/project",
+      authorize({
+        block: [UserRole.Everyone]
+      }),
+      this._projectRouter.router
+    );
+
     this.router.use("/timesheet", this._timesheetRouter.router);
-    this.router.use("/user", this._userRouter.router);
+
+    this.router.use(
+      "/user",
+      authorize({
+        block: [UserRole.Everyone]
+      }),
+      this._userRouter.router
+    );
   }
 }
 

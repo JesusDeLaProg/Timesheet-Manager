@@ -28,6 +28,7 @@ const TravelSchema = new Schema({
       datecompare(
         (doc: ITimesheet) => doc.begin,
         (doc: ITimesheet) => doc.end,
+        "day",
         "[]",
         "La date de ce déplacement doit se situer entre le début et la fin de cette feuille de temps."
       )
@@ -73,7 +74,10 @@ const TravelSchema = new Schema({
     ],
     min: 0
   },
-  expense: [ExpenseSchema]
+  expenses: {
+    type: [ExpenseSchema],
+    required: [true, "Vous devez fournir une liste de dépenses."]
+  }
 });
 
 export const RoadsheetLineSchema = new Schema({

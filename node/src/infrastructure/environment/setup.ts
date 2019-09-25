@@ -1,3 +1,4 @@
 import { config } from "dotenv";
+import path from "path";
 
-config();
+export default () => config();

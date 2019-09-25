@@ -7,6 +7,8 @@
   "files": ["index.ts"],
   "references": [
     { "path": "../constants/symbols/routers" },
+    { "path": "../constants/enums" },
+    { "path": "../infrastructure/auth" },
     { "path": "./abstract" },
     { "path": "./activity" },
     { "path": "./auth" },

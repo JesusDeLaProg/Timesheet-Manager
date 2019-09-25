@@ -1,19 +1,23 @@
-import { Error } from "mongoose";
+import { Error as MongooseError, Types } from "mongoose";
 import { ITimesheetLine, StringId } from "../../../../types/datamodels";
-import { CrudResult, IViewTimesheet } from "../../../../types/viewmodels";
+import { ICrudResult, IViewProject, IViewTimesheet } from "../../../../types/viewmodels";
 import { ITimesheetController, QueryOptions } from "../../interfaces/controllers";
-import { ProjectDocument, TimesheetModel } from "../../interfaces/models";
+import { TimesheetDocument, TimesheetModel, UserModel } from "../../interfaces/models";
 import { AbstractController } from "../abstract";
 export declare class TimesheetController extends AbstractController<IViewTimesheet> implements ITimesheetController {
     private Timesheet;
-    constructor(Timesheet: TimesheetModel);
-    getAllByUserId(userId: string, options?: QueryOptions | undefined): Promise<CrudResult<IViewTimesheet[]>>;
-    getByIdPopulated(id: string): Promise<CrudResult<Array<IViewTimesheet<StringId, ITimesheetLine<ProjectDocument>>>>>;
-    getById(id: string): Promise<CrudResult<IViewTimesheet>>;
-    getAll(options?: QueryOptions | undefined): Promise<CrudResult<IViewTimesheet[]>>;
-    count(): Promise<CrudResult<number>>;
-    validate(document: IViewTimesheet): Promise<CrudResult<Error.ValidationError>>;
-    save(document: IViewTimesheet): Promise<CrudResult<IViewTimesheet | Error.ValidationError>>;
-    deleteById(id: string): Promise<CrudResult<any>>;
+    private User;
+    constructor(Timesheet: TimesheetModel, User: UserModel);
+    getById(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet>>;
+    getAllByUserId(userId: StringId, authenticatedUserId?: StringId, options?: QueryOptions | undefined): Promise<ICrudResult<IViewTimesheet[]>>;
+    getByIdPopulated(id: string, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
+    validate(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<MongooseError.ValidationError>>;
+    save(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<IViewTimesheet | MongooseError.ValidationError>>;
+    protected objectToDocument(input: IViewTimesheet): Promise<TimesheetDocument>;
+    private _getUser;
+    private _validatePrivileges;
+    private _checkReadPrivileges;
+    private _checkUpdatePrivileges;
+    private _checkCreatePrivileges;
 }
 //# sourceMappingURL=index.d.ts.map

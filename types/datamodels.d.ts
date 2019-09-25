@@ -2,15 +2,31 @@
 // Project : Timesheet Manager
 // Definitions by : Maxime Charland
 
+export type IProjectType = "Public" | "Privé";
+export type IUserRole = 0 | 1 | 2 | 3;
+
 export type StringId = string;
 
+export interface IBillingRate {
+    begin: Date;
+    end?: Date;
+    rate: number;
+    jobTitle: string;
+}
+
+export interface IBillingGroup {
+    projectType: IProjectType;
+    timeline: IBillingRate[];
+}
+
 export interface IUser {
-    nomUsager: string;
-    prenom: string;
-    nom: string;
-    role: number;
-    courriel: string;
-    motDePasse?: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    role: IUserRole;
+    email: string;
+    password?: string;
+    billingGroups: IBillingGroup[];
     isActive: boolean;
 }
 
@@ -33,8 +49,7 @@ export interface IProject<TClient = StringId> {
     code: string;
     name: string;
     client: TClient;
-    fees: number;
-    method: string;
+    type: IProjectType;
     isActive: boolean;
 }
 

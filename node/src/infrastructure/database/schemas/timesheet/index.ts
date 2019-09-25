@@ -1,13 +1,17 @@
 /* tslint:disable:object-literal-sort-keys */
 import mongoose, { Schema, Types } from "mongoose";
 
+import { ObjectId } from "bson";
 import moment from "moment";
 import {
   ITimesheet,
   ITimesheetEntry,
-  ITimesheetLine
+  ITimesheetLine,
+  StringId
 } from "../../../../../../types/datamodels";
-import { IViewTimesheet } from "../../../../../../types/viewmodels";
+import { IViewPhase, IViewTimesheet } from "../../../../../../types/viewmodels";
+import { PhaseDocument } from "../../../../interfaces/models";
+import arrayLength from "../../validators/arraylength";
 import datecompare from "../../validators/datecompare";
 import idexists from "../../validators/idexists";
 import min from "../../validators/min";
@@ -27,22 +31,22 @@ function lineInternalUniquenessValidator() {
         >,
       value: string | Types.ObjectId
     ) {
-      if (!value || !this.phase || !this.activity) {
+      if (!this.project || !this.phase || !this.activity) {
         return true;
       } // Only validate if all values are set
 
       const project =
-        value instanceof Types.ObjectId
-          ? (value as Types.ObjectId)
-          : new Types.ObjectId(value);
+        this.project instanceof ObjectId
+          ? (this.project as ObjectId)
+          : new ObjectId(this.project);
       const phase =
-        this.phase instanceof Types.ObjectId
-          ? (this.phase as Types.ObjectId)
-          : new Types.ObjectId(this.phase);
+        this.phase instanceof ObjectId
+          ? (this.phase as ObjectId)
+          : new ObjectId(this.phase);
       const activity =
-        this.activity instanceof Types.ObjectId
-          ? (this.activity as Types.ObjectId)
-          : new Types.ObjectId(this.activity);
+        this.activity instanceof ObjectId
+          ? (this.activity as ObjectId)
+          : new ObjectId(this.activity);
 
       const lines = this.parentArray() as unknown[];
       const filtered = (lines as ITimesheetLine[]).filter(
@@ -63,18 +67,18 @@ function periodUniquenessValidator() {
     msg:
       "Un employé ne peut avoir qu'une seule feuille de temps pour une même période.",
     async validator(this: IViewTimesheet, value: Date) {
-      if (!value || !this.end || !this.user) {
+      if (!this.begin || !this.end || !this.user) {
         return true;
       } // Validate only if values are set.
-      const result = await mongoose.model("Timesheet").countDocuments({
+      const result = await mongoose.model("Timesheet").find({
         _id: { $ne: this._id },
         user: this.user,
         $or: [
-          { begin: { $lte: value }, end: { $gte: value } },
-          { begin: { $gte: value, $lte: this.end } }
+          { begin: { $lte: this.begin }, end: { $gte: this.begin } },
+          { begin: { $gte: this.begin, $lte: this.end } }
         ]
       });
-      return result === 0;
+      return result.length === 0;
     }
   };
 }
@@ -87,6 +91,7 @@ const TimesheetEntrySchema = new Schema({
       datecompare(
         (doc: ITimesheet) => doc.begin,
         (doc: ITimesheet) => doc.end,
+        "day",
         "[]",
         "La date de cette entrée doit être située entre le début et la fin de cette feuille de temps."
       )
@@ -132,7 +137,25 @@ const TimesheetLineSchema = new Schema({
     required: [true, "Vous devez entrer une activité pour cette ligne."],
     validate: [
       idexists("Activity", "Cette activité n'existe pas."),
-      lineInternalUniquenessValidator()
+      lineInternalUniquenessValidator(),
+      {
+        type: "PhaseActivityCompatibilityValidator",
+        msg:
+          "Vous ne pouvez pas entrer cette activité avec la phase présente sur cette ligne.",
+        async validator(
+          this: ITimesheetLine,
+          value: StringId | Types.ObjectId
+        ) {
+          if (!value || !this.phase) {
+            return true;
+          } // Only validate if values are set.
+          const id = value instanceof ObjectId ? value : new ObjectId(value);
+          const phase = (await mongoose
+            .model<PhaseDocument>("Phase")
+            .findById(this.phase)) as IViewPhase;
+          return phase.activities.findIndex((act) => id.equals(act)) !== -1;
+        }
+      }
     ]
   },
   divers: {
@@ -149,9 +172,11 @@ const TimesheetLineSchema = new Schema({
       validator(this: Types.Embedded, value: ITimesheetEntry[]) {
         const timesheet = (this.ownerDocument() as unknown) as ITimesheet;
         const numberOfDays =
-          moment
-            .duration(moment(timesheet.end).diff(timesheet.begin))
-            .asDays() + 1; // Add 1 to include the first day.
+          Math.floor(
+            moment
+              .duration(moment(timesheet.end).diff(timesheet.begin))
+              .asDays()
+          ) + 1; // Add 1 to include the first day.
         return value.length === numberOfDays;
       }
     }
@@ -210,14 +235,11 @@ export const TimesheetSchema = new Schema(
         "Vous devez entrer une liste de ligne sur cette feuille de temps."
       ],
       validate: [
-        {
-          type: "ListLenghtValidator",
-          msg:
-            "Vous devez entrer au moins une ligne sur cette feuille de temps.",
-          validator(value: ITimesheetLine[]) {
-            return value.length > 0;
-          }
-        }
+        arrayLength(
+          1,
+          null,
+          "Vous devez entrer au moins une ligne sur cette feuille de temps."
+        )
       ]
     },
     roadsheetLines: {

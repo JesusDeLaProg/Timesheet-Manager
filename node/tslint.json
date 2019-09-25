@@ -18,7 +18,12 @@
                 "allow-pascal-case",
                 "ban-keywords"
             ]
-        }
+        },
+        "only-arrow-functions": [
+            true,
+            "allow-declarations",
+            "allow-named-functions"
+        ]
     },
     "rulesDirectory": []
 }
