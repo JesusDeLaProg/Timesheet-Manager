@@ -28,11 +28,20 @@ export function createExpressApp() {
   app.use("/api", iocContainer.get<HasRouter>(Routers.ApiRouter).router);
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof CrudResult) {
+      if (err.result instanceof Error) {
+        err = CrudResult.Success(err.result + "", err.result.message);
+      }
       return res
         .status((err.result as HasHttpCode).code || 500)
         .type("json")
         .send(err);
     } else {
+      if (err instanceof Error) {
+        err = err + "";
+      }
+      if (err.info instanceof Error) {
+        err.info = err.info + "";
+      }
       res
         .status(err.code || 500)
         .type("json")

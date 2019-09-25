@@ -7,13 +7,29 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch via NPM",
+            "cwd": "${workspaceFolder}/node",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "port": 9229,
+            "outFiles": ["${workspaceFolder}/node/out/**/*.js"],
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "nodemon",
             "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/nodemon",
             "cwd": "${workspaceFolder}/node",
             "program": "${workspaceFolder}/node/bin/www",
             "restart": true,
             "console": "integratedTerminal",
-            "internalConsoleOptions": "openOnFirstSessionStart"
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",

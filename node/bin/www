@@ -3,8 +3,7 @@
 /**
  * Module dependencies.
  */
-
-require("../out/infrastructure/environment/setup");
+const envResult = require("../out/infrastructure/environment/setup").default();
 const app = require("../out/app").app;
 const debug = require("debug")("node:server");
 const http = require("http");

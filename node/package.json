@@ -7,7 +7,7 @@
     "lint": "tslint -c ./tslint.json -p ./src/tsconfig.json",
     "build": "tsc -b ./src && cp -R ./src/public ./out",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
-    "debug": "nodemon --inspect-brk ./bin/www",
+    "debug": "node --inspect-brk ./bin/www",
     "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"
   },
   "dependencies": {

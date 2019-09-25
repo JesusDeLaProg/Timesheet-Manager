@@ -292,6 +292,10 @@ export const UserSchema = new Schema({
         msg:
           "Vous devez entrer une et une seule liste de taux horaire pour chaque type de projet.",
         validator(value: IBillingGroup[]) {
+          if (value.length === 0) {
+            return true;
+          }
+
           let projectTypes = $enum(ProjectType).getValues();
           for (const billingGroup of value) {
             if (projectTypes.length === 0) {
