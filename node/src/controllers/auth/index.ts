@@ -1,7 +1,6 @@
 import fs from "fs";
 import { inject, injectable } from "inversify";
 import jwt from "jsonwebtoken";
-import ms from "ms";
 import path from "path";
 
 import { ICrudResult } from "../../../../types/viewmodels";
@@ -47,7 +46,7 @@ export class AuthController implements IAuthController {
 
   public createJWT(payload: JWTPayload): string {
     return jwt.sign(payload, this._jwtKeyOrSecret, {
-      algorithm: process.env.JWTALGO,
+      algorithm: process.env.JWTSECRET ? "HS256" : process.env.JWTALGO,
       expiresIn: process.env.SESSIONTIMEOUT,
       issuer: process.env.APPNAME
     });

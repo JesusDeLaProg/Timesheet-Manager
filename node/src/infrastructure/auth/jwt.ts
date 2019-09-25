@@ -33,7 +33,9 @@ export default function setup(verifyFunction: VerifyFunction) {
   passport.use(
     new JWTStrategy(
       {
-        algorithms: [process.env.JWTALGO || ""],
+        algorithms: [
+          process.env.JWTSECRET ? "HS256" : process.env.JWTALGO || ""
+        ],
         issuer: process.env.APPNAME,
         jwtFromRequest: extractJWT,
         secretOrKey: jwtSecretOrKey
