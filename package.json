@@ -38,7 +38,7 @@
       "prettier --arrow-parens always --write",
       "git add"
     ],
-    "angular/**/*.(html|ts|scss)": [
+    "angular/tm-app/{,**/}{*.ts,*.html,*.scss}": [
       "prettier --config angular/tm-app/.prettierrc --write"
     ]
   }
