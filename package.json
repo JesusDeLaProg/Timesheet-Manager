@@ -37,6 +37,9 @@
     "node/src/{,**/}!(*.d.ts|*.d.ts.map)": [
       "prettier --arrow-parens always --write",
       "git add"
+    ],
+    "angular/**/*.(html|ts|scss)": [
+      "prettier --config angular/tm-app/.prettierrc --write"
     ]
   }
 }
