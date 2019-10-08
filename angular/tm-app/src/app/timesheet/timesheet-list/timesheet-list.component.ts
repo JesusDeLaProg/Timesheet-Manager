@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'tm-timesheet-list',
-  templateUrl: './timesheet-list.component.html',
-  styleUrls: ['./timesheet-list.component.scss']
+  selector: "tm-timesheet-list",
+  templateUrl: "./timesheet-list.component.html",
+  styleUrls: ["./timesheet-list.component.scss"]
 })
 export class TimesheetListComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

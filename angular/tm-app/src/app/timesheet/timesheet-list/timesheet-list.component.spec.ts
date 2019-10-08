@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { TimesheetListComponent } from './timesheet-list.component';
+import { TimesheetListComponent } from "./timesheet-list.component";
 
-describe('TimesheetListComponent', () => {
+describe("TimesheetListComponent", () => {
   let component: TimesheetListComponent;
   let fixture: ComponentFixture<TimesheetListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimesheetListComponent ]
-    })
-    .compileComponents();
+      declarations: [TimesheetListComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('TimesheetListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
