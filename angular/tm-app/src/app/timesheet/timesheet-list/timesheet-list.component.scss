@@ -11,3 +11,11 @@ mat-table.main-table {
 mat-paginator.table-paginator {
   margin-bottom: $tm-spacing * 3;
 }
+
+mat-icon.user-active {
+  color: green;
+}
+
+mat-icon.user-inactive {
+  color: red;
+}

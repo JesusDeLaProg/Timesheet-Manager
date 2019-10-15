@@ -4,10 +4,132 @@
   </mat-card-title>
   <mat-card-content>
     <div class="mat-elevation-z8">
+      <nav mat-tab-nav-bar>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 1"
+          [active]="selectedUser === 1"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          Maxime Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 2"
+          [active]="selectedUser === 2"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          François Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 3"
+          [active]="selectedUser === 3"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          Maxime Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 4"
+          [active]="selectedUser === 4"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          François Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 5"
+          [active]="selectedUser === 5"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          Maxime Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 6"
+          [active]="selectedUser === 6"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          François Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 7"
+          [active]="selectedUser === 7"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          Maxime Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 8"
+          [active]="selectedUser === 8"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          François Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 9"
+          [active]="selectedUser === 9"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          Maxime Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 10"
+          [active]="selectedUser === 10"
+        >
+          <mat-icon class="user-active">person</mat-icon>
+          François Charland
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 11"
+          [active]="selectedUser === 11"
+        >
+          <mat-icon class="user-inactive">person</mat-icon>
+          Luc Robillard
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 12"
+          [active]="selectedUser === 12"
+        >
+          <mat-icon class="user-inactive">person</mat-icon>
+          Luc Robillard
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 13"
+          [active]="selectedUser === 13"
+        >
+          <mat-icon class="user-inactive">person</mat-icon>
+          Luc Robillard
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 14"
+          [active]="selectedUser === 14"
+        >
+          <mat-icon class="user-inactive">person</mat-icon>
+          Luc Robillard
+        </a>
+        <a
+          mat-tab-link
+          (click)="selectedUser = 15"
+          [active]="selectedUser === 15"
+        >
+          <mat-icon class="user-inactive">person</mat-icon>
+          Luc Robillard
+        </a>
+      </nav>
       <tm-timesheet-list-table></tm-timesheet-list-table>
       <mat-paginator
         class="table-paginator"
-        [length]="10"
+        [length]="20"
         [pageSize]="10"
       ></mat-paginator>
     </div>

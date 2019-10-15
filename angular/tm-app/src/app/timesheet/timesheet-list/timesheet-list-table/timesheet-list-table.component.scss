@@ -1,5 +1,16 @@
 @import "~src/variables";
 
-.action mat-icon {
-  margin-right: $tm-spacing;
+mat-cell.actions {
+  mat-icon {
+    margin-right: $tm-spacing;
+  }
+
+  button {
+    margin-right: $tm-spacing;
+  }
+}
+
+mat-header-cell,
+mat-cell {
+  justify-content: center;
 }

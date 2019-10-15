@@ -96,7 +96,7 @@ export class TimesheetRouter implements HasRouter {
     this.router.get("/", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          req.user && req.user.role === UserRole.Everyone
+          req.user && req.user.role && req.user.role === UserRole.Everyone
             ? await this._timesheetController.getAllByUserId(
                 req.user._id.toHexString(),
                 req.user._id,

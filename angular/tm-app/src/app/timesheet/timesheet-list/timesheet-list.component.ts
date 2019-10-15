@@ -6,6 +6,8 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./timesheet-list.component.scss"]
 })
 export class TimesheetListComponent implements OnInit {
+  public selectedUser = 1;
+
   constructor() {}
 
   ngOnInit() {}

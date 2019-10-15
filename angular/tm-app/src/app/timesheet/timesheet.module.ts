@@ -4,6 +4,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatTabsModule } from "@angular/material/tabs";
 import { MatTableModule } from "@angular/material/table";
 
 import { TimesheetRoutingModule } from "./timesheet-routing.module";
@@ -19,6 +20,7 @@ import { TimesheetListTableComponent } from "./timesheet-list/timesheet-list-tab
     MatCardModule,
     MatIconModule,
     MatPaginatorModule,
+    MatTabsModule,
     MatTableModule
   ]
 })
