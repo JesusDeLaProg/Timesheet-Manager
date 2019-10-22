@@ -183,6 +183,7 @@ export const UserSchema = new Schema({
     required: [true, "Vous devez entrer un nom d'utilisateur unique."],
     unique: true,
     trim: true,
+    index: true,
     validate: [
       unique(
         "User",
