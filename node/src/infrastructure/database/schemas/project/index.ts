@@ -40,8 +40,7 @@ export const ProjectSchema = new Schema(
         message: `Le type de projet doit être dans [${$enum(
           ProjectType
         ).getValues()}].`
-      },
-      default: ProjectType.Public
+      }
     },
     isActive: {
       type: Boolean,
