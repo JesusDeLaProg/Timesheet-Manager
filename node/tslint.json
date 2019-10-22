@@ -23,7 +23,10 @@
             true,
             "allow-declarations",
             "allow-named-functions"
-        ]
+        ],
+        "object-literal-sort-keys": {
+            "severity": "off"
+        }
     },
     "rulesDirectory": []
 }

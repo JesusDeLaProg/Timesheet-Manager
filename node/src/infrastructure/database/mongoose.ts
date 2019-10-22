@@ -20,8 +20,8 @@ if (dbString.indexOf("?") > -1) {
 
 mongoose
   .connect(dbString, {
-    useNewUrlParser: true,
     autoIndex: !process.env.MIGRATION,
+    useNewUrlParser: true,
     useCreateIndex: true
   })
   .then(() => console.debug("Mongoose connected.")) // tslint:disable-line:no-console
