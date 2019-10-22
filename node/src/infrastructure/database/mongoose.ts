@@ -12,7 +12,17 @@ if (process.env.DB_AUTH_DB) {
   dbString += `?authSource=${process.env.DB_AUTH_DB}`;
 }
 
+if (dbString.indexOf("?") > -1) {
+  dbString += "&replSet=rs";
+} else {
+  dbString += "?replSet=rs";
+}
+
 mongoose
-  .connect(dbString, { useNewUrlParser: true })
+  .connect(dbString, {
+    autoIndex: !process.env.MIGRATION,
+    useNewUrlParser: true,
+    useCreateIndex: true
+  })
   .then(() => console.debug("Mongoose connected.")) // tslint:disable-line:no-console
   .catch(console.error.bind(console, "connection error:")); // tslint:disable-line:no-console
