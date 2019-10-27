@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
-import { TimesheetModule } from "../timesheet.module";
 import {
   BaseDataService,
   IQueryOptions
@@ -14,7 +13,7 @@ import {
 import { ITimesheetLine } from "../../../../../../types/datamodels";
 
 @Injectable({
-  providedIn: TimesheetModule
+  providedIn: "root"
 })
 export class TimesheetService extends BaseDataService {
   constructor(http: HttpClient) {
@@ -39,10 +38,18 @@ export class TimesheetService extends BaseDataService {
     >(`/populated/${id}`, undefined, () => false);
   }
 
-  getAllByUserId(userId: string, options: IQueryOptions) {
-    return this.get<ICrudResult<IViewTimesheet>>(
+  getAllByUserId(userId: string, options?: IQueryOptions) {
+    return this.get<ICrudResult<IViewTimesheet[]>>(
       `/byUserId/${userId}`,
       options,
+      () => false
+    );
+  }
+
+  countByUserId(userId: string) {
+    return this.get<ICrudResult<number>>(
+      `/countByUserId/${userId}`,
+      undefined,
       () => false
     );
   }

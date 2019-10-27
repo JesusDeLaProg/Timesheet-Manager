@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import conforms from "lodash.conforms";
-import { join } from "path";
 import { throwError, of, Observable } from "rxjs";
 import { catchError } from "rxjs/operators";
 
@@ -16,10 +15,12 @@ export abstract class BaseDataService {
   protected readonly baseUrl;
 
   constructor(baseUrl: string, protected http: HttpClient) {
-    baseUrl = join(environment.apiUrl, baseUrl);
+    if (environment.apiUrl.slice(-1)[0] === "/") {
+    }
+    this.baseUrl = this.joinPath(environment.apiUrl, baseUrl);
   }
 
-  get<T>(
+  protected get<T>(
     path: string,
     options?: IQueryOptions,
     isErrorExpected?: (any) => boolean
@@ -34,11 +35,14 @@ export abstract class BaseDataService {
     }
 
     return this.http
-      .get<T>(join(this.baseUrl, path), { params: httpParams })
+      .get<T>(this.joinPath(this.baseUrl, path), {
+        params: httpParams,
+        withCredentials: true
+      })
       .pipe(catchError(this.handleError(isErrorExpected)));
   }
 
-  post<T>(
+  protected post<T>(
     path: string,
     body: any,
     isErrorExpected?: (any) => boolean
@@ -46,11 +50,14 @@ export abstract class BaseDataService {
     const headers = new HttpHeaders({ application: "application/json" });
 
     return this.http
-      .post<T>(join(this.baseUrl, path), body, { headers })
+      .post<T>(this.joinPath(this.baseUrl, path), body, {
+        headers,
+        withCredentials: true
+      })
       .pipe(catchError(this.handleError(isErrorExpected)));
   }
 
-  handleError(isErrorExpected?: (any) => boolean) {
+  protected handleError(isErrorExpected?: (any) => boolean) {
     if (!isErrorExpected) {
       isErrorExpected = conforms({
         result: res => res !== undefined,
@@ -63,5 +70,26 @@ export abstract class BaseDataService {
       if (isErrorExpected(err)) return of(err);
       return throwError(err);
     };
+  }
+
+  protected joinPath(base: string, path: string) {
+    let result = "";
+    if (base.startsWith("http://")) {
+      result = "http://";
+      base = base.substring(7);
+    } else if (base.startsWith("https://")) {
+      result = "https://";
+      base = base.substring(8);
+    } else {
+      result = "/";
+    }
+    return (
+      result +
+      base
+        .split("/")
+        .concat(path.split("/"))
+        .filter(e => !!e)
+        .join("/")
+    );
   }
 }

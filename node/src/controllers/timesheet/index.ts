@@ -89,6 +89,17 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     return CrudResult.Success(result);
   }
 
+  public async countByUserId(
+    userId: StringId,
+    authenticatedUserId?: StringId | Types.ObjectId
+  ): Promise<ICrudResult<number>> {
+    await this._validatePrivileges("read", authenticatedUserId, userId);
+
+    return CrudResult.Success(
+      await this.Timesheet.countDocuments({ user: userId })
+    );
+  }
+
   public async validate(
     input: IViewTimesheet,
     authenticatedUserId?: StringId

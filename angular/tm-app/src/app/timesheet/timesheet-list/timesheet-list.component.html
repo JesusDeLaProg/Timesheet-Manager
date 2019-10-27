@@ -7,130 +7,50 @@
       <nav mat-tab-nav-bar>
         <a
           mat-tab-link
-          (click)="selectedUser = 1"
-          [active]="selectedUser === 1"
+          (click)="selectUserGroup('active')"
+          [active]="selectedUserGroup === userGroups.get('active')"
         >
-          <mat-icon class="user-active">person</mat-icon>
-          Maxime Charland
+          <mat-icon [ngClass]="userGroups.get('active')?.iconClass">
+            {{ userGroups.get("active")?.icon }}
+          </mat-icon>
+          {{ userGroups.get("active")?.label }}
         </a>
         <a
           mat-tab-link
-          (click)="selectedUser = 2"
-          [active]="selectedUser === 2"
+          (click)="selectUserGroup('inactive')"
+          [active]="selectedUserGroup === userGroups.get('inactive')"
         >
-          <mat-icon class="user-active">person</mat-icon>
-          François Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 3"
-          [active]="selectedUser === 3"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          Maxime Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 4"
-          [active]="selectedUser === 4"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          François Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 5"
-          [active]="selectedUser === 5"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          Maxime Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 6"
-          [active]="selectedUser === 6"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          François Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 7"
-          [active]="selectedUser === 7"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          Maxime Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 8"
-          [active]="selectedUser === 8"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          François Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 9"
-          [active]="selectedUser === 9"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          Maxime Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 10"
-          [active]="selectedUser === 10"
-        >
-          <mat-icon class="user-active">person</mat-icon>
-          François Charland
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 11"
-          [active]="selectedUser === 11"
-        >
-          <mat-icon class="user-inactive">person</mat-icon>
-          Luc Robillard
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 12"
-          [active]="selectedUser === 12"
-        >
-          <mat-icon class="user-inactive">person</mat-icon>
-          Luc Robillard
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 13"
-          [active]="selectedUser === 13"
-        >
-          <mat-icon class="user-inactive">person</mat-icon>
-          Luc Robillard
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 14"
-          [active]="selectedUser === 14"
-        >
-          <mat-icon class="user-inactive">person</mat-icon>
-          Luc Robillard
-        </a>
-        <a
-          mat-tab-link
-          (click)="selectedUser = 15"
-          [active]="selectedUser === 15"
-        >
-          <mat-icon class="user-inactive">person</mat-icon>
-          Luc Robillard
+          <mat-icon [ngClass]="userGroups.get('inactive')?.iconClass">
+            {{ userGroups.get("inactive")?.icon }}
+          </mat-icon>
+          {{ userGroups.get("inactive")?.label }}
         </a>
       </nav>
-      <tm-timesheet-list-table></tm-timesheet-list-table>
+      <nav mat-tab-nav-bar>
+        <a
+          mat-tab-link
+          *ngFor="let user of selectedUserGroup?.users"
+          (click)="selectUser(user)"
+          [active]="selectedUser === user"
+        >
+          <mat-icon
+            [class.user-active]="user.isActive"
+            [class.user-inactive]="!user.isActive"
+          >
+            {{ user.isActive ? "person" : "lens" }}
+          </mat-icon>
+          {{ user.firstName }} {{ user.lastName }}
+        </a>
+      </nav>
+      <tm-timesheet-list-table
+        [timesheets]="selectedUser?.timesheets"
+      ></tm-timesheet-list-table>
       <mat-paginator
         class="table-paginator"
-        [length]="20"
+        [length]="selectedUserTotalTimesheets"
         [pageSize]="10"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="pageChanged($event)"
       ></mat-paginator>
     </div>
   </mat-card-content>

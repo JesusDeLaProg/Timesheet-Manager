@@ -11,6 +11,7 @@ export declare class TimesheetController extends AbstractController<IViewTimeshe
     getById(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet>>;
     getAllByUserId(userId: StringId, authenticatedUserId?: StringId, options?: QueryOptions | undefined): Promise<ICrudResult<IViewTimesheet[]>>;
     getByIdPopulated(id: string, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
+    countByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<number>>;
     validate(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<MongooseError.ValidationError>>;
     save(input: IViewTimesheet, authenticatedUserId?: StringId): Promise<ICrudResult<IViewTimesheet | MongooseError.ValidationError>>;
     protected objectToDocument(input: IViewTimesheet): Promise<TimesheetDocument>;

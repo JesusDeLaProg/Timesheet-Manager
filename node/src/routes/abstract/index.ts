@@ -29,9 +29,9 @@ export default {
 
   buildQueryOptionsFromRequest(req: Request): QueryOptions {
     return {
-      limit: +((req.params || {}).limit || 0),
-      skip: +((req.params || {}).skip || 0),
-      sort: (req.params || {}).sort || ""
+      limit: +((req.query || {}).limit || 0),
+      skip: +((req.query || {}).skip || 0),
+      sort: (req.query || {}).sort || ""
     };
   }
 };

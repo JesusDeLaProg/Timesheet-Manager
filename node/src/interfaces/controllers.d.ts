@@ -43,6 +43,7 @@ export interface ITimesheetController extends IController<IViewTimesheet> {
     getById(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet>>;
     getAllByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
     getByIdPopulated(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
+    countByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<number>>;
     save(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet | Error.ValidationError>>;
     validate(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<Error.ValidationError>>;
 }

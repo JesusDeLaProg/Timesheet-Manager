@@ -113,6 +113,7 @@ export class AuthRouter implements HasRouter {
     const sessionTimeout = ms(process.env.SESSIONTIMEOUT || "0");
     res.cookie(tokenCookieName, jwt, {
       httpOnly: true,
+      sameSite: false,
       maxAge: sessionTimeout
     });
     res.header(

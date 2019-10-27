@@ -1,36 +1,44 @@
-<mat-table class="main-table" [dataSource]="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+<mat-table class="main-table" [dataSource]="timesheets">
   <ng-container matColumnDef="actions">
     <mat-header-cell class="actions" *matHeaderCellDef>Actions</mat-header-cell>
-    <mat-cell class="actions" *matCellDef="let elem">
+    <mat-cell class="actions" *matCellDef="let timesheet">
       <span class="spacer"></span>
-      <button mat-raised-button color="primary">
+      <a
+        mat-raised-button
+        color="primary"
+        [routerLink]="'/timesheet/edit/' + timesheet._id"
+      >
         <mat-icon>create</mat-icon>Modifier
-      </button>
-      <button mat-raised-button color="primary">
+      </a>
+      <a
+        mat-raised-button
+        color="primary"
+        [routerLink]="'/timesheet/print/' + timesheet._id"
+      >
         <mat-icon>print</mat-icon>Imprimer
-      </button>
+      </a>
       <span class="spacer"></span>
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="begin">
     <mat-header-cell *matHeaderCellDef>Début</mat-header-cell>
-    <mat-cell *matCellDef="let elem">
-      1 janvier 1970
+    <mat-cell *matCellDef="let timesheet">
+      {{ moment(timesheet.begin).format("D MMMM YYYY") }}
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="end">
     <mat-header-cell *matHeaderCellDef>Fin</mat-header-cell>
-    <mat-cell *matCellDef="let elem">
-      31 Décembre 2019
+    <mat-cell *matCellDef="let timesheet">
+      {{ moment(timesheet.end).format("D MMMM YYYY") }}
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="total">
     <mat-header-cell *matHeaderCellDef>Nombre d'heures</mat-header-cell>
-    <mat-cell *matCellDef="let elem">
-      40 heures
+    <mat-cell *matCellDef="let timesheet">
+      {{ getTotalTime(timesheet) }} heures
     </mat-cell>
   </ng-container>
 

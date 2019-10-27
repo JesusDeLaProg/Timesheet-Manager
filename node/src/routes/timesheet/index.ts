@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
 
-import authorize from "../../infrastructure/auth/authorize";
-
 import { UserRole } from "../../constants/enums/user-role";
 import Controllers from "../../constants/symbols/controllers";
 import { ITimesheetController } from "../../interfaces/controllers";
@@ -70,6 +68,22 @@ export class TimesheetRouter implements HasRouter {
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.getByIdPopulated(
             req.params.id || "",
+            userId
+          ),
+          res,
+          next
+        );
+      } catch (err) {
+        next(utils.buildErrorCrudResultFromError(err));
+      }
+    });
+
+    this.router.get("/countByUserId/:userId", async (req, res, next) => {
+      try {
+        const userId = (req.user && req.user._id) || undefined;
+        utils.sendResultOrGiveToErrorHandler(
+          await this._timesheetController.countByUserId(
+            req.params.userId || "",
             userId
           ),
           res,
