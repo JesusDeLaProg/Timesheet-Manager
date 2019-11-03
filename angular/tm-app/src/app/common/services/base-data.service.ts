@@ -23,15 +23,19 @@ export abstract class BaseDataService {
   protected get<T>(
     path: string,
     options?: IQueryOptions,
-    isErrorExpected?: (any) => boolean
+    isErrorExpected?: (err: any) => boolean
   ): Observable<T> {
     let httpParams = new HttpParams();
     if (options) {
-      if (options.limit)
+      if (options.limit) {
         httpParams = httpParams.append("limit", options.limit + "");
-      if (options.skip)
+      }
+      if (options.skip) {
         httpParams = httpParams.append("skip", options.skip + "");
-      if (options.sort) httpParams = httpParams.append("sort", options.sort);
+      }
+      if (options.sort) {
+        httpParams = httpParams.append("sort", options.sort);
+      }
     }
 
     return this.http
@@ -45,7 +49,7 @@ export abstract class BaseDataService {
   protected post<T>(
     path: string,
     body: any,
-    isErrorExpected?: (any) => boolean
+    isErrorExpected?: (err: any) => boolean
   ): Observable<T> {
     const headers = new HttpHeaders({ application: "application/json" });
 
@@ -57,7 +61,7 @@ export abstract class BaseDataService {
       .pipe(catchError(this.handleError(isErrorExpected)));
   }
 
-  protected handleError(isErrorExpected?: (any) => boolean) {
+  protected handleError(isErrorExpected?: (err: any) => boolean) {
     if (!isErrorExpected) {
       isErrorExpected = conforms({
         result: res => res !== undefined,
@@ -67,7 +71,9 @@ export abstract class BaseDataService {
     }
 
     return err => {
-      if (isErrorExpected(err)) return of(err);
+      if (isErrorExpected(err)) {
+        return of(err);
+      }
       return throwError(err);
     };
   }

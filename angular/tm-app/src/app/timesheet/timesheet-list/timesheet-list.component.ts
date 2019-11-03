@@ -73,7 +73,9 @@ export class TimesheetListComponent extends BaseComponent implements OnInit {
   selectUser(user: IViewUser & WithTimesheets) {
     this.selectedUser = user;
 
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     if (this.tablePaginator.pageIndex === 0) {
       this.getSelectedUserTimesheets();

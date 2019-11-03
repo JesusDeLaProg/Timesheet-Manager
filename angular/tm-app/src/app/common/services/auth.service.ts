@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core";
-import { BaseDataService } from "./base-data.service";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 import { ICrudResult } from "../../../../../../types/viewmodels";
+import { BaseDataService } from "./base-data.service";
 
 @Injectable({
   providedIn: "root"
@@ -11,7 +11,7 @@ export class AuthService extends BaseDataService {
     super("/auth", http);
   }
 
-  login(username: string, password: string) {
+  public login(username: string, password: string) {
     return this.post<ICrudResult<boolean>>(
       "/login",
       { username, password },
@@ -19,7 +19,7 @@ export class AuthService extends BaseDataService {
     );
   }
 
-  logout() {
+  public logout() {
     return this.get("/logout", undefined, () => false);
   }
 }

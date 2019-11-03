@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { ICrudResult } from "../../../../types/viewmodels";
+import { CrudResult } from "../../infrastructure/utils/crud-result";
 import { QueryOptions } from "../../interfaces/controllers";
 
 export default {
@@ -19,12 +20,12 @@ export default {
     }
   },
 
-  buildErrorCrudResultFromError(error: any): ICrudResult {
-    return {
-      message: error.message,
-      result: error,
-      success: false
-    };
+  buildErrorCrudResultFromError(error: any) {
+    if (error instanceof CrudResult) {
+      return error;
+    } else {
+      return CrudResult.Failure(error);
+    }
   },
 
   buildQueryOptionsFromRequest(req: Request): QueryOptions {
