@@ -3,7 +3,7 @@
 // Definitions by : Maxime Charland
 
 export type IProjectType = "Public" | "Privé";
-export type IUserRole = 0 | 1 | 2 | 3;
+export type IUserRole = 1 | 2 | 3 | 4;
 
 export type StringId = string;
 

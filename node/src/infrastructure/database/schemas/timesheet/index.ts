@@ -10,7 +10,10 @@ import {
   StringId
 } from "../../../../../../types/datamodels";
 import { IViewPhase, IViewTimesheet } from "../../../../../../types/viewmodels";
-import { PhaseDocument } from "../../../../interfaces/models";
+import {
+  PhaseDocument,
+  TimesheetDocument
+} from "../../../../interfaces/models";
 import arrayLength from "../../validators/arraylength";
 import datecompare from "../../validators/datecompare";
 import idexists from "../../validators/idexists";
@@ -250,3 +253,46 @@ export const TimesheetSchema = new Schema(
     timestamps: true
   }
 );
+
+TimesheetSchema.pre("validate", function(this: TimesheetDocument) {
+  this.begin =
+    this.begin &&
+    moment(this.begin)
+      .startOf("day")
+      .toDate();
+  this.end =
+    this.end &&
+    moment(this.end)
+      .startOf("day")
+      .toDate();
+  this.lines =
+    this.lines &&
+    this.lines.map((line) => {
+      line.entries =
+        line.entries &&
+        line.entries.map((entry) => {
+          entry.date =
+            entry.date &&
+            moment(entry.date)
+              .startOf("day")
+              .toDate();
+          return entry;
+        });
+      return line;
+    });
+  this.roadsheetLines =
+    this.roadsheetLines &&
+    this.roadsheetLines.map((line) => {
+      line.travels =
+        line.travels &&
+        line.travels.map((travel) => {
+          travel.date =
+            travel.date &&
+            moment(travel.date)
+              .startOf("day")
+              .toDate();
+          return travel;
+        });
+      return line;
+    });
+});
