@@ -1,0 +1,51 @@
+<mat-table class="main-table" [dataSource]="timesheets">
+  <ng-container matColumnDef="actions">
+    <mat-header-cell class="actions" *matHeaderCellDef>Actions</mat-header-cell>
+    <mat-cell class="actions" *matCellDef="let timesheet">
+      <span class="spacer"></span>
+      <a
+        mat-raised-button
+        color="primary"
+        [routerLink]="'/timesheet/edit/' + timesheet._id"
+      >
+        <mat-icon>create</mat-icon>Modifier
+      </a>
+      <a
+        mat-raised-button
+        color="primary"
+        [routerLink]="'/timesheet/print/' + timesheet._id"
+      >
+        <mat-icon>print</mat-icon>Imprimer
+      </a>
+      <span class="spacer"></span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="begin">
+    <mat-header-cell *matHeaderCellDef>Début</mat-header-cell>
+    <mat-cell *matCellDef="let timesheet">
+      {{ moment(timesheet.begin).format("D MMMM YYYY") }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="end">
+    <mat-header-cell *matHeaderCellDef>Fin</mat-header-cell>
+    <mat-cell *matCellDef="let timesheet">
+      {{ moment(timesheet.end).format("D MMMM YYYY") }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="total">
+    <mat-header-cell *matHeaderCellDef>Nombre d'heures</mat-header-cell>
+    <mat-cell *matCellDef="let timesheet">
+      {{ getTotalTime(timesheet) }} heures
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row
+    *matHeaderRowDef="['actions', 'begin', 'end', 'total']"
+  ></mat-header-row>
+  <mat-row
+    *matRowDef="let row; columns: ['actions', 'begin', 'end', 'total']"
+  ></mat-row>
+</mat-table>

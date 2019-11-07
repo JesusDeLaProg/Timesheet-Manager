@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import logger from "morgan";
 import path from "path";
@@ -25,27 +26,29 @@ export function createExpressApp() {
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, "public")));
-  app.use("/api", iocContainer.get<HasRouter>(Routers.ApiRouter).router);
+  app.options("*", cors({ origin: true, credentials: true }));
+  app.use(
+    "/api",
+    cors({ origin: true, credentials: true }),
+    iocContainer.get<HasRouter>(Routers.ApiRouter).router
+  );
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof CrudResult) {
+      res.status((err.result as HasHttpCode).code || 500);
+
       if (err.result instanceof Error) {
-        err = CrudResult.Success(err.result + "", err.result.message);
+        err = CrudResult.Failure(err.result + "", err.result.message);
       }
-      return res
-        .status((err.result as HasHttpCode).code || 500)
-        .type("json")
-        .send(err);
+      return res.type("json").send(err);
     } else {
+      res.status(err.code || 500);
       if (err instanceof Error) {
         err = err + "";
       }
       if (err.info instanceof Error) {
         err.info = err.info + "";
       }
-      res
-        .status(err.code || 500)
-        .type("json")
-        .send(err);
+      res.type("json").send(err);
     }
   });
 

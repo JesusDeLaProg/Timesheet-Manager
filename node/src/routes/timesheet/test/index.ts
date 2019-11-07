@@ -400,7 +400,7 @@ export default function buildTestSuite(
         .startOf("day")
         .toDate();
       timesheet.end = moment(timesheet.end)
-        .endOf("day")
+        .startOf("day")
         .toDate();
       timesheet.lines = timesheet.lines.map((line) => {
         line.entries = line.entries.map((entry) => {

@@ -1,0 +1,22 @@
+@import "~src/variables";
+
+mat-card.main-card {
+  margin: $tm-spacing;
+}
+
+mat-table.main-table {
+  margin-top: $tm-spacing * 3;
+}
+
+mat-paginator.table-paginator {
+  margin-bottom: $tm-spacing * 3;
+}
+
+mat-icon.user-active {
+  color: green;
+}
+
+mat-icon.user-inactive {
+  color: red;
+  margin-right: $tm-spacing;
+}

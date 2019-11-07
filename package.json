@@ -39,7 +39,8 @@
       "git add"
     ],
     "angular/tm-app/{,**/}{*.ts,*.html,*.scss}": [
-      "prettier --config angular/tm-app/.prettierrc --write"
+      "prettier --config angular/tm-app/.prettierrc --write",
+      "git add"
     ]
   }
 }

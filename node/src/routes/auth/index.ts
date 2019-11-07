@@ -73,6 +73,22 @@ export class AuthRouter implements HasRouter {
       }
     });
 
+    this.router.get(
+      "/whoami",
+      this.authenticationMiddlewares,
+      async (req, res, next) => {
+        try {
+          utils.sendResultOrGiveToErrorHandler(
+            await this._userController.getById(req.user!._id.toHexString()),
+            res,
+            next
+          );
+        } catch (err) {
+          next(utils.buildErrorCrudResultFromError(err));
+        }
+      }
+    );
+
     this.router.get("/logout", async (req, res, next) => {
       res.clearCookie(tokenCookieName, { httpOnly: true });
       res
@@ -113,6 +129,7 @@ export class AuthRouter implements HasRouter {
     const sessionTimeout = ms(process.env.SESSIONTIMEOUT || "0");
     res.cookie(tokenCookieName, jwt, {
       httpOnly: true,
+      sameSite: false,
       maxAge: sessionTimeout
     });
     res.header(
