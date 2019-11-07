@@ -9,7 +9,7 @@ install:
   - cd ..
   - cd angular/tm-app
   - npm ci
-  - cd ..
+  - cd ../..
 script:
   - cd node
   - npm run lint
