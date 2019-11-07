@@ -1,9 +1,4 @@
 {
   "extends": "../../base.tsconfig.json",
-  "compilerOptions": {
-    "declarationDir": "./types",
-    "outDir": "../../out/constants"
-  },
-  "files": [],
-  "references": [{ "path": "./symbols" }]
+  "include": ["./enums/*.ts", "./symbols/*.ts"]
 }

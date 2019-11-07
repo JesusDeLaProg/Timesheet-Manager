@@ -7,7 +7,7 @@ import path from "path";
 import Routers from "./constants/symbols/routers";
 import { ControllerModule } from "./controllers";
 import { ModelModule } from "./infrastructure/database/models";
-import initializeContainer from "./infrastructure/ioc";
+import initializeContainer from "./infrastructure/ioc/init";
 import { CrudResult } from "./infrastructure/utils/crud-result";
 import { HasHttpCode } from "./infrastructure/utils/has-http-code";
 import { HasRouter } from "./interfaces/routers";
@@ -48,7 +48,7 @@ export function createExpressApp() {
       if (err.info instanceof Error) {
         err.info = err.info + "";
       }
-      res.type("json").send(err);
+      return res.type("json").send(err);
     }
   });
 

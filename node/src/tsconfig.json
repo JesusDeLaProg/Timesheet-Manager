@@ -1,13 +1,11 @@
 {
   "extends": "../base.tsconfig.json",
-  "compilerOptions": {
-    "declarationDir": "./types",
-    "outDir": "../out"
-  },
-  "files": ["./app.ts", "./create-app.ts"],
+  "include": ["./*.ts"],
   "references": [
-    { "path": "./routes" },
-    { "path": "./infrastructure" },
-    { "path": "./controllers" }
+    { "path": "./controllers" },
+    { "path": "./infrastructure/database" },
+    { "path": "./infrastructure/ioc" },
+    { "path": "./infrastructure/utils" },
+    { "path": "./routes" }
   ]
 }

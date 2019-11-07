@@ -4,13 +4,13 @@ import { Container } from "inversify";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/models";
 import { UserModel } from "../../interfaces/models";
-import activityTestSuite from "../activity/test";
-import authTestSuite from "../auth/test";
-import clientTestSuite from "../client/test";
-import phaseTestSuite from "../phase/test";
-import projectTestSuite from "../project/test";
-import timesheetTestSuite from "../timesheet/test";
-import userTestSuite from "../user/test";
+import activityTestSuite from "./activity";
+import authTestSuite from "./auth";
+import clientTestSuite from "./client";
+import phaseTestSuite from "./phase";
+import projectTestSuite from "./project";
+import timesheetTestSuite from "./timesheet";
+import userTestSuite from "./user";
 import { UserRole } from "../../constants/enums/user-role";
 
 export default function buildTestSuite(

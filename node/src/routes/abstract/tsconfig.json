@@ -1,9 +1,0 @@
-{
-  "extends": "../../../base.tsconfig.json",
-  "compilerOptions": {
-    "declarationDir": "./types",
-    "outDir": "../../../out/routes/abstract"
-  },
-  "files": ["index.ts"],
-  "references": [{ "path": "../../infrastructure/utils" }]
-}

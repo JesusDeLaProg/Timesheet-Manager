@@ -1,8 +1,0 @@
-{
-  "extends": "../../../../test.tsconfig.json",
-  "files": ["./index.ts"],
-  "references": [
-    { "path": "../" },
-    { "path": "../../../infrastructure/database/testing" }
-  ]
-}

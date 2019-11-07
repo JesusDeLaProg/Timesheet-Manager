@@ -3,6 +3,7 @@
   "files": ["./index.ts"],
   "references": [
     { "path": "../controllers/test" },
+    { "path": "../infrastructure/environment" },
     { "path": "../routes/test" },
     { "path": "../" }
   ]

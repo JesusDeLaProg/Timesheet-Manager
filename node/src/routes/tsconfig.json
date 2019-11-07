@@ -1,21 +1,8 @@
 {
   "extends": "../../base.tsconfig.json",
-  "compilerOptions": {
-    "declarationDir": "./types",
-    "outDir": "../../out/routes"
-  },
-  "files": ["index.ts"],
+  "include": ["./*.ts"],
   "references": [
-    { "path": "../constants/symbols/routers" },
-    { "path": "../constants/enums" },
-    { "path": "../infrastructure/auth" },
-    { "path": "./abstract" },
-    { "path": "./activity" },
-    { "path": "./auth" },
-    { "path": "./client" },
-    { "path": "./phase" },
-    { "path": "./project" },
-    { "path": "./timesheet" },
-    { "path": "./user" }
+    { "path": "../constants" },
+    { "path": "../infrastructure/auth" }
   ]
 }
