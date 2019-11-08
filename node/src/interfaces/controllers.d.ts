@@ -11,6 +11,7 @@ export interface QueryOptions {
 }
 
 declare type JwtSignedToken = string;
+declare type ObjectId = StringId | Types.ObjectId;
 
 export interface IAuthController {
     login(username: string, password: string): Promise<ICrudResult<JwtSignedToken>>;
@@ -18,37 +19,34 @@ export interface IAuthController {
 }
 
 export interface IController<T extends IViewInterface> {
-    getById(id: StringId): Promise<ICrudResult<T>>;
-    getAll(options?: QueryOptions): Promise<ICrudResult<T[]>>;
-    count(): Promise<ICrudResult<number>>;
-    validate(input: T): Promise<ICrudResult<Error.ValidationError>>;
-    save(input: T): Promise<ICrudResult<T | Error.ValidationError>>;
+    getById(authenticatedUserId: ObjectId, id: ObjectId): Promise<ICrudResult<T>>;
+    getAll(authenticatedUserId: ObjectId, options?: QueryOptions): Promise<ICrudResult<T[]>>;
+    count(authenticatedUserId: ObjectId): Promise<ICrudResult<number>>;
+    validate(authenticatedUserId: ObjectId, input: T): Promise<ICrudResult<Error.ValidationError>>;
+    save(authenticatedUserId: ObjectId, input: T): Promise<ICrudResult<T | Error.ValidationError>>;
 }
 
 export interface IActivityController extends IController<IViewActivity> {}
 
 export interface IPhaseController extends IController<IViewPhase> {
-    getAllPopulated(options?: QueryOptions): Promise<ICrudResult<IViewPhase<IViewActivity>[]>>;
+    getAllPopulated(authenticatedUserId: ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewPhase<IViewActivity>[]>>;
 }
 
 export interface IClientController extends IController<IViewClient> {
-    getAllByName(name: string, options?: QueryOptions): Promise<ICrudResult<IViewClient[]>>;
+    getAllByName(authenticatedUserId: ObjectId, name: string, options?: QueryOptions): Promise<ICrudResult<IViewClient[]>>;
 }
 
 export interface IProjectController extends IController<IViewProject> {
-    getAllByCode(code: string, options?: QueryOptions): Promise<ICrudResult<IViewProject[]>>;
+    getAllByCode(authenticatedUserId: ObjectId, code: string, options?: QueryOptions): Promise<ICrudResult<IViewProject[]>>;
 }
 
 export interface ITimesheetController extends IController<IViewTimesheet> {
-    getById(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet>>;
-    getAllByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
-    getByIdPopulated(id: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet<StringId, ITimesheetLine<IViewProject>>>>;
-    countByUserId(userId: StringId, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<number>>;
-    save(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewTimesheet | Error.ValidationError>>;
-    validate(input: IViewTimesheet, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<Error.ValidationError>>;
+    getAllByUserId(authenticatedUserId: ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
+    getByIdPopulated(authenticatedUserId: ObjectId, id: ObjectId): Promise<ICrudResult<IViewTimesheet<ObjectId, ITimesheetLine<IViewProject>>>>;
+    countByUserId(authenticatedUserId: ObjectId, userId: ObjectId): Promise<ICrudResult<number>>;
 }
 
 export interface IUserController extends IController<IViewUser> {
-    save(input: IViewUser, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<IViewUser | Error.ValidationError>>;
-    validate(input: IViewUser, authenticatedUserId?: StringId | Types.ObjectId): Promise<ICrudResult<Error.ValidationError>>;
+    save(authenticatedUserId: ObjectId, input: IViewUser): Promise<ICrudResult<IViewUser | Error.ValidationError>>;
+    validate(authenticatedUserId: ObjectId, input: IViewUser): Promise<ICrudResult<Error.ValidationError>>;
 }
