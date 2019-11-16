@@ -21,6 +21,16 @@ export class AuthController implements IAuthController {
       fs.readFileSync(path.resolve(process.cwd(), "keys/jwt/key"));
   }
 
+  /**
+   * Validates the username and password, then issues a JWT if those match.
+   * The returned JWT contains only the user's id, which is enough to prove identity.
+   * @param {string} username
+   * @param {string} password
+   * @returns {Promise<ICrudResult<string>>}
+   * @throws 400 Error if credentials don't match.
+   * @throws 401 Error if credentials match, but the account is deactivated.
+   * @memberof AuthController
+   */
   public async login(
     username: string,
     password: string
@@ -45,6 +55,12 @@ export class AuthController implements IAuthController {
     return CrudResult.Success(jwtoken);
   }
 
+  /**
+   * Creates a JWT with the desired payload.
+   * @param {JWTPayload} payload
+   * @returns {string}
+   * @memberof AuthController
+   */
   public createJWT(payload: JWTPayload): string {
     return jwt.sign(payload, this._jwtKeyOrSecret, {
       algorithm: process.env.JWTSECRET ? "HS256" : process.env.JWTALGO,

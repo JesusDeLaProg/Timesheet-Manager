@@ -41,7 +41,7 @@ export interface IProjectController extends IController<IViewProject> {
 }
 
 export interface ITimesheetController extends IController<IViewTimesheet> {
-    getAllByUserId(authenticatedUserId: ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
+    getAllByUserId(authenticatedUserId: ObjectId, userId: ObjectId, options?: QueryOptions): Promise<ICrudResult<IViewTimesheet[]>>;
     getByIdPopulated(authenticatedUserId: ObjectId, id: ObjectId): Promise<ICrudResult<IViewTimesheet<ObjectId, ITimesheetLine<IViewProject>>>>;
     countByUserId(authenticatedUserId: ObjectId, userId: ObjectId): Promise<ICrudResult<number>>;
 }

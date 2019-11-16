@@ -8,6 +8,7 @@
     "sourceMap": true,
     "outDir": "./out",
     "rootDir": "./src",
+    "baseUrl": "../",
     "composite": true,
     "strict": true,
     "noImplicitAny": true,
@@ -15,6 +16,9 @@
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "~server/*": ["./node/src/*"]
+    },
     "typeRoots": [
       "../types",
       "./interfaces",

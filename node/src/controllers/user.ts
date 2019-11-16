@@ -15,169 +15,86 @@ import { AbstractController } from "./abstract";
 @injectable()
 export class UserController extends AbstractController<IViewUser>
   implements IUserController {
-  constructor(@inject(Models.User) private User: UserModel) {
-    super(User);
+  constructor(@inject(Models.User) User: UserModel) {
+    super(User, User);
   }
 
-  public async validate(
-    input: IViewUser,
-    authenticatedUserId?: StringId
-  ): Promise<ICrudResult<MongooseError.ValidationError>> {
-    let privilegesError: MongooseError.ValidationError | null;
-    if (input._id) {
-      privilegesError = await this._validatePrivileges(
-        "update",
-        authenticatedUserId,
-        input
-      );
-    } else {
-      privilegesError = await this._validatePrivileges(
-        "create",
-        authenticatedUserId,
-        input
-      );
-    }
-
-    if (privilegesError) {
-      return CrudResult.Failure(privilegesError);
-    } else {
-      return super.validate(input);
-    }
+  /**
+   * Returns the in-database version of the requested or update user.
+   * @protected
+   * @param {UserDocument} resource
+   * @returns {Promise<(UserDocument | null)>}
+   * @memberof UserController
+   */
+  protected async getResourceOwner(resource: UserDocument) {
+    return await this.User.findById(resource.id);
   }
 
-  public async save(
-    input: IViewUser,
-    authenticatedUserId?: StringId
-  ): Promise<ICrudResult<IViewUser | MongooseError.ValidationError>> {
-    let privilegesError: MongooseError.ValidationError | null;
-    if (input._id) {
-      privilegesError = await this._validatePrivileges(
-        "update",
-        authenticatedUserId,
-        input
-      );
-    } else {
-      privilegesError = await this._validatePrivileges(
-        "create",
-        authenticatedUserId,
-        input
-      );
-    }
-
-    if (privilegesError) {
-      return CrudResult.Failure(privilegesError);
-    } else {
-      const result = await super.save(input);
-      (result.result as IViewUser).password = undefined;
-      return result;
-    }
-  }
-
-  protected async objectToDocument(input: IViewUser): Promise<UserDocument> {
-    if (input.billingGroups) {
-      input.billingGroups = input.billingGroups.map((group) => {
-        if (group.timeline) {
-          group.timeline = group.timeline.map((rate) => {
-            if (rate.begin) {
-              rate.begin = moment(rate.begin)
-                .startOf("day")
-                .toDate();
-            }
-            if (rate.end) {
-              rate.end = moment(rate.end)
-                .endOf("day")
-                .toDate();
-            }
-            return rate;
-          });
-        }
-        return group;
-      });
-    }
-    const newPassword = input.password;
-    input.password = undefined;
-    const result = (await (super.objectToDocument(
-      input
-    ) as unknown)) as UserDocument; // Missing IUserExt
-    if (newPassword) {
-      result.plainTextPassword = newPassword;
-    }
-    return result;
-  }
-
-  private async _getUser(
-    authenticatedUserId?: StringId | Types.ObjectId
-  ): Promise<UserDocument> {
-    const result = await this.User.findById(authenticatedUserId);
-    return result as UserDocument;
-  }
-
-  private async _validatePrivileges(
-    operation: "create" | "update",
-    authenticatedUserId: StringId | Types.ObjectId | undefined,
-    input: IViewUser
-  ): Promise<MongooseError.ValidationError | null> {
-    if (!authenticatedUserId) {
-      const error = new Error("No user is authenticated.");
-      (error as HasHttpCode).code = 401;
-      throw error;
-    }
-    const authenticatedUser = await this._getUser(authenticatedUserId);
-
-    const updateOrCreateError = new MongooseError.ValidationError();
-    (updateOrCreateError as HasHttpCode).code = 400;
-    updateOrCreateError.message = "Privilèges utilisateurs insuffisants.";
-    updateOrCreateError.errors = {
-      role: new MongooseError.ValidatorError({
-        message:
-          "Seulement les superutilisateurs peuvent créer ou " +
-          "modifier la feuille de temps d'un autre employé."
-      })
-    };
-
-    if (operation === "create") {
-      return this._checkCreatePrivileges(input, authenticatedUser)
-        ? null
-        : updateOrCreateError;
-    } else {
-      const originaldocument = await this.User.findById(input._id);
-
-      if (!originaldocument) {
-        const error = new Error(`Cannot find user with _id "${input._id}"`);
-        (error as HasHttpCode).code = 401;
-        throw error;
-      }
-
-      return this._checkUpdatePrivileges(
-        originaldocument,
-        input,
-        authenticatedUser
-      )
-        ? null
-        : updateOrCreateError;
-    }
-  }
-
-  private _checkUpdatePrivileges(
-    originalUser: UserDocument,
-    newUser: IViewUser,
-    authenticatedUser: UserDocument
+  /**
+   * Everyone can view their own account's informations.
+   * Special users can view other account informations of other users.
+   * NOTE : See {@link ActivityController#getResourceOwner}
+   * @protected
+   * @param {IViewUser} authenticatedUser
+   * @param {(IViewUser | null)} resourceOwner
+   * @returns {boolean}
+   * @memberof UserController
+   */
+  protected validateReadPermissions(
+    authenticatedUser: IViewUser,
+    resourceOwner: IViewUser | null
   ) {
-    // Only superadmins can modify another user's role (Only if other user is less privileged).
     return (
-      originalUser.role === newUser.role ||
-      (authenticatedUser.role === UserRole.Superadmin &&
-        originalUser.role < UserRole.Superadmin)
+      authenticatedUser._id + "" ===
+        (resourceOwner && resourceOwner._id) + "" ||
+      authenticatedUser.role >= UserRole.Subadmin
     );
   }
 
-  private _checkCreatePrivileges(
-    newUser: IViewUser,
-    authenticatedUser: UserDocument
+  /**
+   * Special users can modify other users' account.
+   * However, a user can only give another user a role that is less privileged than themself.
+   * NOTE : See {@link ActivityController#getResourceOwner}
+   * @protected
+   * @param {IViewUser} authenticatedUser
+   * @param {IViewUser} originalObject
+   * @param {UserDocument} updatedDocument
+   * @param {(IViewUser | null)} resourceOwner
+   * @returns {boolean}
+   * @memberof UserController
+   */
+  protected validateUpdatePermissions(
+    authenticatedUser: IViewUser,
+    originalObject: IViewUser,
+    updatedDocument: UserDocument,
+    resourceOwner: IViewUser | null
   ) {
-    // Only superadmins can create a special user.
+    return originalObject.role === updatedDocument.role
+      ? authenticatedUser.role >= UserRole.Subadmin
+      : (authenticatedUser.role > updatedDocument.role &&
+          authenticatedUser.role > originalObject.role) ||
+          authenticatedUser.role === UserRole.Superadmin;
+  }
+
+  /**
+   * Special users can create normal user accounts.
+   * Admins can create Special user accounts.
+   * NOTE : See {@link ActivityController#getResourceOwner}
+   * @protected
+   * @param {IViewUser} authenticatedUser
+   * @param {UserDocument} updatedDocument
+   * @param {(IViewUser | null)} resourceOwner
+   * @returns {boolean}
+   * @memberof UserController
+   */
+  protected validateCreatePermissions(
+    authenticatedUser: IViewUser,
+    updatedDocument: UserDocument,
+    resourceOwner: IViewUser | null
+  ) {
     return (
-      newUser.role === UserRole.Everyone ||
+      (authenticatedUser.role >= UserRole.Subadmin &&
+        authenticatedUser.role > updatedDocument.role) ||
       authenticatedUser.role === UserRole.Superadmin
     );
   }

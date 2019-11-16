@@ -12,30 +12,36 @@ import {
   IViewUser
 } from "../../../types/viewmodels";
 import { CrudResult } from "../infrastructure/utils/crud-result";
-import { IController, QueryOptions, ObjectId } from "../interfaces/controllers";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
-import { UserModel, UserDocument } from "../interfaces/models";
+import { IController, ObjectId, QueryOptions } from "../interfaces/controllers";
+import { UserDocument, UserModel } from "../interfaces/models";
 
 @injectable()
 export abstract class AbstractController<T extends IViewInterface>
   implements IController<T> {
   constructor(
     private Model: ModelType<T & Document>,
-    private User: UserModel
+    protected User: UserModel
   ) {}
 
+  /**
+   * Returns a document retrieved with a given id.
+   * @param {ObjectId} authenticatedUserId
+   * @param {string} id
+   * @returns {Promise<ICrudResult<T>>}
+   * @throws 401 Error if there is no authenticated user.
+   * @throws 403 Error if the authenticated user doesn't have permissions to read the requested item.
+   * @memberof AbstractController
+   */
   public async getById(
     authenticatedUserId: ObjectId,
     id: string
   ): Promise<ICrudResult<T>> {
-    if (!authenticatedUserId) {
-      throw this.get401Error();
-    }
     const result = await this.Model.findById(id);
     if (!result) {
-      throw CrudResult.Failure(
-        new Error(`Cannot find ${this.Model.name} with _id ${id}`)
-      );
+      const error = new Error(`Cannot find ${this.Model.name} with _id ${id}`);
+      (error as HasHttpCode).code = 404;
+      throw CrudResult.Failure(error);
     }
     if (
       this.validateReadPermissions(
@@ -49,6 +55,15 @@ export abstract class AbstractController<T extends IViewInterface>
     }
   }
 
+  /**
+   * Returns all the documents from a collection. Paged with {@link QueryOptions}.
+   * @param {ObjectId} authenticatedUserId
+   * @param {QueryOptions} [options]
+   * @returns {Promise<ICrudResult<T[]>>}
+   * @throws 401 Error if there is no authenticated user.
+   * @throws 403 Error if the authenticated user doesn't have permissions to read that collection.
+   * @memberof AbstractController
+   */
   public async getAll(
     authenticatedUserId: ObjectId,
     options?: QueryOptions
@@ -68,6 +83,14 @@ export abstract class AbstractController<T extends IViewInterface>
     }
   }
 
+  /**
+   * Returns the number of documents in a collection.
+   * @param {ObjectId} authenticatedUserId
+   * @returns {Promise<ICrudResult<number>>}
+   * @throws 401 Error if there is no authenticated user.
+   * @throws 40 Error if the authenticated user doesn't have permissions to read that collection.
+   * @memberof AbstractController
+   */
   public async count(
     authenticatedUserId: ObjectId
   ): Promise<ICrudResult<number>> {
@@ -84,21 +107,44 @@ export abstract class AbstractController<T extends IViewInterface>
     }
   }
 
+  /**
+   * Validates a document using Mongoose validators.
+   * @param {ObjectId} authenticatedUserId
+   * @param {T} input
+   * @returns {Promise<ICrudResult<MongooseError.ValidationError>>}
+   * @throws 401 Error if there is no authenticated user.
+   * @throws 403 Error if the authenticated user doesn't have permissions to update or create a document in that collection.
+   * @memberof AbstractController
+   */
   public async validate(
     authenticatedUserId: ObjectId,
     input: T
   ): Promise<ICrudResult<MongooseError.ValidationError>> {
-    const { document, resourceOwner } = await this.objectToDocument(input);
+    const {
+      document,
+      originalObject,
+      resourceOwner: originalResourceOwner
+    } = await this.objectToDocument(input);
     let authorized = false;
     if (input._id) {
       authorized = this.validateUpdatePermissions(
         await this.getUser(authenticatedUserId),
-        resourceOwner
+        originalObject as T,
+        document,
+        originalResourceOwner
       );
+      const newResourceOwner = await this.getResourceOwner(document);
+      authorized =
+        authorized &&
+        (!!originalResourceOwner
+          ? !!newResourceOwner &&
+            originalResourceOwner.id + "" === newResourceOwner.id + ""
+          : true);
     } else {
       authorized = this.validateCreatePermissions(
         await this.getUser(authenticatedUserId),
-        resourceOwner
+        document,
+        originalResourceOwner
       );
     }
     if (authorized) {
@@ -107,9 +153,7 @@ export abstract class AbstractController<T extends IViewInterface>
         return CrudResult.Success(null);
       } catch (error) {
         if (error instanceof MongooseError.ValidationError) {
-          (error as MongooseError.ValidationError & {
-            code: number;
-          }).code = 400;
+          (error as MongooseError.ValidationError & HasHttpCode).code = 400;
           return CrudResult.Failure(error);
         } else {
           throw error;
@@ -120,20 +164,36 @@ export abstract class AbstractController<T extends IViewInterface>
     }
   }
 
+  /**
+   * Saves a document after validating it using Mongoose validators.
+   * @param {ObjectId} authenticatedUserId
+   * @param {T} input
+   * @returns {Promise<ICrudResult<T | MongooseError.ValidationError>>} Updated document if saved successfully, ValidationError otherwise.
+   * @throws 401 Error if there is no authenticated user.
+   * @throws 403 Error if the authenticated user doesn't have permissions to update or create a document in that collection.
+   * @memberof AbstractController
+   */
   public async save(
     authenticatedUserId: ObjectId,
     input: T
   ): Promise<ICrudResult<T | MongooseError.ValidationError>> {
-    const { document, resourceOwner } = await this.objectToDocument(input);
+    const {
+      document,
+      originalObject,
+      resourceOwner
+    } = await this.objectToDocument(input);
     let authorized = false;
     if (input._id) {
       authorized = this.validateUpdatePermissions(
         await this.getUser(authenticatedUserId),
+        originalObject as T,
+        document,
         resourceOwner
       );
     } else {
       authorized = this.validateCreatePermissions(
         await this.getUser(authenticatedUserId),
+        document,
         resourceOwner
       );
     }
@@ -143,9 +203,7 @@ export abstract class AbstractController<T extends IViewInterface>
         return CrudResult.Success(result);
       } catch (error) {
         if (error instanceof MongooseError.ValidationError) {
-          (error as MongooseError.ValidationError & {
-            code: number;
-          }).code = 400;
+          (error as MongooseError.ValidationError & HasHttpCode).code = 400;
           return CrudResult.Failure(error);
         } else {
           throw error;
@@ -174,9 +232,27 @@ export abstract class AbstractController<T extends IViewInterface>
     return query;
   }
 
+  /**
+   * Transforms an input object to a Mongoose Document.
+   * Returns the original document as a plain object,
+   * the updated document and the resource owner,
+   * retrieved from the original document.
+   * @protected
+   * @param {T} input
+   * @returns {(Promise<{
+   *     resourceOwner: UserDocument | null;
+   *     originalObject: T | null;
+   *     document: T & Document;
+   *   }>)}
+   * @memberof AbstractController
+   */
   protected async objectToDocument(
     input: T
-  ): Promise<{ resourceOwner: UserDocument | null; document: T & Document }> {
+  ): Promise<{
+    resourceOwner: UserDocument | null;
+    originalObject: T | null;
+    document: T & Document;
+  }> {
     if (input._id) {
       const result = await this.Model.findById(input._id);
 
@@ -185,11 +261,13 @@ export abstract class AbstractController<T extends IViewInterface>
           new Error(`Cannot find document with _id: "${input._id}"`)
         );
       }
+      const originalObject = result.toObject();
       const resourceOwner = await this.getResourceOwner(result);
       delete input._id;
       Object.assign(result, input);
       return {
         resourceOwner,
+        originalObject,
         document: result
       };
     } else {
@@ -197,6 +275,7 @@ export abstract class AbstractController<T extends IViewInterface>
       const result = new this.Model(input);
       return {
         resourceOwner: await this.getResourceOwner(result),
+        originalObject: null,
         document: result
       };
     }
@@ -219,10 +298,13 @@ export abstract class AbstractController<T extends IViewInterface>
   ): boolean;
   protected abstract validateUpdatePermissions(
     authenticatedUser: IViewUser,
+    originalObject: T,
+    updatedDocument: T & Document,
     resourceOwner: IViewUser | null
   ): boolean;
   protected abstract validateCreatePermissions(
     authenticatedUser: IViewUser,
+    updatedDocument: T & Document,
     resourceOwner: IViewUser | null
   ): boolean;
 
