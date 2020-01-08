@@ -20,9 +20,8 @@ export class UserRouter implements HasRouter {
   private _init() {
     this.router.post("/validate", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._userController.validate(req.body || {}, userId),
+          await this._userController.validate(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -33,9 +32,8 @@ export class UserRouter implements HasRouter {
 
     this.router.post("/save", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._userController.save(req.body || {}, userId),
+          await this._userController.save(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -47,7 +45,7 @@ export class UserRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._userController.getById(req.params.id || ""),
+          await this._userController.getById(req.user!._id, req.params.id || ""),
           res,
           next
         );
@@ -60,6 +58,7 @@ export class UserRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._userController.getAll(
+            req.user!._id,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,

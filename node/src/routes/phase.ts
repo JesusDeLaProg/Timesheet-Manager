@@ -21,7 +21,7 @@ export class PhaseRouter implements HasRouter {
     this.router.post("/validate", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._phaseController.validate(req.body || {}),
+          await this._phaseController.validate(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -33,7 +33,7 @@ export class PhaseRouter implements HasRouter {
     this.router.post("/save", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._phaseController.save(req.body || {}),
+          await this._phaseController.save(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -46,6 +46,7 @@ export class PhaseRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._phaseController.getAllPopulated(
+            req.user!._id,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,
@@ -59,7 +60,7 @@ export class PhaseRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._phaseController.getById(req.params.id || ""),
+          await this._phaseController.getById(req.user!._id, req.params.id || ""),
           res,
           next
         );
@@ -72,6 +73,7 @@ export class PhaseRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._phaseController.getAll(
+            req.user!._id,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,

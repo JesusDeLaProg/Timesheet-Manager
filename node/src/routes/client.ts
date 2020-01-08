@@ -21,7 +21,7 @@ export class ClientRouter implements HasRouter {
     this.router.post("/validate", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._clientController.validate(req.body || {}),
+          await this._clientController.validate(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -33,7 +33,7 @@ export class ClientRouter implements HasRouter {
     this.router.post("/save", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._clientController.save(req.body || {}),
+          await this._clientController.save(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -46,6 +46,7 @@ export class ClientRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._clientController.getAllByName(
+            req.user!._id,
             req.params.name || "",
             utils.buildQueryOptionsFromRequest(req)
           ),
@@ -60,7 +61,7 @@ export class ClientRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._clientController.getById(req.params.id || ""),
+          await this._clientController.getById(req.user!._id, req.params.id || ""),
           res,
           next
         );
@@ -73,6 +74,7 @@ export class ClientRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._clientController.getAll(
+            req.user!._id,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,

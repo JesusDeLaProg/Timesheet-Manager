@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 
-import { ICrudResult, IViewPhase, IViewUser } from "../../../types/viewmodels";
+import { IViewPhase, IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";

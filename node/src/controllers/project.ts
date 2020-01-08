@@ -2,7 +2,6 @@ import { inject, injectable } from "inversify";
 import escapeRegExp from "lodash.escaperegexp";
 
 import {
-  ICrudResult,
   IViewProject,
   IViewUser
 } from "../../../types/viewmodels";

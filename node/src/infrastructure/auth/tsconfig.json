@@ -1,5 +1,5 @@
 {
   "extends": "../../../base.tsconfig.json",
-  "files": ["./jwt.ts", "./authorize.ts"],
-  "references": [{ "path": "../../constants" }, { "path": "../utils" }]
+  "include": ["./*.ts"],
+  "references": []
 }

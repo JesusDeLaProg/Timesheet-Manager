@@ -21,7 +21,7 @@ export class ProjectRouter implements HasRouter {
     this.router.post("/validate", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._projectController.validate(req.body || {}),
+          await this._projectController.validate(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -33,7 +33,7 @@ export class ProjectRouter implements HasRouter {
     this.router.post("/save", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._projectController.save(req.body || {}),
+          await this._projectController.save(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -46,6 +46,7 @@ export class ProjectRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._projectController.getAllByCode(
+            req.user!._id,
             req.params.code || "",
             utils.buildQueryOptionsFromRequest(req)
           ),
@@ -60,7 +61,7 @@ export class ProjectRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._projectController.getById(req.params.id || ""),
+          await this._projectController.getById(req.user!._id, req.params.id || ""),
           res,
           next
         );
@@ -73,6 +74,7 @@ export class ProjectRouter implements HasRouter {
       try {
         utils.sendResultOrGiveToErrorHandler(
           await this._projectController.getAll(
+            req.user!._id,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,

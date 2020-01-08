@@ -21,9 +21,8 @@ export class TimesheetRouter implements HasRouter {
   private _init() {
     this.router.post("/validate", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.validate(req.body || {}, userId),
+          await this._timesheetController.validate(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -34,9 +33,8 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.post("/save", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.save(req.body || {}, userId),
+          await this._timesheetController.save(req.user!._id, req.body || {}),
           res,
           next
         );
@@ -47,11 +45,10 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/byUserId/:id", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.getAllByUserId(
+            req.user!._id,
             req.params.id || "",
-            userId,
             utils.buildQueryOptionsFromRequest(req)
           ),
           res,
@@ -64,11 +61,10 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/populated/:id", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.getByIdPopulated(
+            req.user!._id,
             req.params.id || "",
-            userId
           ),
           res,
           next
@@ -80,11 +76,10 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/countByUserId/:userId", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.countByUserId(
+            req.user!._id,
             req.params.userId || "",
-            userId
           ),
           res,
           next
@@ -96,9 +91,8 @@ export class TimesheetRouter implements HasRouter {
 
     this.router.get("/:id", async (req, res, next) => {
       try {
-        const userId = (req.user && req.user._id) || undefined;
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.getById(req.params.id || "", userId),
+          await this._timesheetController.getById(req.user!._id, req.params.id || ""),
           res,
           next
         );
@@ -117,6 +111,7 @@ export class TimesheetRouter implements HasRouter {
                 utils.buildQueryOptionsFromRequest(req)
               )
             : await this._timesheetController.getAll(
+                req.user!._id,
                 utils.buildQueryOptionsFromRequest(req)
               ),
           res,

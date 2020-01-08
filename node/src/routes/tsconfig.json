@@ -3,6 +3,7 @@
   "include": ["./*.ts"],
   "references": [
     { "path": "../constants" },
-    { "path": "../infrastructure/auth" }
+    { "path": "../infrastructure/auth" },
+    { "path": "../infrastructure/utils" }
   ]
 }

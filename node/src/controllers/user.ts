@@ -1,13 +1,8 @@
 import { inject, injectable } from "inversify";
-import moment from "moment";
-import { Error as MongooseError, Types } from "mongoose";
 
-import { StringId } from "../../../types/datamodels";
-import { ICrudResult, IViewUser } from "../../../types/viewmodels";
+import { IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
-import { CrudResult } from "../infrastructure/utils/crud-result";
-import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IUserController } from "../interfaces/controllers";
 import { UserDocument, UserModel } from "../interfaces/models";
 import { AbstractController } from "./abstract";

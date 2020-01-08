@@ -5,9 +5,11 @@ import ms from "ms";
 import passport from "passport";
 
 import Controllers from "../constants/symbols/controllers";
+import Models from "../constants/symbols/models";
 import setupJwtStrategy from "../infrastructure/auth/jwt";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IAuthController, IUserController } from "../interfaces/controllers";
+import { UserModel } from "~server/interfaces/models";
 import { HasRouter } from "../interfaces/routers";
 import utils from "./abstract";
 
@@ -22,7 +24,9 @@ export class AuthRouter implements HasRouter {
     @inject(Controllers.AuthController)
     private _authController: IAuthController,
     @inject(Controllers.UserController)
-    private _userController: IUserController
+    private _userController: IUserController,
+    @inject(Models.User)
+    private User: UserModel
   ) {
     this._init();
   }
@@ -30,9 +34,9 @@ export class AuthRouter implements HasRouter {
   private _init() {
     setupJwtStrategy(async (jwtPayload, done) => {
       try {
-        const result = await this._userController.getById(jwtPayload.user);
-        if (result.result) {
-          if (!result.result.isActive) {
+        const result = await this.User.findById(jwtPayload.user);
+        if (result) {
+          if (!result.isActive) {
             const error = new Error(
               "Ce compte est désactivé. Veuillez vous connecter avec un compte actif."
             );
@@ -41,8 +45,8 @@ export class AuthRouter implements HasRouter {
           }
 
           return done(null, {
-            _id: result.result._id,
-            role: result.result.role
+            _id: result._id,
+            role: result.role
           });
         } else {
           return done(null, false);
@@ -79,7 +83,7 @@ export class AuthRouter implements HasRouter {
       async (req, res, next) => {
         try {
           utils.sendResultOrGiveToErrorHandler(
-            await this._userController.getById(req.user!._id.toHexString()),
+            await this._userController.getById(req.user!._id, req.user!._id),
             res,
             next
           );

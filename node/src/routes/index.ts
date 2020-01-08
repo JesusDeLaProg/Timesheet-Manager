@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { ContainerModule, inject, injectable } from "inversify";
 
-import authorize from "../infrastructure/auth/authorize";
-
 import { HasRouter } from "../interfaces/routers";
 
-import { UserRole } from "../constants/enums/user-role";
 import Routers from "../constants/symbols/routers";
 import { ActivityRouter } from "./activity";
 import { AuthRouter } from "./auth";
@@ -38,33 +35,21 @@ export class ApiRouter implements HasRouter {
 
     this.router.use(
       "/activity",
-      authorize({
-        allow: [UserRole.Superadmin]
-      }),
       this._activityRouter.router
     );
 
     this.router.use(
       "/client",
-      authorize({
-        block: [UserRole.Everyone]
-      }),
       this._clientRouter.router
     );
 
     this.router.use(
       "/phase",
-      authorize({
-        allow: [UserRole.Superadmin]
-      }),
       this._phaseRouter.router
     );
 
     this.router.use(
       "/project",
-      authorize({
-        block: [UserRole.Everyone]
-      }),
       this._projectRouter.router
     );
 
@@ -72,9 +57,6 @@ export class ApiRouter implements HasRouter {
 
     this.router.use(
       "/user",
-      authorize({
-        block: [UserRole.Everyone]
-      }),
       this._userRouter.router
     );
   }
