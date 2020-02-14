@@ -1,5 +1,4 @@
 import { Container } from "inversify";
-import { Types } from "mongoose";
 import "reflect-metadata";
 import should from "should";
 
@@ -7,7 +6,19 @@ import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { PhaseController } from "../phase";
 import { PhaseModel, ActivityModel } from "../../interfaces/models";
-import { IViewPhase } from "../../../../types/viewmodels";
+import {
+  IViewPhase,
+  IViewActivity,
+  ICrudResult
+} from "../../../../types/viewmodels";
+import {
+  createPhases,
+  createActivities,
+  defaultUsers,
+  setupDatabase,
+  createControllerTests
+} from "./abstract";
+import { AllUserRoles, UserRole } from "node/src/constants/enums/user-role";
 
 export default function buildTestSuite() {
   describe(PhaseController.name, function() {
@@ -15,27 +26,8 @@ export default function buildTestSuite() {
     let Phase: PhaseModel;
     let controller: PhaseController;
 
-    async function createActivities(number: number) {
-      const activities = [];
-      for (let i = 1; i <= number; ++i) {
-        activities.push(new Activity({ code: `ACT${i}`, name: `Test${i}` }));
-      }
-      for (const act of activities) {
-        await act.save();
-      }
-      return activities;
-    }
-
-    async function createPhases(number: number) {
-      const phases = [];
-      for (let i = 1; i <= number; ++i) {
-        phases.push(new Phase({ code: `PH${i}`, name: `Test${i}` }));
-      }
-      for (const ph of phases) {
-        await ph.save();
-      }
-      return phases;
-    }
+    let activities: IViewActivity[];
+    let phases: IViewPhase[];
 
     this.beforeAll(function() {
       const container = new Container();
@@ -46,111 +38,94 @@ export default function buildTestSuite() {
       Phase = container.get(Models.Phase);
     });
 
+    this.beforeEach(async function() {
+      activities = createActivities(Array(6));
+      phases = createPhases(Array(6)).map((ph, i, arr) => {
+        const j = i <= arr.length / 2 ? 0 : 3;
+        ph.activities = activities
+          .slice(j, j + 3)
+          .map((act) => act._id.toString());
+        return ph;
+      });
+      await setupDatabase(
+        {
+          users: defaultUsers,
+          activities,
+          phases
+        },
+        false
+      );
+    });
+
     this.afterEach(async function() {
       await Phase.deleteMany({});
       await Activity.deleteMany({});
     });
 
-    it("should have a getById function.", async function() {
-      const id = new Types.ObjectId();
-      await new Phase({
-        _id: id,
-        code: "PH",
-        name: "Test"
-      }).save();
-      const result = await controller.getById(id.toHexString());
-      should(result.success).be.true();
-      should(result.result).match({ code: "PH", name: "Test" });
-    });
+    for (const user of defaultUsers) {
+      describe(`Logged in as ${user.username}`, function() {
+        const inputValidateCreate = JSON.parse(JSON.stringify(phases[2]));
+        const inputSaveCreate = JSON.parse(JSON.stringify(phases[2]));
 
-    it("should have a getAll function.", async function() {
-      await createPhases(3);
-      const result = await controller.getAll();
-      should(result.success).be.true();
-      should(result.result).have.length(3);
-      should((result.result as IViewPhase[])[2]).match({
-        code: "PH3",
-        name: "Test3"
+        createControllerTests(controller, user, {
+          getById: {
+            id: phases[4]._id,
+            allowedRoles: AllUserRoles,
+            verify: (res) => should(res.result).match(phases[4])
+          },
+          getAll: {
+            options: {},
+            allowedRoles: AllUserRoles,
+            verify: (res) => should(res.result).match(phases)
+          },
+          count: {
+            allowedRoles: AllUserRoles,
+            verify: (res) => should(res.result).match(phases)
+          },
+          validateCreate: {
+            input: inputValidateCreate,
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).be.null(),
+            verifyFail: (res: ICrudResult<any>) =>
+              should(res.result!.code).equal(403)
+          },
+          validateUpdate: {
+            input: JSON.parse(JSON.stringify(phases[3])),
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).be.null(),
+            verifyFail: (res: ICrudResult<any>) =>
+              should(res.result!.code).equal(403)
+          },
+          saveCreate: {
+            input: inputSaveCreate,
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).match(inputSaveCreate),
+            verifyFail: (res: ICrudResult<any>) =>
+              should(res.result!.code).equal(403)
+          },
+          saveUpdate: {
+            input: JSON.parse(JSON.stringify(phases[3])),
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).match(phases[3]),
+            verifyFail: (res: ICrudResult<any>) =>
+              should(res.result!.code).equal(403)
+          }
+        });
+
+        it("getAllPopulated", async function() {
+          const objectsToMatch = phases.map((ph) => {
+            const phase: IViewPhase<IViewActivity> = Object.assign({}, ph, {
+              activities: ph.activities.map((actId) =>
+                activities.find((a) => a._id === actId)
+              )
+            } as { activities: IViewActivity[] });
+            return phase;
+          });
+          const result = await controller.getAllPopulated(user._id, {});
+          should(result.success).be.true();
+          should(result.result).match(objectsToMatch);
+        });
       });
-    });
-
-    it("should have a count function.", async function() {
-      await createPhases(3);
-      const result = await controller.count();
-      should(result.success).be.true();
-      should(result.result).equal(3);
-    });
-
-    it("should have a validate function.", async function() {
-      const result = await controller.validate({
-        _id: undefined,
-        code: "PH",
-        name: "Test",
-        activities: []
-      });
-      should(result.success).be.true();
-      should(result.result).be.null();
-      const id = new Types.ObjectId();
-      await new Phase({ _id: id, code: "PH1", name: "Test1" }).save();
-      should(
-        (await controller.validate({
-          _id: id,
-          code: "PH",
-          name: "Test",
-          activities: []
-        })).success
-      ).be.true();
-    });
-
-    it("should have a save function.", async function() {
-      const results = [
-        await controller.save({
-          _id: undefined,
-          code: "PH1",
-          name: "Test1",
-          activities: []
-        }),
-        await controller.save({
-          _id: undefined,
-          code: "PH2",
-          name: "Test2",
-          activities: []
-        })
-      ];
-      should(results).match([{ success: true }, { success: true }]);
-      should(await Phase.find({})).match([
-        { code: "PH1", name: "Test1" },
-        { code: "PH2", name: "Test2" }
-      ]);
-    });
-
-    it("should have a getAllPopulated function.", async function() {
-      const activities = await createActivities(3);
-      const plainActivities = activities.map((act) => act.toObject());
-      const activitiesIds = activities.map((act) => act._id);
-      const phases = [
-        new Phase({
-          code: "PH1",
-          name: "Test1",
-          activities: activitiesIds
-        }),
-        new Phase({
-          code: "PH2",
-          name: "Test2",
-          activities: activitiesIds
-        })
-      ];
-      for (const phase of phases) {
-        await phase.save();
-      }
-      const result = await controller.getAllPopulated();
-      should(result).match({
-        success: true,
-        result: [
-          { code: "PH1", name: "Test1", activities: plainActivities },
-          { code: "PH2", name: "Test2", activities: plainActivities }
-        ]
-      });
-    });
+    }
   });
 }

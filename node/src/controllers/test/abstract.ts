@@ -298,43 +298,39 @@ interface Authorization {
   allowedRoles: UserRole[];
 }
 
+interface VerifyCallbacks<T> {
+  verify: (res: ICrudResult<T>) => void;
+  verifyFail?: (res: ICrudResult<Error>) => void;
+}
+
 export interface ControllerTestOptions<T> {
   getById?: {
     // ID to get
     id: string;
-    verify: (res: ICrudResult<T>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<T> &
+    Authorization;
   getAll?: {
     // Options to give to getAll
     options: QueryOptions;
-    verify: (res: ICrudResult<T[]>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
-  count?: {
-    verify: (res: ICrudResult<number>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<T[]> &
+    Authorization;
+  count?: VerifyCallbacks<number> & Authorization;
   validateUpdate?: {
     input: T;
-    verify: (res: ICrudResult<MongooseError.ValidationError>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<MongooseError.ValidationError> &
+    Authorization;
   validateCreate?: {
     input: T;
-    verify: (res: ICrudResult<MongooseError.ValidationError>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<MongooseError.ValidationError> &
+    Authorization;
   saveUpdate?: {
     input: T;
-    verify: (res: ICrudResult<T | MongooseError.ValidationError>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<T | MongooseError.ValidationError> &
+    Authorization;
   saveCreate?: {
     input: T;
-    verify: (res: ICrudResult<T | MongooseError.ValidationError>) => void;
-    verifyFail?: (failRes: ICrudResult<null>) => void;
-  } & Authorization;
+  } & VerifyCallbacks<T | MongooseError.ValidationError> &
+    Authorization;
 }
 
 export function createControllerTests<T extends IViewInterface>(

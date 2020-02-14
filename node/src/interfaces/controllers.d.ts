@@ -1,4 +1,4 @@
-import { Document, Error, Types } from "mongoose";
+import { Error, Types } from "mongoose";
 
 import { JWTPayload } from "./routers";
 import { IViewInterface, IViewActivity, IViewPhase, IViewClient, IViewProject, IViewTimesheet, IViewUser, ICrudResult } from "../../../types/viewmodels";
