@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import abstractTestSuite from "./abstract";
+import { clearDatabase } from "./abstract";
 import activityTestSuite from "./activity";
 import authTestSuite from "./auth";
 import clientTestSuite from "./client";
@@ -11,7 +11,10 @@ import userTestSuite from "./user";
 
 export default function buildTestSuite() {
   describe("Controllers", function() {
-    abstractTestSuite();
+    this.afterAll(async function() {
+      await clearDatabase();
+    });
+
     activityTestSuite();
     authTestSuite();
     clientTestSuite();

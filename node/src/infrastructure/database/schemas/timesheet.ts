@@ -10,10 +10,7 @@ import {
   StringId
 } from "../../../../../types/datamodels";
 import { IViewPhase, IViewTimesheet } from "../../../../../types/viewmodels";
-import {
-  PhaseDocument,
-  TimesheetDocument
-} from "../../../interfaces/models";
+import { PhaseDocument, TimesheetDocument } from "../../../interfaces/models";
 import arrayLength from "../validators/arraylength";
 import datecompare from "../validators/datecompare";
 import idexists from "../validators/idexists";

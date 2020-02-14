@@ -9,7 +9,7 @@ import Models from "../constants/symbols/models";
 import setupJwtStrategy from "../infrastructure/auth/jwt";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IAuthController, IUserController } from "../interfaces/controllers";
-import { UserModel } from "~server/interfaces/models";
+import { UserModel } from "../interfaces/models";
 import { HasRouter } from "../interfaces/routers";
 import utils from "./abstract";
 

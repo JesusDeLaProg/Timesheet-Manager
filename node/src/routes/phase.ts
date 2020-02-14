@@ -60,7 +60,10 @@ export class PhaseRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._phaseController.getById(req.user!._id, req.params.id || ""),
+          await this._phaseController.getById(
+            req.user!._id,
+            req.params.id || ""
+          ),
           res,
           next
         );

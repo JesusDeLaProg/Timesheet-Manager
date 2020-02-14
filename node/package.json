@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "lint": "tslint -c ./tslint.json -p ./src/tsconfig.json",
-    "build": "webpack --config ./webpack.config.js --colors",
+    "build": "tsc --build src/tsconfig.json",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "node --inspect-brk ./bin/www",
     "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"

@@ -1,6 +1,7 @@
 /* tslint:disable:object-literal-sort-keys */
 import base64url from "base64url";
 import crypto from "crypto";
+import { promisify } from "util";
 import sortBy from "lodash.sortby";
 import moment from "moment";
 import { Schema, SchemaTypeOpts, Types } from "mongoose";
@@ -313,7 +314,7 @@ export const UserSchema = new Schema({
   }
 });
 
-function encryptPassword(
+async function encryptPassword(
   password: string,
   salt: string = "",
   encryptionFunction: string = "",
@@ -330,36 +331,33 @@ function encryptPassword(
     iterationCount || parseInt(process.env.ITERCOUNT as string, 10);
   outLength = outLength || parseInt(process.env.OUTLENGTH as string, 10);
 
+  const asyncEncFn = promisify(crypto.pbkdf2);
+
   return [
     base64url.encode(iterationCount.toString(16)),
     base64url.encode(encryptionFunction),
     base64url.encode(outLength.toString(16)),
     base64url.encode(salt),
     base64url.encode(
-      crypto
-        .pbkdf2Sync(
-          password,
-          salt,
-          iterationCount,
-          outLength,
-          encryptionFunction
-        )
-        .toString("hex")
+      (await asyncEncFn(
+        password,
+        salt,
+        iterationCount,
+        outLength,
+        encryptionFunction
+      )).toString("hex")
     )
   ].join(".");
 }
 
-UserSchema.virtual("plainTextPassword")
-  .get(() => "")
-  .set(function(this: IUser, plainTextPassword: string) {
-    if (!isLength(plainTextPassword, { min: 3 })) {
-      this.password = ".".repeat((plainTextPassword || { length: 0 }).length);
-    } else {
-      this.password = encryptPassword(plainTextPassword);
-    }
-  });
+UserSchema.methods.setPassword = async function(plainTextPassword: string) {
+  this.password = await encryptPassword(plainTextPassword);
+};
 
-UserSchema.methods.checkPassword = function(this: IUser, password: string) {
+UserSchema.methods.checkPassword = async function(
+  this: IUser,
+  password: string
+) {
   if (!password) {
     return false;
   }
@@ -372,12 +370,12 @@ UserSchema.methods.checkPassword = function(this: IUser, password: string) {
 
   return (
     this.password ===
-    encryptPassword(
+    (await encryptPassword(
       password,
       salt,
       encryptionFunction,
       iterationCount,
       outLength
-    )
+    ))
   );
 };

@@ -7,75 +7,69 @@ import { ModelModule } from "../../infrastructure/database/testing";
 import { AuthController } from "../auth";
 import { UserModel } from "../../interfaces/models";
 import { AssertionError } from "assert";
+import { createUsers, setupDatabase } from "./abstract";
+import { UserRole } from "node/src/constants/enums/user-role";
+import { IViewUser } from "types/viewmodels";
 
 export default function buildTestSuite() {
   describe(AuthController.name, function() {
-    let controller: AuthController;
     let User: UserModel;
+    let controller: AuthController;
+
+    const users = createUsers([
+      { username: "Active", isActive: true, role: UserRole.Everyone },
+      { username: "Inactive", isActive: false, role: UserRole.Subadmin }
+    ]);
 
     this.beforeAll(function() {
       const container = new Container();
       container.load(ModelModule);
       container.bind<AuthController>(AuthController).toSelf();
       controller = container.get(AuthController);
-      User = container.get(Models.User);
+      User = container.get(Models.Activity);
+    });
+
+    this.beforeEach(async function() {
+      const userDocs = [new User(users[0]), new User(users[1])];
+      await userDocs[0].setPassword("password1");
+      await userDocs[1].setPassword("password2");
+      await setupDatabase(
+        {
+          users: userDocs.map((u) => u.toJSON() as IViewUser)
+        },
+        false
+      );
     });
 
     this.afterEach(async function() {
       await User.deleteMany({});
     });
 
-    it("should log in a user with correct credentials.", async function() {
-      const user = new User({
-        username: "testuser",
-        isActive: true
-      });
-      user.plainTextPassword = "password";
-      await user.save({ validateBeforeSave: false });
-
-      const result = await controller.login("testuser", "password");
-      should(result.success).be.true();
+    it("should authenticate active user with correct credentials", async function() {
+      const result = await controller.login(users[0].username, "password1");
+      should(result.success).true();
     });
 
-    it("should throw an error for incorrect credentials.", async function() {
-      const user = new User({
-        username: "testuser",
-        isActive: true
-      });
-      user.plainTextPassword = "password";
-      await user.save({ validateBeforeSave: false });
-
+    it("should block active user with wrong credentials", async function() {
       try {
-        await controller.login("testuser2", "password");
+        const result = await controller.login(
+          users[0].username,
+          "sdfadfsgdxcvbxcb"
+        );
       } catch (err) {
         should(err).match({
           success: false,
           message: "Nom d'usager ou mot de passe invalide."
         });
-        try {
-          await controller.login("testuser", "wrong password");
-        } catch (error) {
-          should(error).match({
-            success: false,
-            message: "Nom d'usager ou mot de passe invalide."
-          });
-          return;
-        }
       }
       throw new AssertionError({
-        message: "Execution should not have continued."
+        message: "Authentication should throw an exception on wrong credentials"
       });
     });
 
-    it("should throw an error for inactive accounts.", async function() {
-      const user = new User({
-        username: "testuser",
-        isActive: false
-      });
-      user.plainTextPassword = "password";
-      await user.save({ validateBeforeSave: false });
+    it("should block inactive user", async function() {
       try {
-        await controller.login("testuser", "password");
+        const result = await controller.login(users[1].username, "password2");
       } catch (err) {
         should(err).match({
           success: false,
@@ -83,10 +77,9 @@ export default function buildTestSuite() {
             "Ce compte utilisateur est désactivé. " +
             "Veuillez réactiver ce compte ou vous connecter avec un autre compte."
         });
-        return;
       }
       throw new AssertionError({
-        message: "Execution should not have continued."
+        message: "Authentication should throw an exception on wrong credentials"
       });
     });
   });

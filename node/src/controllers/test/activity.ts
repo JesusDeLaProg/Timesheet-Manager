@@ -5,93 +5,99 @@ import should from "should";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ActivityController } from "../activity";
-import { ActivityModel } from "../../interfaces/models";
+import { ActivityModel, UserModel } from "../../interfaces/models";
 import { Types } from "mongoose";
 import { IViewActivity } from "../../../../types/viewmodels";
+import {
+  createActivities,
+  defaultUsers,
+  setupDatabase,
+  createControllerTests
+} from "./abstract";
+import { UserRole, AllUserRoles } from "node/src/constants/enums/user-role";
 
 export default function buildTestSuite() {
   describe(ActivityController.name, function() {
+    let User: UserModel;
     let Activity: ActivityModel;
     let controller: ActivityController;
 
-    async function createActivities(number: number) {
-      const activities = [];
-      for (let i = 1; i <= number; ++i) {
-        activities.push(new Activity({ code: `ACT${i}`, name: `Test${i}` }));
-      }
-      for (const act of activities) {
-        await act.save();
-      }
-    }
+    let activities: IViewActivity[];
 
     this.beforeAll(function() {
       const container = new Container();
       container.load(ModelModule);
       container.bind<ActivityController>(ActivityController).toSelf();
       controller = container.get(ActivityController);
+      User = container.get(Models.User);
       Activity = container.get(Models.Activity);
+    });
+
+    this.beforeEach(async function() {
+      activities = createActivities(Array(6));
+      activities = activities.map((act) => {
+        act._id = new Types.ObjectId();
+        return act;
+      });
+      await setupDatabase(
+        {
+          users: defaultUsers,
+          activities
+        },
+        false
+      );
     });
 
     this.afterEach(async function() {
       await Activity.deleteMany({});
+      await User.deleteMany({});
     });
 
-    it("should have a getById function.", async function() {
-      const id = new Types.ObjectId();
-      await new Activity({
-        _id: id,
-        code: "AA",
-        name: "Test"
-      }).save();
-      const result = await controller.getById(id.toHexString());
-      should(result.success).be.true();
-      should(result.result).match({ code: "AA", name: "Test" });
-    });
+    for (let user of defaultUsers) {
+      describe(`Logged in as ${user.username}`, function() {
+        const inputValidateCreate = createActivities([{}])[0];
+        const inputSaveCreate = createActivities([{}])[0];
 
-    it("should have a getAll function.", async function() {
-      await createActivities(3);
-      const result = await controller.getAll();
-      should(result.success).be.true();
-      should(result.result).have.length(3);
-      should((result.result as IViewActivity[])[2]).match({
-        code: "ACT3",
-        name: "Test3"
+        createControllerTests(controller, user, {
+          getById: {
+            id: activities[3]._id,
+            verify: (res) => should(res.result).match(activities[3]),
+            allowedRoles: AllUserRoles
+          },
+          getAll: {
+            options: {},
+            verify: (res) => should(res.result).match(activities),
+            allowedRoles: AllUserRoles
+          },
+          count: {
+            allowedRoles: AllUserRoles,
+            verify: (res) => should(res.result).equal(activities.length)
+          },
+          validateCreate: {
+            input: inputValidateCreate,
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).be.null()
+          },
+          validateUpdate: {
+            input: JSON.parse(JSON.stringify(activities[4])),
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).be.null()
+          },
+          saveCreate: {
+            input: inputSaveCreate,
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) => should(res.result).match(inputSaveCreate)
+          },
+          saveUpdate: {
+            input: JSON.parse(JSON.stringify(activities[4])),
+            allowedRoles: [UserRole.Admin, UserRole.Superadmin],
+            verify: (res) =>
+              should(res.result).match(
+                JSON.parse(JSON.stringify(activities[4]))
+              )
+          }
+        });
       });
-    });
-
-    it("should have a count function.", async function() {
-      await createActivities(3);
-      const result = await controller.count();
-      should(result.success).be.true();
-      should(result.result).equal(3);
-    });
-
-    it("should have a validate function.", async function() {
-      const result = await controller.validate({
-        _id: undefined,
-        code: "ACT",
-        name: "Test"
-      });
-      should(result.success).be.true();
-      should(result.result).be.null();
-      const id = new Types.ObjectId();
-      await new Activity({ _id: id, code: "ACT1", name: "Test1" }).save();
-      should(
-        (await controller.validate({ _id: id, code: "ACT", name: "Test" }))
-          .success
-      ).be.true();
-    });
-
-    it("should have a save function.", async function() {
-      const results = [
-        await controller.save({ _id: undefined, code: "ACT1", name: "Test1" }),
-        await controller.save({ _id: undefined, code: "ACT2", name: "Test2" })
-      ];
-      should(results).match([{ success: true }, { success: true }]);
-      should(await Activity.find({})).match([
-        { code: "ACT1", name: "Test1" },
-        { code: "ACT2", name: "Test2" }
-      ]);
-    });
+    }
   });
 }

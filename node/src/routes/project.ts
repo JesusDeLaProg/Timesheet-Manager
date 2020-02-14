@@ -61,7 +61,10 @@ export class ProjectRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._projectController.getById(req.user!._id, req.params.id || ""),
+          await this._projectController.getById(
+            req.user!._id,
+            req.params.id || ""
+          ),
           res,
           next
         );

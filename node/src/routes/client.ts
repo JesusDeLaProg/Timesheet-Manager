@@ -61,7 +61,10 @@ export class ClientRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._clientController.getById(req.user!._id, req.params.id || ""),
+          await this._clientController.getById(
+            req.user!._id,
+            req.params.id || ""
+          ),
           res,
           next
         );

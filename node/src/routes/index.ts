@@ -33,32 +33,17 @@ export class ApiRouter implements HasRouter {
 
     this.router.use(this._authRouter.authenticationMiddlewares);
 
-    this.router.use(
-      "/activity",
-      this._activityRouter.router
-    );
+    this.router.use("/activity", this._activityRouter.router);
 
-    this.router.use(
-      "/client",
-      this._clientRouter.router
-    );
+    this.router.use("/client", this._clientRouter.router);
 
-    this.router.use(
-      "/phase",
-      this._phaseRouter.router
-    );
+    this.router.use("/phase", this._phaseRouter.router);
 
-    this.router.use(
-      "/project",
-      this._projectRouter.router
-    );
+    this.router.use("/project", this._projectRouter.router);
 
     this.router.use("/timesheet", this._timesheetRouter.router);
 
-    this.router.use(
-      "/user",
-      this._userRouter.router
-    );
+    this.router.use("/user", this._userRouter.router);
   }
 }
 

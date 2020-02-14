@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { Document } from "mongoose";
 
 import { IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
@@ -92,5 +93,24 @@ export class UserController extends AbstractController<IViewUser>
         authenticatedUser.role > updatedDocument.role) ||
       authenticatedUser.role === UserRole.Superadmin
     );
+  }
+
+  protected async objectToDocument(
+    input: IViewUser
+  ): Promise<{
+    resourceOwner: UserDocument | null;
+    originalObject: IViewUser | null;
+    document: IViewUser & Document;
+  }> {
+    let newPassord;
+    if (input.password) {
+      newPassord = input.password;
+      input.password = undefined;
+    }
+    const result = await super.objectToDocument(input);
+    if (newPassord) {
+      await (result.document as UserDocument).setPassword(newPassord);
+    }
+    return result;
   }
 }

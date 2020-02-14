@@ -1,10 +1,7 @@
 import { inject, injectable } from "inversify";
 import escapeRegExp from "lodash.escaperegexp";
 
-import {
-  IViewProject,
-  IViewUser
-} from "../../../types/viewmodels";
+import { IViewProject, IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";

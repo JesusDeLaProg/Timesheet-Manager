@@ -22,7 +22,10 @@ export class TimesheetRouter implements HasRouter {
     this.router.post("/validate", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.validate(req.user!._id, req.body || {}),
+          await this._timesheetController.validate(
+            req.user!._id,
+            req.body || {}
+          ),
           res,
           next
         );
@@ -64,7 +67,7 @@ export class TimesheetRouter implements HasRouter {
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.getByIdPopulated(
             req.user!._id,
-            req.params.id || "",
+            req.params.id || ""
           ),
           res,
           next
@@ -79,7 +82,7 @@ export class TimesheetRouter implements HasRouter {
         utils.sendResultOrGiveToErrorHandler(
           await this._timesheetController.countByUserId(
             req.user!._id,
-            req.params.userId || "",
+            req.params.userId || ""
           ),
           res,
           next
@@ -92,7 +95,10 @@ export class TimesheetRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._timesheetController.getById(req.user!._id, req.params.id || ""),
+          await this._timesheetController.getById(
+            req.user!._id,
+            req.params.id || ""
+          ),
           res,
           next
         );

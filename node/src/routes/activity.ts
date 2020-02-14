@@ -21,7 +21,10 @@ export class ActivityRouter implements HasRouter {
     this.router.post("/validate", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._activityController.validate(req.user!._id, req.body || {}),
+          await this._activityController.validate(
+            req.user!._id,
+            req.body || {}
+          ),
           res,
           next
         );
@@ -45,7 +48,10 @@ export class ActivityRouter implements HasRouter {
     this.router.get("/:id", async (req, res, next) => {
       try {
         utils.sendResultOrGiveToErrorHandler(
-          await this._activityController.getById(req.user!._id, req.params.id || ""),
+          await this._activityController.getById(
+            req.user!._id,
+            req.params.id || ""
+          ),
           res,
           next
         );

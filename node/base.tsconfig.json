@@ -16,9 +16,6 @@
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "~server/*": ["./node/src/*"]
-    },
     "typeRoots": [
       "../types",
       "./interfaces",
