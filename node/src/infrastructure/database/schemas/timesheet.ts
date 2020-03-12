@@ -172,7 +172,7 @@ const TimesheetLineSchema = new Schema({
       validator(this: Types.Embedded, value: ITimesheetEntry[]) {
         const timesheet = (this.ownerDocument() as unknown) as ITimesheet;
         const numberOfDays =
-          Math.floor(
+          Math.ceil(
             moment
               .duration(moment(timesheet.end).diff(timesheet.begin))
               .asDays()

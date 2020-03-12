@@ -5,7 +5,7 @@ export interface IUserExt {
 
   // Instance methods
   setPassword(plainTextPassword: string): Promise<void>;
-  checkPassword(password: string): boolean;
+  checkPassword(password: string): Promise<boolean>;
 }
 
 export type UserDocument = DataModels.IUser & IUserExt & Document;

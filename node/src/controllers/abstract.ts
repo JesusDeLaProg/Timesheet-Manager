@@ -49,7 +49,7 @@ export abstract class AbstractController<T extends IViewInterface>
         await this.getResourceOwner(result)
       )
     ) {
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.toJSON());
     } else {
       throw this.get403Error();
     }
@@ -77,7 +77,7 @@ export abstract class AbstractController<T extends IViewInterface>
       let query = this.Model.find();
       query = this.applyQueryOptions(query, options);
       const result = await query;
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.map((o) => o.toJSON()));
     } else {
       throw this.get403Error();
     }
@@ -113,7 +113,8 @@ export abstract class AbstractController<T extends IViewInterface>
    * @param {T} input
    * @returns {Promise<ICrudResult<MongooseError.ValidationError>>}
    * @throws 401 Error if there is no authenticated user.
-   * @throws 403 Error if the authenticated user doesn't have permissions to update or create a document in that collection.
+   * @throws 403 Error if the authenticated user doesn't have
+   *         permissions to update or create a document in that collection.
    * @memberof AbstractController
    */
   public async validate(
@@ -126,7 +127,7 @@ export abstract class AbstractController<T extends IViewInterface>
       resourceOwner: originalResourceOwner
     } = await this.objectToDocument(input);
     let authorized = false;
-    if (input._id) {
+    if (originalObject) {
       authorized = this.validateUpdatePermissions(
         await this.getUser(authenticatedUserId),
         originalObject as T,
@@ -168,9 +169,11 @@ export abstract class AbstractController<T extends IViewInterface>
    * Saves a document after validating it using Mongoose validators.
    * @param {ObjectId} authenticatedUserId
    * @param {T} input
-   * @returns {Promise<ICrudResult<T | MongooseError.ValidationError>>} Updated document if saved successfully, ValidationError otherwise.
+   * @returns {Promise<ICrudResult<T | MongooseError.ValidationError>>} Updated document
+   *          if saved successfully, ValidationError otherwise.
    * @throws 401 Error if there is no authenticated user.
-   * @throws 403 Error if the authenticated user doesn't have permissions to update or create a document in that collection.
+   * @throws 403 Error if the authenticated user doesn't have permissions to update or
+   *         create a document in that collection.
    * @memberof AbstractController
    */
   public async save(
@@ -183,7 +186,7 @@ export abstract class AbstractController<T extends IViewInterface>
       resourceOwner
     } = await this.objectToDocument(input);
     let authorized = false;
-    if (input._id) {
+    if (originalObject) {
       authorized = this.validateUpdatePermissions(
         await this.getUser(authenticatedUserId),
         originalObject as T,
@@ -200,7 +203,7 @@ export abstract class AbstractController<T extends IViewInterface>
     if (authorized) {
       try {
         const result = await document.save();
-        return CrudResult.Success(result);
+        return CrudResult.Success(result.toJSON());
       } catch (error) {
         if (error instanceof MongooseError.ValidationError) {
           (error as MongooseError.ValidationError & HasHttpCode).code = 400;

@@ -1,10 +1,9 @@
-import fs from "fs";
 import { inject, injectable } from "inversify";
 import jwt from "jsonwebtoken";
-import path from "path";
 
 import { ICrudResult } from "../../../types/viewmodels";
 import Models from "../constants/symbols/models";
+import { SERVER_KEY_OR_SECRET } from "../constants/symbols/parameters";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IAuthController } from "../interfaces/controllers";
@@ -15,10 +14,11 @@ import { JWTPayload } from "../interfaces/routers";
 export class AuthController implements IAuthController {
   private readonly _jwtKeyOrSecret: string | Buffer;
 
-  constructor(@inject(Models.User) private User: UserModel) {
-    this._jwtKeyOrSecret =
-      process.env.JWTSECRET ||
-      fs.readFileSync(path.resolve(process.cwd(), "keys/jwt/key"));
+  constructor(
+    @inject(Models.User) private User: UserModel,
+    @inject(SERVER_KEY_OR_SECRET) serverKeyOrSecret: string
+  ) {
+    this._jwtKeyOrSecret = serverKeyOrSecret;
   }
 
   /**
@@ -36,7 +36,7 @@ export class AuthController implements IAuthController {
     password: string
   ): Promise<ICrudResult<string>> {
     const user = await this.User.findOne({ username });
-    if (!user || !user.checkPassword(password)) {
+    if (!user || !(await user.checkPassword(password))) {
       const error = new Error("Nom d'usager ou mot de passe invalide.");
       (error as HasHttpCode).code = 400;
       throw CrudResult.Failure(error);

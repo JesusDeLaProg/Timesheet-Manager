@@ -1,20 +1,30 @@
 import { Container } from "inversify";
-import { Types } from "mongoose";
 import "reflect-metadata";
-import should from "should";
 
 import Models from "../../constants/symbols/models";
-import { ProjectType } from "../../constants/enums/project-type";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ProjectController } from "../project";
 import { ProjectModel, ClientModel } from "../../interfaces/models";
-import { IViewProject } from "../../../../types/viewmodels";
+import { IViewProject, IViewClient } from "../../../../types/viewmodels";
+import {
+  createClients,
+  createProjects,
+  setupDatabase,
+  defaultUsers,
+  createControllerTests,
+  compareIds
+} from "./abstract";
+import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
+import should from "should";
 
 export default function buildTestSuite() {
   describe(ProjectController.name, function() {
     let Client: ClientModel;
     let Project: ProjectModel;
     let controller: ProjectController;
+
+    let clients: IViewClient[];
+    let projects: IViewProject[];
 
     this.beforeAll(function() {
       const container = new Container();
@@ -25,143 +35,135 @@ export default function buildTestSuite() {
       Project = container.get(Models.Project);
     });
 
-    async function createProjects(number: number) {
-      const id = new Types.ObjectId();
-      const testClient = await new Client({
-        _id: id,
-        name: "TestClient"
-      }).save();
-      const projects = [];
-      for (let i = 1; i <= number; ++i) {
-        projects.push(
-          new Project({
-            code: `PROJ${i}`,
-            name: `Test${i}`,
-            client: testClient._id,
-            type: ProjectType.Public,
-            isActive: true
-          })
-        );
-      }
-      for (const proj of projects) {
-        await proj.save();
-      }
-      return projects;
-    }
+    this.beforeEach(async function() {
+      clients = createClients(Array(3).fill({}));
+      projects = createProjects(Array(6).fill({})).map((proj, i) => {
+        proj.client = clients[Math.floor(i / 2)]._id;
+        return proj;
+      });
+      await setupDatabase(
+        {
+          users: defaultUsers,
+          clients,
+          projects
+        },
+        false
+      );
+    });
 
     this.afterEach(async function() {
       await Project.deleteMany({});
       await Client.deleteMany({});
     });
 
-    it("should have a getById function.", async function() {
-      const projects = await createProjects(1);
-      const result = await controller.getById(projects[0]._id);
-      should(result.success).be.true();
-      should(result.result).match({ code: "PROJ1", name: "Test1" });
-    });
+    for (const user of defaultUsers) {
+      describe(`Logged in as ${user.username}`, function() {
+        const inputValidateCreate = createProjects([{}])[0];
+        delete inputValidateCreate._id;
+        const inputSaveCreate = createProjects([{}])[0];
+        delete inputSaveCreate._id;
 
-    it("should have a getAll function.", async function() {
-      await createProjects(3);
-      const result = await controller.getAll();
-      should(result.success).be.true();
-      should(result.result).have.length(3);
-      should((result.result as IViewProject[])[2]).match({
-        code: "PROJ3",
-        name: "Test3"
+        createControllerTests(() => controller, user, {
+          getById: () => ({
+            id: projects[4]._id,
+            allowedRoles: AllUserRoles,
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, projects[4], {
+                  _id: compareIds(projects[4]._id),
+                  client: compareIds(projects[4].client)
+                })
+              )
+          }),
+          getAll: () => ({
+            options: {},
+            allowedRoles: AllUserRoles,
+            verify: (res) =>
+              should(res.result).match(
+                projects.map((p) =>
+                  Object.assign({}, p, {
+                    _id: compareIds(p._id),
+                    client: compareIds(p.client)
+                  })
+                )
+              )
+          }),
+          count: () => ({
+            allowedRoles: AllUserRoles,
+            verify: (res) => should(res.result).equal(projects.length)
+          }),
+          validateCreate: () => ({
+            input: Object.assign({}, inputValidateCreate, {
+              client: clients[0]._id
+            }),
+            allowedRoles: [
+              UserRole.Subadmin,
+              UserRole.Admin,
+              UserRole.Superadmin
+            ],
+            verify: (res) => should(res.result).be.null()
+          }),
+          validateUpdate: () => ({
+            input: JSON.parse(JSON.stringify(projects[2])),
+            allowedRoles: [
+              UserRole.Subadmin,
+              UserRole.Admin,
+              UserRole.Superadmin
+            ],
+            verify: (res) => should(res.result).be.null()
+          }),
+          saveCreate: () => ({
+            input: Object.assign({}, inputSaveCreate, {
+              client: clients[0]._id
+            }),
+            allowedRoles: [
+              UserRole.Subadmin,
+              UserRole.Admin,
+              UserRole.Superadmin
+            ],
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, inputSaveCreate, {
+                  client: compareIds(clients[0]._id)
+                })
+              )
+          }),
+          saveUpdate: () => ({
+            input: JSON.parse(JSON.stringify(projects[2])),
+            allowedRoles: [
+              UserRole.Subadmin,
+              UserRole.Admin,
+              UserRole.Superadmin
+            ],
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, projects[2], {
+                  _id: compareIds(projects[2]._id),
+                  client: compareIds(projects[2].client)
+                })
+              )
+          })
+        });
+
+        it("getAllByCode", async function() {
+          await Project.deleteMany({});
+          const tempProjects = createProjects(
+            Array(21)
+              .fill({})
+              .map((_, i) => ({
+                code: "Proj" + i,
+                client: clients[0]._id,
+                isActive: i % 2 === 0
+              }))
+          );
+          for (const proj of tempProjects) {
+            await new Project(proj).save();
+          }
+          const result = await controller.getAllByCode(user._id, "j1");
+          should(result.success).be.true();
+          should(result.result).have.lengthOf(5);
+        });
       });
-    });
-
-    it("should have a count function.", async function() {
-      await createProjects(3);
-      const result = await controller.count();
-      should(result.success).be.true();
-      should(result.result).equal(3);
-    });
-
-    it("should have a validate function.", async function() {
-      const testClient = await new Client({ name: "Test" }).save();
-      const result = await controller.validate({
-        _id: undefined,
-        code: "PROJ",
-        name: "Test",
-        client: testClient._id,
-        isActive: true,
-        type: ProjectType.Public
-      });
-      should(result.success).be.true();
-      should(result.result).be.null();
-      const id = new Types.ObjectId();
-      await new Project({
-        _id: id,
-        code: "PROJ1",
-        name: "Test1",
-        isActive: true,
-        client: testClient._id,
-        type: ProjectType.Public
-      }).save();
-      should(
-        (await controller.validate({
-          _id: id,
-          code: "PROJ",
-          name: "Test",
-          client: testClient._id,
-          isActive: true,
-          type: ProjectType.Public
-        })).success
-      ).be.true();
-    });
-
-    it("should have a save function.", async function() {
-      const testClient = await new Client({ name: "Test" }).save();
-      const results = [
-        await controller.save({
-          _id: undefined,
-          code: "PROJ1",
-          name: "Test1",
-          client: testClient._id,
-          isActive: true,
-          type: ProjectType.Public
-        }),
-        await controller.save({
-          _id: undefined,
-          code: "PROJ2",
-          name: "Test2",
-          client: testClient._id,
-          isActive: true,
-          type: ProjectType.Public
-        })
-      ];
-      should(results).match([{ success: true }, { success: true }]);
-      should(await Project.find({})).match([
-        {
-          code: "PROJ1",
-          name: "Test1",
-          client: testClient._id,
-          isActive: true,
-          type: ProjectType.Public
-        },
-        {
-          code: "PROJ2",
-          name: "Test2",
-          client: testClient._id,
-          isActive: true,
-          type: ProjectType.Public
-        }
-      ]);
-    });
-
-    it("should have a getAllByCode function.", async function() {
-      const projects = await createProjects(20);
-      const expectedProjects = projects
-        .filter((proj) => proj.code.match(/J1/g))
-        .map((proj) => proj.toObject());
-      const result = await controller.getAllByCode("J1");
-      should(result.result).have.length(11);
-      should(result).match({
-        success: true,
-        result: expectedProjects
-      });
-    });
+    }
   });
 }

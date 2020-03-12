@@ -72,22 +72,30 @@ export async function setupDatabase(
 
   if (databaseState.activities) {
     for (const act of databaseState.activities) {
-      await new Activity(act).save();
+      const actDoc = new Activity(act);
+      await actDoc.save();
+      act._id = actDoc._id + "";
     }
   }
   if (databaseState.phases) {
     for (const phase of databaseState.phases) {
-      await new Phase(phase).save();
+      const phaseDoc = new Phase(phase);
+      await phaseDoc.save();
+      phase._id = phaseDoc._id + "";
     }
   }
   if (databaseState.clients) {
     for (const client of databaseState.clients) {
-      await new Client(client).save();
+      const clientDoc = new Client(client);
+      await clientDoc.save();
+      client._id = clientDoc._id + "";
     }
   }
   if (databaseState.projects) {
     for (const project of databaseState.projects) {
-      await new Project(project).save();
+      const projDoc = new Project(project);
+      await projDoc.save();
+      project._id = projDoc._id + "";
     }
   }
   if (databaseState.users) {
@@ -95,13 +103,17 @@ export async function setupDatabase(
       const userDoc = new User(user);
       if (!userDoc.password) {
         await userDoc.setPassword(generateRandomString(10));
+        user.password = userDoc.password;
       }
       await userDoc.save();
+      user._id = userDoc._id + "";
     }
   }
   if (databaseState.timesheets) {
     for (const timesheet of databaseState.timesheets) {
-      await new Timesheet(timesheet).save();
+      const timesheetDoc = new Timesheet(timesheet);
+      await timesheetDoc.save();
+      timesheet._id = timesheetDoc._id + "";
     }
   }
 
@@ -160,6 +172,7 @@ function generateRandomString(length: number) {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
   return Array(length)
+    .fill(null)
     .map((_) => chars[Math.floor(Math.random() * chars.length)])
     .join("");
 }
@@ -190,7 +203,7 @@ export function createPhases(phases: Partial<IViewPhase>[]) {
     if (phase._id) base._id = phase._id;
     base.code = phase.code === undefined ? generateRandomString(4) : phase.code;
     base.name = phase.name === undefined ? generateRandomString(8) : phase.name;
-    base.activities = [];
+    base.activities = phase.activities || [];
     return new Phase(base).toJSON() as IViewPhase;
   });
 }
@@ -233,7 +246,8 @@ export function createTimesheets(timesheets: Partial<IViewTimesheet>[]) {
     base.end =
       timesheet.end === undefined
         ? moment(new Date())
-            .endOf("week")
+            .startOf("week")
+            .add(6, "days")
             .toDate()
         : timesheet.end;
     base.user = timesheet.user as string;
@@ -275,7 +289,17 @@ export function createUsers(users: Partial<IViewUser>[]) {
           projectType: ProjectType.Prive,
           timeline: [
             {
-              begin: new Date(1970, 1, 1),
+              begin: new Date(1970, 0, 1),
+              jobTitle: generateRandomString(10),
+              rate: +(Math.random() * 100).toFixed(2)
+            }
+          ]
+        },
+        {
+          projectType: ProjectType.Public,
+          timeline: [
+            {
+              begin: new Date(1970, 0, 1),
               jobTitle: generateRandomString(10),
               rate: +(Math.random() * 100).toFixed(2)
             }
@@ -304,163 +328,164 @@ interface VerifyCallbacks<T> {
 }
 
 export interface ControllerTestOptions<T> {
-  getById?: {
+  getById: () => {
     // ID to get
     id: string;
   } & VerifyCallbacks<T> &
     Authorization;
-  getAll?: {
+  getAll: () => {
     // Options to give to getAll
     options: QueryOptions;
   } & VerifyCallbacks<T[]> &
     Authorization;
-  count?: VerifyCallbacks<number> & Authorization;
-  validateUpdate?: {
+  count: () => VerifyCallbacks<number> & Authorization;
+  validateUpdate: () => {
     input: T;
   } & VerifyCallbacks<MongooseError.ValidationError> &
     Authorization;
-  validateCreate?: {
+  validateCreate: () => {
     input: T;
   } & VerifyCallbacks<MongooseError.ValidationError> &
     Authorization;
-  saveUpdate?: {
+  saveUpdate: () => {
     input: T;
   } & VerifyCallbacks<T | MongooseError.ValidationError> &
     Authorization;
-  saveCreate?: {
+  saveCreate: () => {
     input: T;
   } & VerifyCallbacks<T | MongooseError.ValidationError> &
     Authorization;
 }
 
 export function createControllerTests<T extends IViewInterface>(
-  controller: IController<T>,
+  controller: () => IController<T>,
   user: IViewUser,
-  options: ControllerTestOptions<T>
+  options: Partial<ControllerTestOptions<T>>
 ) {
   describe("Controllers tests", function() {
     if (options.getById) {
       it("getById", async function() {
+        const opt = options.getById!();
+        let result;
         try {
-          const result = await controller.getById(
-            user._id,
-            options.getById!.id
-          );
+          result = await controller().getById(user._id, opt.id);
+          should(user.role).equalOneOf(opt.allowedRoles);
           should(result.success).be.true();
-          options.getById!.verify(result);
+          opt!.verify(result);
         } catch (err) {
-          should(options.getById!.verifyFail).not.be.null();
-          should(err.success).be.false();
-          options.getById!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.getAll) {
       it("getAll", async function() {
+        const opt = options.getAll!();
         try {
-          const result = await controller.getAll(
-            user._id,
-            options.getAll!.options
-          );
+          const result = await controller().getAll(user._id, opt.options);
+          should(user.role).equalOneOf(opt.allowedRoles);
           should(result.success).be.true();
-          options.getAll!.verify(result);
+          opt.verify(result);
         } catch (err) {
-          should(options.getAll!.verifyFail).not.be.null();
-          should(err.success).be.false();
-          options.getAll!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.count) {
       it("count", async function() {
+        const opt = options.count!();
         try {
-          const result = await controller.count(user._id);
+          const result = await controller().count(user._id);
+          should(user.role).equalOneOf(opt.allowedRoles);
           should(result.success).be.true();
-          options.count!.verify(result);
+          opt.verify(result);
         } catch (err) {
-          should(options.count!.verifyFail).not.be.null();
-          should(err.success).be.false();
-          options.count!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.validateCreate) {
       it("validate create", async function() {
+        const opt = options.validateCreate!();
         try {
-          const result = await controller.validate(
-            user._id,
-            options.validateCreate!.input
-          );
-          should(user.role).equalOneOf(options.validateCreate!.allowedRoles);
+          const result = await controller().validate(user._id, opt.input);
+          should(user.role).equalOneOf(opt.allowedRoles);
           should(result.success).be.true();
-          options.validateCreate!.verify(result);
+          opt.verify(result);
         } catch (err) {
-          should(err.success).be.false();
-          should(user.role).not.equalOneOf(
-            options.validateCreate!.allowedRoles
-          );
-          options.validateCreate!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.validateUpdate) {
       it("validate update", async function() {
+        const opt = options.validateUpdate!();
         try {
-          const result = await controller.validate(
-            user._id,
-            options.validateUpdate!.input
-          );
+          const result = await controller().validate(user._id, opt.input);
           should(result.success).be.true();
-          should(user.role).equalOneOf(options.validateUpdate!.allowedRoles);
-          options.validateUpdate!.verify(result);
+          should(user.role).equalOneOf(opt.allowedRoles);
+          opt.verify(result);
         } catch (err) {
-          should(err.success).be.false();
-          should(user.role).not.equalOneOf(
-            options.validateUpdate!.allowedRoles
-          );
-          options.validateUpdate!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.saveCreate) {
       it("save create", async function() {
+        const opt = options.saveCreate!();
         try {
-          const result = await controller.save(
-            user._id,
-            options.saveCreate!.input
-          );
+          const result = await controller().save(user._id, opt.input);
           should(result.success).be.true();
-          should(user.role).equalOneOf(options.saveCreate!.allowedRoles);
-          options.saveCreate!.verify(result);
+          should(user.role).equalOneOf(opt.allowedRoles);
+          opt.verify(result);
         } catch (err) {
-          should(err.success).be.false();
-          should(user.role).not.equalOneOf(options.saveCreate!.allowedRoles);
-          options.saveCreate!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
 
     if (options.saveUpdate) {
       it("save update", async function() {
+        const opt = options.saveUpdate!();
         try {
-          const result = await controller.save(
-            user._id,
-            options.saveUpdate!.input
-          );
+          const result = await controller().save(user._id, opt.input);
           should(result.success).be.true();
-          should(user.role).equalOneOf(options.saveUpdate!.allowedRoles);
-          options.saveUpdate!.verify(result);
+          should(user.role).equalOneOf(opt.allowedRoles);
+          opt.verify(result);
         } catch (err) {
-          should(err.success).be.false();
-          should(user.role).not.equalOneOf(options.saveUpdate!.allowedRoles);
-          options.saveUpdate!.verifyFail!(err);
+          handleTestError(user, opt, err);
         }
       });
     }
   });
+}
+
+function handleTestError<T>(
+  user: IViewUser,
+  testOptions: Authorization & VerifyCallbacks<T>,
+  error: any
+) {
+  // Unexpected error
+  if (error.success === undefined) throw error;
+
+  should(error.success).be.false();
+  if (testOptions.allowedRoles.indexOf(user.role) === -1) {
+    // Should be 403 error
+    should(error.result).match({ code: 403 });
+  } else {
+    if (testOptions.verifyFail) {
+      testOptions.verifyFail(error);
+    } else {
+      // No error is acceptable
+      throw error;
+    }
+  }
+}
+
+export function compareIds(compareTo: any) {
+  return (id: any) => id + "" === compareTo + "";
 }

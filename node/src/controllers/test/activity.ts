@@ -12,9 +12,10 @@ import {
   createActivities,
   defaultUsers,
   setupDatabase,
-  createControllerTests
+  createControllerTests,
+  compareIds
 } from "./abstract";
-import { UserRole, AllUserRoles } from "node/src/constants/enums/user-role";
+import { UserRole, AllUserRoles } from "../../constants/enums/user-role";
 
 export default function buildTestSuite() {
   describe(ActivityController.name, function() {
@@ -34,7 +35,7 @@ export default function buildTestSuite() {
     });
 
     this.beforeEach(async function() {
-      activities = createActivities(Array(6));
+      activities = createActivities(Array(6).fill({}));
       activities = activities.map((act) => {
         act._id = new Types.ObjectId();
         return act;
@@ -56,46 +57,60 @@ export default function buildTestSuite() {
     for (let user of defaultUsers) {
       describe(`Logged in as ${user.username}`, function() {
         const inputValidateCreate = createActivities([{}])[0];
+        delete inputValidateCreate._id;
         const inputSaveCreate = createActivities([{}])[0];
+        delete inputSaveCreate._id;
 
-        createControllerTests(controller, user, {
-          getById: {
+        createControllerTests(() => controller, user, {
+          getById: () => ({
             id: activities[3]._id,
-            verify: (res) => should(res.result).match(activities[3]),
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, activities[3], {
+                  _id: compareIds(activities[3]._id)
+                })
+              ),
             allowedRoles: AllUserRoles
-          },
-          getAll: {
+          }),
+          getAll: () => ({
             options: {},
-            verify: (res) => should(res.result).match(activities),
+            verify: (res) =>
+              should(res.result).match(
+                activities.map((a) =>
+                  Object.assign({}, a, { _id: compareIds(a._id) })
+                )
+              ),
             allowedRoles: AllUserRoles
-          },
-          count: {
+          }),
+          count: () => ({
             allowedRoles: AllUserRoles,
             verify: (res) => should(res.result).equal(activities.length)
-          },
-          validateCreate: {
+          }),
+          validateCreate: () => ({
             input: inputValidateCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
             verify: (res) => should(res.result).be.null()
-          },
-          validateUpdate: {
+          }),
+          validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(activities[4])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
             verify: (res) => should(res.result).be.null()
-          },
-          saveCreate: {
+          }),
+          saveCreate: () => ({
             input: inputSaveCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
             verify: (res) => should(res.result).match(inputSaveCreate)
-          },
-          saveUpdate: {
+          }),
+          saveUpdate: () => ({
             input: JSON.parse(JSON.stringify(activities[4])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
             verify: (res) =>
               should(res.result).match(
-                JSON.parse(JSON.stringify(activities[4]))
+                Object.assign({}, activities[4], {
+                  _id: compareIds(activities[4]._id)
+                })
               )
-          }
+          })
         });
       });
     }

@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { Document } from "mongoose";
 
 import { ITimesheetLine, StringId } from "../../../types/datamodels";
 import {
@@ -56,7 +57,7 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
       });
       query = this.applyQueryOptions(query, options);
       const result = await query;
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.map((o) => o.toJSON()));
     } else {
       throw this.get403Error();
     }
@@ -73,7 +74,8 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     const query = this.Timesheet.findById(id);
     const result = ((await query.populate(
       "lines.project"
-    )) as unknown) as IViewTimesheet<StringId, ITimesheetLine<IViewProject>>;
+    )) as unknown) as (Document &
+      IViewTimesheet<StringId, ITimesheetLine<IViewProject>>);
     if (!result) {
       const error = new Error(`Cannot find Timesheet with _id ${id}`);
       (error as HasHttpCode).code = 404;
@@ -86,7 +88,7 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
         await this.getResourceOwner((result as unknown) as TimesheetDocument)
       )
     ) {
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.toJSON());
     } else {
       throw this.get403Error();
     }

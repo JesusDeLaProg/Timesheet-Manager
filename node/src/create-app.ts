@@ -1,9 +1,11 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
+import fs from "fs";
 import logger from "morgan";
 import path from "path";
 
+import { SERVER_KEY_OR_SECRET } from "./constants/symbols/parameters";
 import Routers from "./constants/symbols/routers";
 import { ControllerModule } from "./controllers";
 import { ModelModule } from "./infrastructure/database/models";
@@ -20,6 +22,12 @@ export function createExpressApp() {
     ControllerModule,
     RouterModule
   ]);
+  iocContainer
+    .bind(SERVER_KEY_OR_SECRET)
+    .toConstantValue(
+      process.env.JWTSECRET ||
+        fs.readFileSync(path.resolve(process.cwd(), "keys/jwt/key"))
+    );
 
   app.use(logger("dev"));
   app.use(express.json());

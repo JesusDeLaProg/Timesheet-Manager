@@ -8,8 +8,9 @@ import { AuthController } from "../auth";
 import { UserModel } from "../../interfaces/models";
 import { AssertionError } from "assert";
 import { createUsers, setupDatabase } from "./abstract";
-import { UserRole } from "node/src/constants/enums/user-role";
-import { IViewUser } from "types/viewmodels";
+import { UserRole } from "../../constants/enums/user-role";
+import { SERVER_KEY_OR_SECRET } from "../../constants/symbols/parameters";
+import { IViewUser } from "../../../../types/viewmodels";
 
 export default function buildTestSuite() {
   describe(AuthController.name, function() {
@@ -25,8 +26,11 @@ export default function buildTestSuite() {
       const container = new Container();
       container.load(ModelModule);
       container.bind<AuthController>(AuthController).toSelf();
+      container
+        .bind(SERVER_KEY_OR_SECRET)
+        .toConstantValue(process.env.JWTSECRET);
       controller = container.get(AuthController);
-      User = container.get(Models.Activity);
+      User = container.get(Models.User);
     });
 
     this.beforeEach(async function() {
@@ -52,15 +56,13 @@ export default function buildTestSuite() {
 
     it("should block active user with wrong credentials", async function() {
       try {
-        const result = await controller.login(
-          users[0].username,
-          "sdfadfsgdxcvbxcb"
-        );
+        await controller.login(users[0].username, "sdfadfsgdxcvbxcb");
       } catch (err) {
         should(err).match({
           success: false,
           message: "Nom d'usager ou mot de passe invalide."
         });
+        return;
       }
       throw new AssertionError({
         message: "Authentication should throw an exception on wrong credentials"
@@ -69,7 +71,7 @@ export default function buildTestSuite() {
 
     it("should block inactive user", async function() {
       try {
-        const result = await controller.login(users[1].username, "password2");
+        await controller.login(users[1].username, "password2");
       } catch (err) {
         should(err).match({
           success: false,
@@ -77,6 +79,7 @@ export default function buildTestSuite() {
             "Ce compte utilisateur est désactivé. " +
             "Veuillez réactiver ce compte ou vous connecter avec un autre compte."
         });
+        return;
       }
       throw new AssertionError({
         message: "Authentication should throw an exception on wrong credentials"

@@ -6,19 +6,16 @@ import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { PhaseController } from "../phase";
 import { PhaseModel, ActivityModel } from "../../interfaces/models";
-import {
-  IViewPhase,
-  IViewActivity,
-  ICrudResult
-} from "../../../../types/viewmodels";
+import { IViewPhase, IViewActivity } from "../../../../types/viewmodels";
 import {
   createPhases,
   createActivities,
   defaultUsers,
   setupDatabase,
-  createControllerTests
+  createControllerTests,
+  compareIds
 } from "./abstract";
-import { AllUserRoles, UserRole } from "node/src/constants/enums/user-role";
+import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
 
 export default function buildTestSuite() {
   describe(PhaseController.name, function() {
@@ -39,8 +36,8 @@ export default function buildTestSuite() {
     });
 
     this.beforeEach(async function() {
-      activities = createActivities(Array(6));
-      phases = createPhases(Array(6)).map((ph, i, arr) => {
+      activities = createActivities(Array(6).fill({}));
+      phases = createPhases(Array(6).fill({})).map((ph, i, arr) => {
         const j = i <= arr.length / 2 ? 0 : 3;
         ph.activities = activities
           .slice(j, j + 3)
@@ -64,52 +61,79 @@ export default function buildTestSuite() {
 
     for (const user of defaultUsers) {
       describe(`Logged in as ${user.username}`, function() {
-        const inputValidateCreate = JSON.parse(JSON.stringify(phases[2]));
-        const inputSaveCreate = JSON.parse(JSON.stringify(phases[2]));
+        const inputValidateCreate = createPhases([{}])[0];
+        delete inputValidateCreate._id;
+        const inputSaveCreate = createPhases([{}])[0];
+        delete inputSaveCreate._id;
 
-        createControllerTests(controller, user, {
-          getById: {
+        createControllerTests(() => controller, user, {
+          getById: () => ({
             id: phases[4]._id,
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).match(phases[4])
-          },
-          getAll: {
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, phases[4], {
+                  _id: compareIds(phases[4]._id),
+                  activities: phases[4].activities.map((a) => ({
+                    _id: compareIds(a)
+                  }))
+                })
+              )
+          }),
+          getAll: () => ({
             options: {},
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).match(phases)
-          },
-          count: {
+            verify: (res) =>
+              should(res.result).match(
+                phases.map((p) =>
+                  Object.assign({}, p, {
+                    _id: compareIds(p._id),
+                    activities: p.activities.map((a) => ({
+                      _id: compareIds(a)
+                    }))
+                  })
+                )
+              )
+          }),
+          count: () => ({
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).match(phases)
-          },
-          validateCreate: {
+            verify: (res) => should(res.result).equals(phases.length)
+          }),
+          validateCreate: () => ({
             input: inputValidateCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null(),
-            verifyFail: (res: ICrudResult<any>) =>
-              should(res.result!.code).equal(403)
-          },
-          validateUpdate: {
+            verify: (res) => should(res.result).be.null()
+          }),
+          validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(phases[3])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null(),
-            verifyFail: (res: ICrudResult<any>) =>
-              should(res.result!.code).equal(403)
-          },
-          saveCreate: {
+            verify: (res) => should(res.result).be.null()
+          }),
+          saveCreate: () => ({
             input: inputSaveCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).match(inputSaveCreate),
-            verifyFail: (res: ICrudResult<any>) =>
-              should(res.result!.code).equal(403)
-          },
-          saveUpdate: {
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, inputSaveCreate, {
+                  activities: inputSaveCreate.activities.map((a) => ({
+                    _id: compareIds(a)
+                  }))
+                })
+              )
+          }),
+          saveUpdate: () => ({
             input: JSON.parse(JSON.stringify(phases[3])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).match(phases[3]),
-            verifyFail: (res: ICrudResult<any>) =>
-              should(res.result!.code).equal(403)
-          }
+            verify: (res) =>
+              should(res.result).match(
+                Object.assign({}, phases[3], {
+                  _id: compareIds(phases[3]._id),
+                  activities: phases[3].activities.map((a) => ({
+                    _id: compareIds(a)
+                  }))
+                })
+              )
+          })
         });
 
         it("getAllPopulated", async function() {
@@ -123,7 +147,16 @@ export default function buildTestSuite() {
           });
           const result = await controller.getAllPopulated(user._id, {});
           should(result.success).be.true();
-          should(result.result).match(objectsToMatch);
+          should(result.result).match(
+            objectsToMatch.map((p) =>
+              Object.assign({}, p, {
+                _id: compareIds(p._id),
+                activities: p.activities.map((a) =>
+                  Object.assign({}, a, { _id: compareIds(a._id) })
+                )
+              })
+            )
+          );
         });
       });
     }

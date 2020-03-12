@@ -1,11 +1,11 @@
 /* tslint:disable:object-literal-sort-keys */
 import base64url from "base64url";
 import crypto from "crypto";
-import { promisify } from "util";
 import sortBy from "lodash.sortby";
 import moment from "moment";
 import { Schema, SchemaTypeOpts, Types } from "mongoose";
 import { $enum } from "ts-enum-util";
+import { promisify } from "util";
 import isEmail from "validator/lib/isEmail";
 import isLength from "validator/lib/isLength";
 
@@ -350,11 +350,14 @@ async function encryptPassword(
   ].join(".");
 }
 
-UserSchema.methods.setPassword = async function(plainTextPassword: string) {
+UserSchema.method("setPassword", async function(
+  this: IUser,
+  plainTextPassword: string
+) {
   this.password = await encryptPassword(plainTextPassword);
-};
+});
 
-UserSchema.methods.checkPassword = async function(
+UserSchema.method("checkPassword", async function(
   this: IUser,
   password: string
 ) {
@@ -378,4 +381,4 @@ UserSchema.methods.checkPassword = async function(
       outLength
     ))
   );
-};
+});

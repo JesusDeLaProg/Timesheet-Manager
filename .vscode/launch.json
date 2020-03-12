@@ -44,7 +44,6 @@
             "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/mocha",
             "cwd": "${workspaceFolder}/node",
             "args": [
-              "--exit",
               "--timeout",
               "60000",
               "--colors",
@@ -53,7 +52,8 @@
               "ts-node/register"
             ],
             "env": {
-                "TS_NODE_PROJECT": "${workspaceFolder}/node/src/test/tsconfig.json"
+                "TS_NODE_PROJECT": "${workspaceFolder}/node/src/test/tsconfig.json",
+                "JWTSECRET": "SECRET"
             },
             "console": "integratedTerminal",
             "sourceMaps": true,

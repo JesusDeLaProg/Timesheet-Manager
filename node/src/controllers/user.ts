@@ -11,8 +11,11 @@ import { AbstractController } from "./abstract";
 @injectable()
 export class UserController extends AbstractController<IViewUser>
   implements IUserController {
-  constructor(@inject(Models.User) User: UserModel) {
-    super(User, User);
+  constructor(
+    @inject(Models.User) User: UserModel,
+    @inject(Models.User) User2: UserModel
+  ) {
+    super(User, User2);
   }
 
   /**
@@ -105,8 +108,8 @@ export class UserController extends AbstractController<IViewUser>
     let newPassord;
     if (input.password) {
       newPassord = input.password;
-      input.password = undefined;
     }
+    delete input.password;
     const result = await super.objectToDocument(input);
     if (newPassord) {
       await (result.document as UserDocument).setPassword(newPassord);

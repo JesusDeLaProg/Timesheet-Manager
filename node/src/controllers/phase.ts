@@ -50,7 +50,7 @@ export class PhaseController extends AbstractController<IViewPhase>
       const result = ((await query) as unknown) as Array<
         PhaseDocument<ActivityDocument>
       >;
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.map((o) => o.toJSON()));
     } else {
       throw this.get403Error();
     }

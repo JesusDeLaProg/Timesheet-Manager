@@ -49,7 +49,7 @@ export class ProjectController extends AbstractController<IViewProject>
       });
       query = this.applyQueryOptions(query, options);
       const result = await query;
-      return CrudResult.Success(result);
+      return CrudResult.Success(result.map((o) => o.toJSON()));
     } else {
       throw this.get403Error();
     }
