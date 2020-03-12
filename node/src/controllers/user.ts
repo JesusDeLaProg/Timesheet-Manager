@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import { Document } from "mongoose";
+import { Document, Error as MongooseError } from "mongoose";
 
-import { IViewUser } from "../../../types/viewmodels";
+import { IViewUser, ICrudResult } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
-import { IUserController } from "../interfaces/controllers";
+import { IUserController, ObjectId } from "../interfaces/controllers";
 import { UserDocument, UserModel } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 
@@ -16,6 +16,18 @@ export class UserController extends AbstractController<IViewUser>
     @inject(Models.User) User2: UserModel
   ) {
     super(User, User2);
+  }
+
+  public async save(
+    authenticatedUserId: ObjectId,
+    input: IViewUser
+  ): Promise<ICrudResult<IViewUser | MongooseError.ValidationError>> {
+    const res = await super.save(authenticatedUserId, input);
+    if (res.success) {
+      const user = res.result as IViewUser;
+      delete user.password;
+    }
+    return res;
   }
 
   /**

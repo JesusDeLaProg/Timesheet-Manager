@@ -98,7 +98,7 @@ export default function buildTestSuite(
 
     it("should have GET /", async function() {
       const user = new User(validUser());
-      user.plainTextPassword = "password";
+      await user.setPassword("password");
       await user.save();
       const response = await agent
         .get(baseUrl + "/")
@@ -117,7 +117,7 @@ export default function buildTestSuite(
 
     it("should have GET /:id", async function() {
       const user = new User(validUser());
-      user.plainTextPassword = "password";
+      await user.setPassword("password");
       await user.save();
       const response = await agent
         .get(baseUrl + `/${user.id}`)
@@ -165,13 +165,14 @@ export default function buildTestSuite(
           rate.end =
             rate.end &&
             moment(rate.end)
-              .endOf("day")
+              .startOf("day")
               .toDate();
           return rate;
         });
         return group;
       });
-      const expectedUser = JSON.parse(JSON.stringify(user)) as IViewUser;
+      const expectedUser = JSON.parse(JSON.stringify(user));
+      delete expectedUser.password;
       should(response.body).match({
         message: "",
         result: expectedUser,

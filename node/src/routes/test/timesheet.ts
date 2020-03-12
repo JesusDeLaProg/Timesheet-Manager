@@ -237,7 +237,7 @@ export default function buildTestSuite(
     }
     const projects = await createProjects(number);
     const testUser = new User(validUser());
-    testUser.plainTextPassword = "password";
+    await testUser.setPassword("password");
     await testUser.save();
     const timesheets = [];
     for (let i = 0; i < number; ++i) {
@@ -363,7 +363,7 @@ export default function buildTestSuite(
       }
       const projects = await createProjects(3);
       const user = new User(validUser());
-      user.plainTextPassword = "password";
+      await user.setPassword("password");
       await user.save();
       const timesheet = validTimesheet(user, projects, phases, activities, 0);
       const response = await agent
@@ -387,7 +387,7 @@ export default function buildTestSuite(
       }
       const projects = await createProjects(3);
       const user = new User(validUser());
-      user.plainTextPassword = "password";
+      await user.setPassword("password");
       await user.save();
       const timesheet = validTimesheet(user, projects, phases, activities, 0);
       const response = await agent

@@ -92,7 +92,7 @@ export default function buildTestSuite(
 
     it("should have POST /login", async function() {
       const user = new User(validUser());
-      user.plainTextPassword = "password";
+      await user.setPassword("password");
       await user.save();
       const response = await agent
         .post(baseUrl + "/login")

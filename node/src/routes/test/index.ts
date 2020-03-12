@@ -4,8 +4,8 @@ import { Container } from "inversify";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/models";
 import { UserModel } from "../../interfaces/models";
-import activityTestSuite from "./activity";
 import authTestSuite from "./auth";
+import activityTestSuite from "./activity";
 import clientTestSuite from "./client";
 import phaseTestSuite from "./phase";
 import projectTestSuite from "./project";
@@ -29,7 +29,7 @@ export default function buildTestSuite(
         role: UserRole.Superadmin,
         username: "admin"
       });
-      user.plainTextPassword = "admin";
+      await user.setPassword("admin");
       await user.save({ validateBeforeSave: false });
     });
 

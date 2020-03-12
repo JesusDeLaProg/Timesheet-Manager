@@ -110,13 +110,14 @@ export default function buildTestSuite() {
               password: undefined
             }),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) =>
-              should(res.result).match(
-                Object.assign({}, otherUser, {
-                  _id: compareIds(otherUser._id),
-                  role: UserRole.Everyone
-                })
-              )
+            verify: (res) => {
+              const expected = Object.assign({}, otherUser, {
+                _id: compareIds(otherUser._id),
+                role: UserRole.Everyone
+              });
+              delete expected.password;
+              should(res.result).match(expected);
+            }
           })
         });
       });
