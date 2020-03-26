@@ -2,11 +2,10 @@ import { Model, Document } from "mongoose";
 import DataModels from "../../../types/datamodels";
 
 export interface IUserExt {
-  // Virtuals
-  plainTextPassword: string
 
   // Instance methods
-  checkPassword(password: string): boolean;
+  setPassword(plainTextPassword: string): Promise<void>;
+  checkPassword(password: string): Promise<boolean>;
 }
 
 export type UserDocument = DataModels.IUser & IUserExt & Document;

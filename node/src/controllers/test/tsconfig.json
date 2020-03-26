@@ -1,14 +1,9 @@
 {
   "extends": "../../../test.tsconfig.json",
-  "files": ["./index.ts"],
+  "include": ["./*.ts"],
   "references": [
-    { "path": "../abstract/test" },
-    { "path": "../activity/test" },
-    { "path": "../auth/test" },
-    { "path": "../client/test" },
-    { "path": "../phase/test" },
-    { "path": "../project/test" },
-    { "path": "../timesheet/test" },
-    { "path": "../user/test" }
+    { "path": "../../constants" },
+    { "path": "../../infrastructure/database/testing" },
+    { "path": "../" }
   ]
 }

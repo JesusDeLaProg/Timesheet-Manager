@@ -4,3 +4,10 @@ export enum UserRole {
   Admin = 3,
   Superadmin = 4
 }
+
+export const AllUserRoles = [
+  UserRole.Everyone,
+  UserRole.Subadmin,
+  UserRole.Admin,
+  UserRole.Superadmin
+];

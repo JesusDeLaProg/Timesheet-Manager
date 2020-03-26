@@ -1,9 +1,0 @@
-{
-  "extends": "../../../base.tsconfig.json",
-  "compilerOptions": {
-    "declarationDir": "./types",
-    "outDir": "../../../out/constants/enums"
-  },
-  "include": ["./**/*.ts"],
-  "exclude": ["./types/**/*.*"]
-}

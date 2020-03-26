@@ -1,4 +1,5 @@
 {
-  "extends": "../../../../base.tsconfig.json",
-  "files": ["./index.ts"]
+  "extends": "../../../../test.tsconfig.json",
+  "files": ["./index.ts"],
+  "references": [{ "path": "../" }]
 }
