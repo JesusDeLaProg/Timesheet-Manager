@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Document, Error as MongooseError } from "mongoose";
 
-import { IViewUser, ICrudResult } from "../../../types/viewmodels";
+import { ICrudResult, IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
 import { IUserController, ObjectId } from "../interfaces/controllers";

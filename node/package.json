@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "lint": "tslint -c ./tslint.json -p ./src/tsconfig.json",
+    "lint": "tslint --fix -c ./tslint.json -p ./src/tsconfig.json",
     "build": "tsc --build src/tsconfig.json",
     "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
     "debug": "node --inspect-brk ./bin/www",
