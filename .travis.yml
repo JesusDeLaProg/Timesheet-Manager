@@ -2,20 +2,20 @@ language: node_js
 node_js:
   - 10
   - 12
-install:
-  - npm ci
-  - cd node
-  - npm ci
-  - cd ..
-  - cd angular/tm-app
-  - npm ci
-  - cd ../..
-script:
-  - cd node
-  - npm run lint
-  - npm test
-  - cd ..
-  - cd angular/tm-app
-  - npm run lint
 env:
   - SALTSIZE=256 ENCFUNC=sha512 ITERCOUNT=100000 OUTLENGTH=64 APPNAME="Timesheet Manager" JWTALGO=RS256 JWTSECRET=Secret SESSIONTIMEOUT=1h ROADSHEET_DISTANCE_RATE=0.48
+jobs:
+  include:
+    - install:
+      - npm ci
+      - cd node
+      - npm ci
+      script:
+      - npm run lint
+      - npm run test
+    - install:
+      - npm ci
+      - cd angular
+      - npm ci
+      script:
+      - npm run lint
