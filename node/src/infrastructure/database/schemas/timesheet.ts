@@ -7,7 +7,7 @@ import {
   ITimesheet,
   ITimesheetEntry,
   ITimesheetLine,
-  StringId
+  StringId,
 } from "../../../../../types/datamodels";
 import { IViewPhase, IViewTimesheet } from "../../../../../types/viewmodels";
 import { PhaseDocument, TimesheetDocument } from "../../../interfaces/models";
@@ -57,7 +57,7 @@ function lineInternalUniquenessValidator() {
           this.divers === line.divers
       );
       return filtered.length === 1;
-    }
+    },
   };
 }
 
@@ -75,11 +75,11 @@ function periodUniquenessValidator() {
         user: this.user,
         $or: [
           { begin: { $lte: this.begin }, end: { $gte: this.begin } },
-          { begin: { $gte: this.begin, $lte: this.end } }
-        ]
+          { begin: { $gte: this.begin, $lte: this.end } },
+        ],
       });
       return result.length === 0;
-    }
+    },
   };
 }
 
@@ -94,8 +94,8 @@ const TimesheetEntrySchema = new Schema({
         "day",
         "[]",
         "La date de cette entrée doit être située entre le début et la fin de cette feuille de temps."
-      )
-    ]
+      ),
+    ],
   },
   time: {
     type: Number,
@@ -106,9 +106,9 @@ const TimesheetEntrySchema = new Schema({
         0,
         "Vous devez entrer une valeur égale ou supérieure à 0 pour cette entrée.",
         true
-      )
-    ]
-  }
+      ),
+    ],
+  },
 });
 
 const TimesheetLineSchema = new Schema({
@@ -119,8 +119,8 @@ const TimesheetLineSchema = new Schema({
     index: true,
     validate: [
       idexists("Project", "Ce projet n'existe pas."),
-      lineInternalUniquenessValidator()
-    ]
+      lineInternalUniquenessValidator(),
+    ],
   },
   phase: {
     type: Schema.Types.ObjectId,
@@ -128,8 +128,8 @@ const TimesheetLineSchema = new Schema({
     required: [true, "Vous devez entrer une phase pour cette ligne"],
     validate: [
       idexists("Phase", "Cette phase n'existe pas."),
-      lineInternalUniquenessValidator()
-    ]
+      lineInternalUniquenessValidator(),
+    ],
   },
   activity: {
     type: Schema.Types.ObjectId,
@@ -154,13 +154,13 @@ const TimesheetLineSchema = new Schema({
             .model<PhaseDocument>("Phase")
             .findById(this.phase)) as IViewPhase;
           return phase.activities.findIndex((act) => id.equals(act)) !== -1;
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   divers: {
     type: String,
-    validate: [lineInternalUniquenessValidator()]
+    validate: [lineInternalUniquenessValidator()],
   },
   entries: {
     type: [TimesheetEntrySchema],
@@ -178,9 +178,9 @@ const TimesheetLineSchema = new Schema({
               .asDays()
           ) + 1; // Add 1 to include the first day.
         return value.length === numberOfDays;
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 export const TimesheetSchema = new Schema(
@@ -190,9 +190,9 @@ export const TimesheetSchema = new Schema(
       ref: "User",
       required: [
         true,
-        "Vous devez attribuer cette feuille de temps à un employé."
+        "Vous devez attribuer cette feuille de temps à un employé.",
       ],
-      validate: [idexists("User", "Cet employé n'existe pas.")]
+      validate: [idexists("User", "Cet employé n'existe pas.")],
     },
     begin: {
       type: Date,
@@ -206,10 +206,10 @@ export const TimesheetSchema = new Schema(
               return true;
             } // Validate only if values are set.
             return moment(value).isBefore(this.end);
-          }
+          },
         },
-        periodUniquenessValidator()
-      ]
+        periodUniquenessValidator(),
+      ],
     },
     end: {
       type: Date,
@@ -223,56 +223,44 @@ export const TimesheetSchema = new Schema(
               return true;
             } // Validate only if values are set.
             return moment(value).isAfter(this.begin);
-          }
+          },
         },
-        periodUniquenessValidator()
-      ]
+        periodUniquenessValidator(),
+      ],
     },
     lines: {
       type: [TimesheetLineSchema],
       required: [
         true,
-        "Vous devez entrer une liste de ligne sur cette feuille de temps."
+        "Vous devez entrer une liste de ligne sur cette feuille de temps.",
       ],
       validate: [
         arrayLength(
           1,
           null,
           "Vous devez entrer au moins une ligne sur cette feuille de temps."
-        )
-      ]
+        ),
+      ],
     },
     roadsheetLines: {
-      type: [RoadsheetLineSchema]
-    }
+      type: [RoadsheetLineSchema],
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-TimesheetSchema.pre("validate", function(this: TimesheetDocument) {
-  this.begin =
-    this.begin &&
-    moment(this.begin)
-      .startOf("day")
-      .toDate();
-  this.end =
-    this.end &&
-    moment(this.end)
-      .startOf("day")
-      .toDate();
+TimesheetSchema.pre("validate", function (this: TimesheetDocument) {
+  this.begin = this.begin && moment(this.begin).startOf("day").toDate();
+  this.end = this.end && moment(this.end).startOf("day").toDate();
   this.lines =
     this.lines &&
     this.lines.map((line) => {
       line.entries =
         line.entries &&
         line.entries.map((entry) => {
-          entry.date =
-            entry.date &&
-            moment(entry.date)
-              .startOf("day")
-              .toDate();
+          entry.date = entry.date && moment(entry.date).startOf("day").toDate();
           return entry;
         });
       return line;
@@ -284,10 +272,7 @@ TimesheetSchema.pre("validate", function(this: TimesheetDocument) {
         line.travels &&
         line.travels.map((travel) => {
           travel.date =
-            travel.date &&
-            moment(travel.date)
-              .startOf("day")
-              .toDate();
+            travel.date && moment(travel.date).startOf("day").toDate();
           return travel;
         });
       return line;

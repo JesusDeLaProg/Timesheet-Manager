@@ -23,6 +23,6 @@ export default function idexists(
         .countDocuments({ _id: id });
 
       return result === 1;
-    }
+    },
   };
 }

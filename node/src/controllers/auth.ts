@@ -8,7 +8,7 @@ import { CrudResult } from "../infrastructure/utils/crud-result";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IAuthController } from "../interfaces/controllers";
 import { UserModel } from "../interfaces/models";
-import { JWTPayload } from "../interfaces/routers";
+import { IJWTPayload } from "../interfaces/routers";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -50,22 +50,22 @@ export class AuthController implements IAuthController {
       throw CrudResult.Failure(error);
     }
     const jwtoken = this.createJWT({
-      user: user.id
+      user: user.id,
     });
     return CrudResult.Success(jwtoken);
   }
 
   /**
    * Creates a JWT with the desired payload.
-   * @param {JWTPayload} payload
+   * @param {IJWTPayload} payload
    * @returns {string}
    * @memberof AuthController
    */
-  public createJWT(payload: JWTPayload): string {
+  public createJWT(payload: IJWTPayload): string {
     return jwt.sign(payload, this._jwtKeyOrSecret, {
       algorithm: process.env.JWTSECRET ? "HS256" : process.env.JWTALGO,
       expiresIn: process.env.SESSIONTIMEOUT,
-      issuer: process.env.APPNAME
+      issuer: process.env.APPNAME,
     });
   }
 }

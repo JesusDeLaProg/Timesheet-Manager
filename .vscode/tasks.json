@@ -5,12 +5,42 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "build",
+      "script": "build-watch",
       "path": "node/",
       "group": {
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "path": "angular/",
+      "problemMatcher": [
+        "$tsc-watch",
+        {
+          "owner": "typescript",
+          "source": "ts",
+          "applyTo": "closedDocuments",
+          "fileLocation": [
+            "relative",
+            "${cwd}"
+          ],
+          "pattern": "$tsc",
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": {
+              "regexp": "(.*?)"
+            },
+            "endsPattern": {
+              "regexp": "Compiled |Failed to compile."
+            }
+          }
+        }
+      ],
+      "label": "npm: start - angular",
+      "detail": "ng serve",
+      "isBackground": true
     }
   ]
 }

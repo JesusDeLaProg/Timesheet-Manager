@@ -6,14 +6,14 @@ import { Strategy as JWTStrategy } from "passport-jwt";
 import path from "path";
 
 import { IUserRole } from "../../../../types/datamodels";
-import { JWTPayload } from "../../interfaces/routers";
+import { IJWTPayload } from "../../interfaces/routers";
 
 declare type DoneFunction = (
   err: any,
   result: { _id: ObjectId; role: IUserRole } | false
 ) => unknown;
 declare type VerifyFunction = (
-  payload: JWTPayload,
+  payload: IJWTPayload,
   done: DoneFunction
 ) => unknown;
 
@@ -34,11 +34,11 @@ export default function setup(verifyFunction: VerifyFunction) {
     new JWTStrategy(
       {
         algorithms: [
-          process.env.JWTSECRET ? "HS256" : process.env.JWTALGO || ""
+          process.env.JWTSECRET ? "HS256" : process.env.JWTALGO || "",
         ],
         issuer: process.env.APPNAME,
         jwtFromRequest: extractJWT,
-        secretOrKey: jwtSecretOrKey
+        secretOrKey: jwtSecretOrKey,
       },
       verifyFunction
     )

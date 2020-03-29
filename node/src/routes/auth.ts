@@ -10,13 +10,13 @@ import setupJwtStrategy from "../infrastructure/auth/jwt";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import { IAuthController, IUserController } from "../interfaces/controllers";
 import { UserModel } from "../interfaces/models";
-import { HasRouter } from "../interfaces/routers";
+import { IHasRouter } from "../interfaces/routers";
 import utils from "./abstract";
 
 const tokenCookieName = "SESSIONID";
 
 @injectable()
-export class AuthRouter implements HasRouter {
+export class AuthRouter implements IHasRouter {
   public readonly router = Router();
   public readonly authenticationMiddlewares = Router();
 
@@ -46,7 +46,7 @@ export class AuthRouter implements HasRouter {
 
           return done(null, {
             _id: result._id,
-            role: result.role
+            role: result.role,
           });
         } else {
           return done(null, false);
@@ -68,10 +68,7 @@ export class AuthRouter implements HasRouter {
 
         this._setAuthCookieAndHeader(result.result, res);
         result.result = null;
-        res
-          .type("json")
-          .status(200)
-          .send(result);
+        res.type("json").status(200).send(result);
       } catch (err) {
         next(utils.buildErrorCrudResultFromError(err));
       }
@@ -122,7 +119,7 @@ export class AuthRouter implements HasRouter {
         return next();
       }
       const jwtoken = this._authController.createJWT({
-        user: req.user._id.toHexString()
+        user: req.user._id.toHexString(),
       });
       this._setAuthCookieAndHeader(jwtoken, res);
       return next();
@@ -134,13 +131,11 @@ export class AuthRouter implements HasRouter {
     res.cookie(tokenCookieName, jwt, {
       httpOnly: true,
       sameSite: false,
-      maxAge: sessionTimeout
+      maxAge: sessionTimeout,
     });
     res.header(
       "X-Token-Expiration",
-      moment(new Date())
-        .add(sessionTimeout, "ms")
-        .toISOString()
+      moment(new Date()).add(sessionTimeout, "ms").toISOString()
     );
   }
 }

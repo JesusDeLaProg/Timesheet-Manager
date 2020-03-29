@@ -4,11 +4,11 @@ import { inject, injectable } from "inversify";
 import { UserRole } from "../constants/enums/user-role";
 import Controllers from "../constants/symbols/controllers";
 import { ITimesheetController } from "../interfaces/controllers";
-import { HasRouter } from "../interfaces/routers";
+import { IHasRouter } from "../interfaces/routers";
 import utils from "./abstract";
 
 @injectable()
-export class TimesheetRouter implements HasRouter {
+export class TimesheetRouter implements IHasRouter {
   public readonly router = Router();
 
   constructor(

@@ -2,27 +2,27 @@ import { Container } from "inversify";
 import "reflect-metadata";
 import should from "should";
 
-import Models from "../../constants/symbols/models";
-import { ModelModule } from "../../infrastructure/database/testing";
-import { AuthController } from "../auth";
-import { UserModel } from "../../interfaces/models";
 import { AssertionError } from "assert";
-import { createUsers, setupDatabase } from "./abstract";
-import { UserRole } from "../../constants/enums/user-role";
-import { SERVER_KEY_OR_SECRET } from "../../constants/symbols/parameters";
 import { IViewUser } from "../../../../types/viewmodels";
+import { UserRole } from "../../constants/enums/user-role";
+import Models from "../../constants/symbols/models";
+import { SERVER_KEY_OR_SECRET } from "../../constants/symbols/parameters";
+import { ModelModule } from "../../infrastructure/database/testing";
+import { UserModel } from "../../interfaces/models";
+import { AuthController } from "../auth";
+import { createUsers, setupDatabase } from "./abstract";
 
 export default function buildTestSuite() {
-  describe(AuthController.name, function() {
+  describe(AuthController.name, function AuthControllerTest() {
     let User: UserModel;
     let controller: AuthController;
 
     const users = createUsers([
       { username: "Active", isActive: true, role: UserRole.Everyone },
-      { username: "Inactive", isActive: false, role: UserRole.Subadmin }
+      { username: "Inactive", isActive: false, role: UserRole.Subadmin },
     ]);
 
-    this.beforeAll(function() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       container.bind<AuthController>(AuthController).toSelf();
@@ -33,43 +33,44 @@ export default function buildTestSuite() {
       User = container.get(Models.User);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       const userDocs = [new User(users[0]), new User(users[1])];
       await userDocs[0].setPassword("password1");
       await userDocs[1].setPassword("password2");
       await setupDatabase(
         {
-          users: userDocs.map((u) => u.toJSON() as IViewUser)
+          users: userDocs.map((u) => u.toJSON() as IViewUser),
         },
         false
       );
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       await User.deleteMany({});
     });
 
-    it("should authenticate active user with correct credentials", async function() {
+    it("should authenticate active user with correct credentials", async () => {
       const result = await controller.login(users[0].username, "password1");
       should(result.success).true();
     });
 
-    it("should block active user with wrong credentials", async function() {
+    it("should block active user with wrong credentials", async () => {
       try {
         await controller.login(users[0].username, "sdfadfsgdxcvbxcb");
       } catch (err) {
         should(err).match({
           success: false,
-          message: "Nom d'usager ou mot de passe invalide."
+          message: "Nom d'usager ou mot de passe invalide.",
         });
         return;
       }
       throw new AssertionError({
-        message: "Authentication should throw an exception on wrong credentials"
+        message:
+          "Authentication should throw an exception on wrong credentials",
       });
     });
 
-    it("should block inactive user", async function() {
+    it("should block inactive user", async () => {
       try {
         await controller.login(users[1].username, "password2");
       } catch (err) {
@@ -77,12 +78,13 @@ export default function buildTestSuite() {
           success: false,
           message:
             "Ce compte utilisateur est désactivé. " +
-            "Veuillez réactiver ce compte ou vous connecter avec un autre compte."
+            "Veuillez réactiver ce compte ou vous connecter avec un autre compte.",
         });
         return;
       }
       throw new AssertionError({
-        message: "Authentication should throw an exception on wrong credentials"
+        message:
+          "Authentication should throw an exception on wrong credentials",
       });
     });
   });

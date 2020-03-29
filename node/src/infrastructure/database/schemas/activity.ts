@@ -15,16 +15,16 @@ export const ActivitySchema = new Schema(
           "Activity",
           "code",
           "Vous devez entrer un code unique pour cette activité."
-        )
-      ]
+        ),
+      ],
     },
     name: {
       type: String,
       required: [true, "Vous devez entrer un nom pour cette activité."],
-      trim: true
-    }
+      trim: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );

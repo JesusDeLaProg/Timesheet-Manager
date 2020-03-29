@@ -1,4 +1,4 @@
 export enum ProjectType {
   Public = "Public",
-  Prive = "Privé"
+  Prive = "Privé",
 }

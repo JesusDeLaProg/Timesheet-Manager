@@ -7,13 +7,13 @@ import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
 import moment from "moment";
-import { UserRouter } from "../user";
 import { IViewUser } from "../../../../types/viewmodels";
 import { ProjectType } from "../../constants/enums/project-type";
 import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { UserModel } from "../../interfaces/models";
+import { UserRouter } from "../user";
 
 export default function buildTestSuite(
   appFactory: () => Express,
@@ -41,15 +41,15 @@ export default function buildTestSuite(
               begin: new Date(1970, 0, 1),
               end: new Date(2000, 0, 1),
               jobTitle: "Ingénieur junior",
-              rate: 100
+              rate: 100,
             },
             {
               begin: new Date(2000, 0, 2),
               end: undefined,
               jobTitle: "Ingénieur",
-              rate: 125
-            }
-          ]
+              rate: 125,
+            },
+          ],
         },
         {
           projectType: ProjectType.Prive,
@@ -58,28 +58,28 @@ export default function buildTestSuite(
               begin: new Date(1970, 0, 1),
               end: new Date(2000, 0, 1),
               jobTitle: "Ingénieur junior",
-              rate: 200
+              rate: 200,
             },
             {
               begin: new Date(2000, 0, 2),
               end: undefined,
               jobTitle: "Ingénieur",
-              rate: 250
-            }
-          ]
-        }
-      ]
+              rate: 250,
+            },
+          ],
+        },
+      ],
     };
   }
 
-  describe(UserRouter.name, function() {
-    this.beforeAll(function() {
+  describe(UserRouter.name, function UserRouterTest() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       User = container.get(Models.User);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -89,14 +89,14 @@ export default function buildTestSuite(
       agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       if (server) {
         server.close();
       }
       await User.deleteMany({ username: { $ne: "admin" } });
     });
 
-    it("should have GET /", async function() {
+    it("should have GET /", async () => {
       const user = new User(validUser());
       await user.setPassword("password");
       await user.save();
@@ -109,13 +109,13 @@ export default function buildTestSuite(
         message: "",
         result: [
           { username: "admin", isActive: true, role: UserRole.Superadmin },
-          JSON.parse(JSON.stringify(user))
+          JSON.parse(JSON.stringify(user)),
         ],
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /:id", async function() {
+    it("should have GET /:id", async () => {
       const user = new User(validUser());
       await user.setPassword("password");
       await user.save();
@@ -127,11 +127,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: JSON.parse(JSON.stringify(user)),
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /validate", async function() {
+    it("should have POST /validate", async () => {
       const user = validUser();
       user.password = "password";
       const response = await agent
@@ -142,11 +142,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: null,
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /save", async function() {
+    it("should have POST /save", async () => {
       const user = validUser();
       user.password = "password";
       const response = await agent
@@ -157,16 +157,8 @@ export default function buildTestSuite(
       user.password = undefined;
       user.billingGroups = user.billingGroups.map((group) => {
         group.timeline = group.timeline.map((rate) => {
-          rate.begin =
-            rate.begin &&
-            moment(rate.begin)
-              .startOf("day")
-              .toDate();
-          rate.end =
-            rate.end &&
-            moment(rate.end)
-              .startOf("day")
-              .toDate();
+          rate.begin = rate.begin && moment(rate.begin).startOf("day").toDate();
+          rate.end = rate.end && moment(rate.end).startOf("day").toDate();
           return rate;
         });
         return group;
@@ -176,7 +168,7 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: expectedUser,
-        success: true
+        success: true,
       });
       should(response.body.result.password).be.undefined();
     });

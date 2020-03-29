@@ -6,11 +6,11 @@ import should from "should";
 import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
-import { ProjectRouter } from "../project";
+import { ProjectType } from "../../constants/enums/project-type";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ClientModel, ProjectModel } from "../../interfaces/models";
-import { ProjectType } from "../../constants/enums/project-type";
+import { ProjectRouter } from "../project";
 
 export default function buildTestSuite(
   appFactory: () => Express,
@@ -22,15 +22,15 @@ export default function buildTestSuite(
   let Project: ProjectModel;
   let Client: ClientModel;
 
-  describe(ProjectRouter.name, function() {
-    this.beforeAll(function() {
+  describe(ProjectRouter.name, function ProjectRouterTest() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       Project = container.get(Models.Project);
       Client = container.get(Models.Client);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -40,7 +40,7 @@ export default function buildTestSuite(
       agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       if (server) {
         server.close();
       }
@@ -48,14 +48,14 @@ export default function buildTestSuite(
       await Client.deleteMany({});
     });
 
-    it("should have GET /", async function() {
+    it("should have GET /", async () => {
       const client = await new Client({ name: "Client1" }).save();
       const project = await new Project({
         code: "PROJ1",
         name: "Project1",
         client: client.id,
         type: ProjectType.Public,
-        isActive: true
+        isActive: true,
       }).save();
       const response = await agent
         .get(baseUrl + "/")
@@ -65,18 +65,18 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: [JSON.parse(JSON.stringify(project))],
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /:id", async function() {
+    it("should have GET /:id", async () => {
       const client = await new Client({ name: "Client1" }).save();
       const project = await new Project({
         code: "PROJ1",
         name: "Project1",
         client: client.id,
         type: ProjectType.Public,
-        isActive: true
+        isActive: true,
       }).save();
       const response = await agent
         .get(baseUrl + `/${project.id}`)
@@ -86,11 +86,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: JSON.parse(JSON.stringify(project)),
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /byCode/:code", async function() {
+    it("should have GET /byCode/:code", async () => {
       const client = await new Client({ name: "Client1" }).save();
       for (let i = 1; i <= 20; ++i) {
         await new Project({
@@ -98,7 +98,7 @@ export default function buildTestSuite(
           name: `Project${i}`,
           client: client.id,
           type: ProjectType.Public,
-          isActive: true
+          isActive: true,
         }).save();
       }
       const response = await agent
@@ -111,7 +111,7 @@ export default function buildTestSuite(
       should(response.body.success).be.true();
     });
 
-    it("should have POST /validate", async function() {
+    it("should have POST /validate", async () => {
       const client = await new Client({ name: "Client1" }).save();
       const response = await agent
         .post(baseUrl + "/validate")
@@ -121,17 +121,17 @@ export default function buildTestSuite(
           name: "Project1",
           client: client.id,
           type: ProjectType.Public,
-          isActive: true
+          isActive: true,
         })
         .expect(200);
       should(response.body).match({
         message: "",
         result: null,
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /save", async function() {
+    it("should have POST /save", async () => {
       const client = await new Client({ name: "Client1" }).save();
       const response = await agent
         .post(baseUrl + "/save")
@@ -141,7 +141,7 @@ export default function buildTestSuite(
           name: "Project1",
           client: client.id,
           type: ProjectType.Public,
-          isActive: true
+          isActive: true,
         })
         .expect(200);
       should(response.body).match({
@@ -151,9 +151,9 @@ export default function buildTestSuite(
           name: "Project1",
           client: client.id,
           type: ProjectType.Public,
-          isActive: true
+          isActive: true,
         },
-        success: true
+        success: true,
       });
     });
   });

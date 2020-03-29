@@ -6,8 +6,8 @@
     "start": "node ./bin/www",
     "lint": "tslint --fix -c ./tslint.json -p ./src/tsconfig.json",
     "build": "tsc --build src/tsconfig.json",
-    "build-watch": "cp -R ./src/public ./out && tsc -b --watch ./src",
-    "debug": "node --inspect-brk ./bin/www",
+    "build-watch": "tsc -b --watch ./src",
+    "debug": "node --inspect=9229 ./bin/www",
     "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "debug": "~2.6.9",
     "dotenv": "^8.0.0",
     "express": "~4.16.1",
+    "http-proxy": "^1.18.0",
     "inversify": "^5.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash.escaperegexp": "^4.1.2",
@@ -58,6 +59,7 @@
     "@types/cors": "^2.8.6",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.0",
+    "@types/http-proxy": "^1.17.4",
     "@types/lodash.escaperegexp": "^4.1.6",
     "@types/lodash.sortby": "^4.7.6",
     "@types/mocha": "^5.2.7",
@@ -82,8 +84,8 @@
     "ts-node": "^8.3.0",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "webpack": "^4.41.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.10"
   }
 }

@@ -5,7 +5,7 @@ export class CrudResult<T = any> implements ICrudResult<T> {
     return new CrudResult<U>({
       message,
       result,
-      success: true
+      success: true,
     });
   }
 
@@ -16,7 +16,7 @@ export class CrudResult<T = any> implements ICrudResult<T> {
     return new CrudResult<U>({
       message: message || "",
       result: error,
-      success: false
+      success: false,
     });
   }
 

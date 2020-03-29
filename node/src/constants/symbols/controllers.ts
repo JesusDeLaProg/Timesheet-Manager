@@ -5,5 +5,5 @@ export default {
   PhaseController: Symbol.for("PhaseController"),
   ProjectController: Symbol.for("ProjectController"),
   TimesheetController: Symbol.for("TimesheetController"),
-  UserController: Symbol.for("UserController")
+  UserController: Symbol.for("UserController"),
 };

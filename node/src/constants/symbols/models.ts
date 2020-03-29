@@ -4,5 +4,5 @@ export default {
   Phase: Symbol.for("PhaseModel"),
   Project: Symbol.for("ProjectModel"),
   Timesheet: Symbol.for("TimesheetModel"),
-  User: Symbol.for("UserModel")
+  User: Symbol.for("UserModel"),
 };

@@ -14,7 +14,7 @@ export default function min(
         return equal
           ? moment(value).isSameOrAfter(minimum)
           : moment(value).isAfter(minimum);
-      }
+      },
     };
   } else {
     return {
@@ -22,7 +22,7 @@ export default function min(
       type: "NumberMinimumValidator",
       validator(value: number) {
         return equal ? value >= minimum : value > minimum;
-      }
+      },
     };
   }
 }

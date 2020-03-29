@@ -14,7 +14,7 @@ import {
   TimesheetDocument,
   TimesheetModel,
   UserDocument,
-  UserModel
+  UserModel,
 } from "../../../interfaces/models";
 import {
   ActivitySchema,
@@ -22,7 +22,7 @@ import {
   PhaseSchema,
   ProjectSchema,
   TimesheetSchema,
-  UserSchema
+  UserSchema,
 } from "../schemas";
 
 export const ModelModule = new ContainerModule((bind) => {

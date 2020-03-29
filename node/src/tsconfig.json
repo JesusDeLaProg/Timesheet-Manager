@@ -4,6 +4,7 @@
   "references": [
     { "path": "./controllers" },
     { "path": "./infrastructure/database" },
+    { "path": "./infrastructure/environment" },
     { "path": "./infrastructure/ioc" },
     { "path": "./infrastructure/utils" },
     { "path": "./routes" }

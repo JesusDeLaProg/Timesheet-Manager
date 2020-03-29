@@ -7,8 +7,8 @@ import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import {
   IProjectController,
+  IQueryOptions,
   ObjectId,
-  QueryOptions
 } from "../interfaces/controllers";
 import { ProjectDocument, ProjectModel, UserModel } from "../interfaces/models";
 import { AbstractController } from "./abstract";
@@ -28,14 +28,14 @@ export class ProjectController extends AbstractController<IViewProject>
    * Codes are matches without case sensitivity.
    * @param {ObjectId} authenticatedUserId
    * @param {string} code
-   * @param {QueryOptions} [options]
+   * @param {IQueryOptions} [options]
    * @returns {Promise<CrudResult<ProjectDocument[]>>}
    * @memberof ProjectController
    */
   public async getAllByCode(
     authenticatedUserId: ObjectId,
     code: string,
-    options?: QueryOptions
+    options?: IQueryOptions
   ) {
     if (
       this.validateReadPermissions(
@@ -45,7 +45,7 @@ export class ProjectController extends AbstractController<IViewProject>
     ) {
       let query = this.Project.find({
         code: new RegExp(escapeRegExp(code), "i"),
-        isActive: true
+        isActive: true,
       });
       query = this.applyQueryOptions(query, options);
       const result = await query;

@@ -7,7 +7,7 @@ import {
   IClientController,
   IPhaseController,
   IProjectController,
-  ITimesheetController
+  ITimesheetController,
 } from "../interfaces/controllers";
 import { ActivityController } from "./activity";
 import { AuthController } from "./auth";

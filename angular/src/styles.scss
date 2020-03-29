@@ -1,1 +1,97 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import "~@angular/material/theming";
+// Plus imports for other components in your app.
+
+@import "./variables";
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+$tm-mat-indigo: map_merge(
+  $mat-indigo,
+  (
+    1000: #000051,
+    contrast:
+      map_merge(
+        map-get($mat-indigo, contrast),
+        (
+          1000: $light-primary-text,
+        )
+      ),
+  )
+);
+
+$tm-mat-red: map_merge(
+  $mat-red,
+  (
+    1000: #7f0000,
+    contrast:
+      map_merge(
+        map-get($mat-red, contrast),
+        (
+          1000: $light-primary-text,
+        )
+      ),
+  )
+);
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$tm-app-primary: mat-palette($tm-mat-indigo, 900, 400, 1000);
+$tm-app-accent: mat-palette($tm-mat-red, 900, 400, 1000);
+
+// The warn palette is optional (defaults to red).
+$tm-app-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$tm-app-theme: mat-light-theme($tm-app-primary, $tm-app-accent, $tm-app-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($tm-app-theme);
+
 /* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.background-primary {
+  background-color: mat-color($tm-app-primary);
+  color: mat-color($tm-app-primary, default-contrast);
+
+  &.light {
+    background-color: mat-color($tm-app-primary, lighter);
+    color: mat-color($tm-app-primary, lighter-contrast);
+  }
+
+  &.dark {
+    background-color: mat-color($tm-app-primary, darker);
+    color: mat-color($tm-app-primary, darker-contrast);
+  }
+}
+
+.background-accent {
+  background-color: mat-color($tm-app-accent);
+  color: mat-color($tm-app-accent, default-contrast);
+
+  &.light {
+    background-color: mat-color($tm-app-accent, lighter);
+    color: mat-color($tm-app-accent, lighter-contrast);
+  }
+
+  &.dark {
+    background-color: mat-color($tm-app-accent, darker);
+    color: mat-color($tm-app-accent, darker-contrast);
+  }
+}

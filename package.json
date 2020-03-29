@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/JesusDeLaProg/Timesheet-Manager#readme",
   "devDependencies": {
-    "husky": "^3.0.3",
-    "lint-staged": "^9.2.1",
-    "prettier": "1.18.2",
+    "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
+    "prettier": "^2.0.2",
     "tslint": "^5.18.0",
     "typescript": "^3.8.3"
   },
@@ -35,13 +35,13 @@
     }
   },
   "lint-staged": {
-    "node/src/{,**/}!(*.d.ts|*.d.ts.map)": [
-      "tslint --fix -c ./node/tslint.json -p ./node/src/tsconfig.json",
+    "node/src/{,**/}!(*.d.ts.map|*.json)": [
+      "tslint --fix -c ./node/tslint.json",
       "prettier --arrow-parens always --write",
       "git add"
     ],
-    "angular/tm-app/{,**/}{*.ts,*.html,*.scss}": [
-      "prettier --config angular/tm-app/.prettierrc --write",
+    "angular/{,**/}{*.ts,*.html,*.scss}": [
+      "prettier --config angular/.prettierrc --write",
       "git add"
     ]
   }

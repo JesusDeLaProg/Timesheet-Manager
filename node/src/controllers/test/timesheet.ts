@@ -2,59 +2,50 @@ import { Container } from "inversify";
 import "reflect-metadata";
 import should from "should";
 
+import moment from "moment";
+import {
+  IViewActivity,
+  IViewClient,
+  IViewPhase,
+  IViewProject,
+  IViewTimesheet,
+  IViewUser,
+} from "../../../../types/viewmodels";
+import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
-import { TimesheetController } from "../timesheet";
 import {
-  TimesheetModel,
-  ProjectModel,
+  ActivityModel,
   ClientModel,
   PhaseModel,
-  ActivityModel
+  ProjectModel,
+  TimesheetModel,
 } from "../../interfaces/models";
+import { TimesheetController } from "../timesheet";
 import {
-  IViewTimesheet,
-  IViewProject,
-  IViewActivity,
-  IViewPhase,
-  IViewClient,
-  IViewUser
-} from "../../../../types/viewmodels";
-import {
-  createClients,
-  createProjects,
+  compareIds,
   createActivities,
+  createClients,
+  createControllerTests,
   createPhases,
+  createProjects,
   createTimesheets,
+  createUsers,
   defaultUsers,
   setupDatabase,
-  createControllerTests,
-  createUsers,
-  compareIds
 } from "./abstract";
-import moment from "moment";
-import { UserRole } from "../../constants/enums/user-role";
 
 function moveTimesheet(
   timesheet: IViewTimesheet,
   amount: number,
   unit: "days" | "weeks"
 ) {
-  timesheet.begin = moment(timesheet.begin)
-    .add(amount, unit)
-    .toDate();
-  timesheet.end = moment(timesheet.end)
-    .add(amount, unit)
-    .toDate();
+  timesheet.begin = moment(timesheet.begin).add(amount, unit).toDate();
+  timesheet.end = moment(timesheet.end).add(amount, unit).toDate();
   timesheet.lines = timesheet.lines.map(
     (l) => (
       (l.entries = l.entries.map(
-        (e) => (
-          (e.date = moment(e.date)
-            .add(amount, unit)
-            .toDate()),
-          e
-        )
+        (e) => ((e.date = moment(e.date).add(amount, unit).toDate()), e)
       )),
       l
     )
@@ -62,7 +53,7 @@ function moveTimesheet(
 }
 
 export default function buildTestSuite() {
-  describe(TimesheetController.name, function() {
+  describe(TimesheetController.name, function TimesheetControllerTest() {
     let Timesheet: TimesheetModel;
     let Project: ProjectModel;
     let Client: ClientModel;
@@ -77,7 +68,7 @@ export default function buildTestSuite() {
     let timesheets: IViewTimesheet[];
     let otherUser: IViewUser;
 
-    this.beforeAll(function() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       container.bind<TimesheetController>(TimesheetController).toSelf();
@@ -89,7 +80,7 @@ export default function buildTestSuite() {
       Activity = container.get(Models.Activity);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       clients = createClients(Array(5).fill({}));
       projects = createProjects(
         Array(5)
@@ -103,7 +94,7 @@ export default function buildTestSuite() {
           .map((_, i) => ({
             activities: activities
               .slice(Math.floor(i / 2), Math.floor(i / 2) + 2)
-              .map((a) => a._id)
+              .map((a) => a._id),
           }))
       );
       otherUser = createUsers([{ role: UserRole.Everyone }])[0];
@@ -120,15 +111,15 @@ export default function buildTestSuite() {
                 activity: phases[i].activities[0],
                 entries: Array(7)
                   .fill({})
-                  .map((_, i) => ({
+                  .map((__, j) => ({
                     date: moment(new Date())
                       .startOf("week")
-                      .add(i, "days")
+                      .add(j, "days")
                       .toDate(),
-                    time: 1
-                  }))
-              }
-            ]
+                    time: 1,
+                  })),
+              },
+            ],
           }))
       );
       await setupDatabase(
@@ -138,13 +129,13 @@ export default function buildTestSuite() {
           clients,
           projects,
           timesheets,
-          users
+          users,
         },
         false
       );
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       await Timesheet.deleteMany({});
       await Project.deleteMany({});
       await Client.deleteMany({});
@@ -153,7 +144,7 @@ export default function buildTestSuite() {
     });
 
     for (const user of defaultUsers) {
-      describe(`Logged in as ${user.username}`, function() {
+      describe(`Logged in as ${user.username}`, () => {
         let inputSaveCreate: IViewTimesheet;
 
         createControllerTests(() => controller, user, {
@@ -162,31 +153,32 @@ export default function buildTestSuite() {
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, timesheets.slice(-1)[0], {
-                  _id: compareIds(timesheets.slice(-1)[0]._id)
+                  _id: compareIds(timesheets.slice(-1)[0]._id),
                 })
-              )
+              ),
           }),
           getAll: () => ({
             options: {},
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
-            verify: (res) => should(res.result!.length).equal(timesheets.length)
+            verify: (res) =>
+              should(res.result!.length).equal(timesheets.length),
           }),
           count: () => ({
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
-            verify: (res) => should(res.result).equal(timesheets.length)
+            verify: (res) => should(res.result).equal(timesheets.length),
           }),
           validateCreate: () => {
             const input = JSON.parse(
@@ -197,13 +189,13 @@ export default function buildTestSuite() {
             return {
               input,
               allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-              verify: (res) => should(res.result).be.null()
+              verify: (res) => should(res.result).be.null(),
             };
           },
           validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(timesheets.slice(-1)[0])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           saveCreate: () => {
             inputSaveCreate = JSON.parse(
@@ -226,13 +218,13 @@ export default function buildTestSuite() {
                         project: compareIds(l.project),
                         entries: l.entries.map((e) =>
                           Object.assign({}, e, {
-                            _id: compareIds((e as any)._id)
+                            _id: compareIds((e as any)._id),
                           })
-                        )
+                        ),
                       })
-                    )
+                    ),
                   })
-                )
+                ),
             };
           },
           saveUpdate: () => ({
@@ -241,13 +233,13 @@ export default function buildTestSuite() {
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, timesheets.slice(-1)[0], {
-                  _id: compareIds(timesheets.slice(-1)[0]._id)
+                  _id: compareIds(timesheets.slice(-1)[0]._id),
                 })
-              )
-          })
+              ),
+          }),
         });
 
-        it("getAllByUserId", async function() {
+        it("getAllByUserId", async () => {
           try {
             const res = await controller.getAllByUserId(
               user._id,
@@ -265,21 +257,23 @@ export default function buildTestSuite() {
                     project: compareIds(l.project),
                     entries: l.entries.map((e) =>
                       Object.assign({}, e, { _id: compareIds((e as any)._id) })
-                    )
+                    ),
                   })
-                )
-              })
+                ),
+              }),
             ]);
             should(res.success).be.true();
           } catch (err) {
-            if (err.success === undefined) throw err;
+            if (err.success === undefined) {
+              throw err;
+            }
             should(user.role).equals(UserRole.Everyone);
             should(err.success).be.false();
             should(err.result).match({ code: 403 });
           }
         });
 
-        it("countByUserId", async function() {
+        it("countByUserId", async () => {
           try {
             const res = await controller.countByUserId(
               user._id,
@@ -288,7 +282,9 @@ export default function buildTestSuite() {
             should(res.result).equals(1);
             should(res.success).be.true();
           } catch (err) {
-            if (err.success === undefined) throw err;
+            if (err.success === undefined) {
+              throw err;
+            }
             should(user.role).equals(UserRole.Everyone);
             should(err.success).be.false();
             should(err.result).match({ code: 403 });

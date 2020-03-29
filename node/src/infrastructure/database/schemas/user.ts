@@ -12,7 +12,7 @@ import isLength from "validator/lib/isLength";
 import {
   IBillingGroup,
   IBillingRate,
-  IUser
+  IUser,
 } from "../../../../../types/datamodels";
 import { ProjectType } from "../../../constants/enums/project-type";
 import { UserRole } from "../../../constants/enums/user-role";
@@ -39,7 +39,7 @@ function timelineDensityValidators(): SchemaTypeOpts.ValidateOpts[] {
           }
         }
         return true;
-      }
+      },
     },
     {
       type: "TimelineNoOverlapValidator",
@@ -57,8 +57,8 @@ function timelineDensityValidators(): SchemaTypeOpts.ValidateOpts[] {
           }
         }
         return true;
-      }
-    }
+      },
+    },
   ];
 }
 
@@ -67,7 +67,7 @@ export const BillingRateSchema = new Schema({
     type: Date,
     required: [
       true,
-      "Vous devez entrer une date de début pour ce taux horaire."
+      "Vous devez entrer une date de début pour ce taux horaire.",
     ],
     validate: [
       {
@@ -83,7 +83,7 @@ export const BillingRateSchema = new Schema({
           } else {
             return true;
           }
-        }
+        },
       },
       {
         type: "DateMinimumValidator",
@@ -93,15 +93,15 @@ export const BillingRateSchema = new Schema({
             return true;
           }
           return moment(this.end).isAfter(value);
-        }
+        },
       },
-      ...timelineDensityValidators()
-    ]
+      ...timelineDensityValidators(),
+    ],
   },
   end: {
     type: Date,
     required: [
-      function(this: IBillingRate & Types.Embedded) {
+      function (this: IBillingRate & Types.Embedded) {
         const sortedBillingRates = sortBy(
           (this.parentArray() as unknown) as IBillingRate[],
           "begin"
@@ -110,7 +110,7 @@ export const BillingRateSchema = new Schema({
           sortedBillingRates.indexOf(this) !== sortedBillingRates.length - 1
         );
       },
-      "Vous devez entrer une date de fin pour ce taux horaire."
+      "Vous devez entrer une date de fin pour ce taux horaire.",
     ],
     validate: [
       ...timelineDensityValidators(),
@@ -130,19 +130,19 @@ export const BillingRateSchema = new Schema({
           } else {
             return true;
           }
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   rate: {
     type: Number,
     required: [true, "Vous devez entrer un montant pour ce taux horaire."],
-    validate: [min(0, "Vous devez entrer un montant supérieur à 0.")]
+    validate: [min(0, "Vous devez entrer un montant supérieur à 0.")],
   },
   jobTitle: {
     type: String,
-    required: [true, "Vous devez entrer un nom de poste pour ce taux horaire."]
-  }
+    required: [true, "Vous devez entrer un nom de poste pour ce taux horaire."],
+  },
 });
 
 export const BillingGroupSchema = new Schema({
@@ -150,20 +150,20 @@ export const BillingGroupSchema = new Schema({
     type: String,
     required: [
       true,
-      "Vous devez entrer un type de projet pour ce groupe de taux horaire."
+      "Vous devez entrer un type de projet pour ce groupe de taux horaire.",
     ],
     enum: {
       values: $enum(ProjectType).getValues(),
       message: `Le type de projet doit être dans [${$enum(
         ProjectType
-      ).getValues()}].`
-    }
+      ).getValues()}].`,
+    },
   },
   timeline: {
     type: [BillingRateSchema],
     required: [
       true,
-      "Vous devez entrer une liste de taux horaire pour ce type de projet."
+      "Vous devez entrer une liste de taux horaire pour ce type de projet.",
     ],
     validate: [
       {
@@ -172,10 +172,10 @@ export const BillingGroupSchema = new Schema({
           "Vous devez entrer au moins un taux horaire pour ce type de projet.",
         validator(value: IBillingRate[]) {
           return value && value.length > 0;
-        }
-      }
-    ]
-  }
+        },
+      },
+    ],
+  },
 });
 
 export const UserSchema = new Schema({
@@ -196,35 +196,35 @@ export const UserSchema = new Schema({
         msg: "Le nom d'utilisateur doit avoir au moins 3 caractères.",
         validator(value: string) {
           return !!value && isLength(value, { min: 3 });
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   firstName: {
     type: String,
     trim: true,
     required: [
-      function(this: IUser) {
+      function (this: IUser) {
         return (
           !!(this.firstName || this.lastName) &&
           (this.firstName.trim() || this.lastName.trim())
         );
       },
-      "Vous devez entrer au moins soit un prénom, soit un nom de famille."
-    ]
+      "Vous devez entrer au moins soit un prénom, soit un nom de famille.",
+    ],
   },
   lastName: {
     type: String,
     trim: true,
     required: [
-      function(this: IUser) {
+      function (this: IUser) {
         return (
           !!(this.firstName || this.lastName) &&
           (this.firstName.trim() || this.lastName.trim())
         );
       },
-      "Vous devez entrer au moins soit un prénom, soit un nom de famille."
-    ]
+      "Vous devez entrer au moins soit un prénom, soit un nom de famille.",
+    ],
   },
   role: {
     type: Number,
@@ -233,8 +233,8 @@ export const UserSchema = new Schema({
       values: $enum(UserRole).getValues(),
       message: `Le rôle de l'utilisateur doit être dans [${$enum(
         UserRole
-      ).getValues()}].`
-    }
+      ).getValues()}].`,
+    },
   },
   email: {
     type: String,
@@ -244,9 +244,9 @@ export const UserSchema = new Schema({
         msg: "Vous devez entrer un courriel valide.",
         validator(value: string) {
           return !value || isEmail(value);
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   password: {
     type: String,
@@ -258,7 +258,7 @@ export const UserSchema = new Schema({
           "Votre mot de passe doit avoir une longueur d'au moins 3 caractères.",
         validator(value: string) {
           return !!value && isLength(value, { min: 3 });
-        }
+        },
       },
       {
         type: "PasswordEncryptionValidation",
@@ -274,19 +274,19 @@ export const UserSchema = new Schema({
             parts.length === 5 &&
             parts.every((part) => isLength(part, { min: 1 }))
           );
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   isActive: {
     type: Boolean,
-    required: [true, "Vous devez entrer un statut pour cet utilisateur."]
+    required: [true, "Vous devez entrer un statut pour cet utilisateur."],
   },
   billingGroups: {
     type: [BillingGroupSchema],
     required: [
       true,
-      "Vous devez entrer une liste de taux horaire pour cet employé."
+      "Vous devez entrer une liste de taux horaire pour cet employé.",
     ],
     validate: [
       {
@@ -308,10 +308,10 @@ export const UserSchema = new Schema({
             );
           }
           return projectTypes.length === 0;
-        }
-      }
-    ]
-  }
+        },
+      },
+    ],
+  },
 });
 
 async function encryptPassword(
@@ -339,25 +339,27 @@ async function encryptPassword(
     base64url.encode(outLength.toString(16)),
     base64url.encode(salt),
     base64url.encode(
-      (await asyncEncFn(
-        password,
-        salt,
-        iterationCount,
-        outLength,
-        encryptionFunction
-      )).toString("hex")
-    )
+      (
+        await asyncEncFn(
+          password,
+          salt,
+          iterationCount,
+          outLength,
+          encryptionFunction
+        )
+      ).toString("hex")
+    ),
   ].join(".");
 }
 
-UserSchema.method("setPassword", async function(
+UserSchema.method("setPassword", async function (
   this: IUser,
   plainTextPassword: string
 ) {
   this.password = await encryptPassword(plainTextPassword);
 });
 
-UserSchema.method("checkPassword", async function(
+UserSchema.method("checkPassword", async function (
   this: IUser,
   password: string
 ) {

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ContainerModule, inject, injectable } from "inversify";
 
-import { HasRouter } from "../interfaces/routers";
+import { IHasRouter } from "../interfaces/routers";
 
 import Routers from "../constants/symbols/routers";
 import { ActivityRouter } from "./activity";
@@ -13,7 +13,7 @@ import { TimesheetRouter } from "./timesheet";
 import { UserRouter } from "./user";
 
 @injectable()
-export class ApiRouter implements HasRouter {
+export class ApiRouter implements IHasRouter {
   public readonly router = Router();
 
   constructor(
@@ -48,12 +48,12 @@ export class ApiRouter implements HasRouter {
 }
 
 export const RouterModule = new ContainerModule((bind) => {
-  bind<HasRouter>(Routers.ApiRouter).to(ApiRouter);
-  bind<HasRouter>(Routers.ActivityRouter).to(ActivityRouter);
-  bind<HasRouter>(Routers.AuthRouter).to(AuthRouter);
-  bind<HasRouter>(Routers.ClientRouter).to(ClientRouter);
-  bind<HasRouter>(Routers.PhaseRouter).to(PhaseRouter);
-  bind<HasRouter>(Routers.ProjectRouter).to(ProjectRouter);
-  bind<HasRouter>(Routers.TimesheetRouter).to(TimesheetRouter);
-  bind<HasRouter>(Routers.UserRouter).to(UserRouter);
+  bind<IHasRouter>(Routers.ApiRouter).to(ApiRouter);
+  bind<IHasRouter>(Routers.ActivityRouter).to(ActivityRouter);
+  bind<IHasRouter>(Routers.AuthRouter).to(AuthRouter);
+  bind<IHasRouter>(Routers.ClientRouter).to(ClientRouter);
+  bind<IHasRouter>(Routers.PhaseRouter).to(PhaseRouter);
+  bind<IHasRouter>(Routers.ProjectRouter).to(ProjectRouter);
+  bind<IHasRouter>(Routers.TimesheetRouter).to(TimesheetRouter);
+  bind<IHasRouter>(Routers.UserRouter).to(UserRouter);
 });

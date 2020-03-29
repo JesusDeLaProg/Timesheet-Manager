@@ -15,22 +15,22 @@ export const PhaseSchema = new Schema(
           "Phase",
           "code",
           "Vous devez entrer un code unique pour cette phase."
-        )
-      ]
+        ),
+      ],
     },
     name: {
       type: String,
       required: [true, "Vous devez entrer un nom pour cette phase."],
-      trim: true
+      trim: true,
     },
     activities: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Activity"
-      }
-    ]
+        ref: "Activity",
+      },
+    ],
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );

@@ -7,14 +7,14 @@ import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import {
   IClientController,
+  IQueryOptions,
   ObjectId,
-  QueryOptions
 } from "../interfaces/controllers";
 import {
   ClientDocument,
   ClientModel,
   UserDocument,
-  UserModel
+  UserModel,
 } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 
@@ -33,20 +33,20 @@ export class ClientController extends AbstractController<IViewClient>
    * Clients names are compared without case sensitivity.
    * @param {ObjectId} authenticatedUser
    * @param {string} name
-   * @param {QueryOptions} [options]
+   * @param {IQueryOptions} [options]
    * @returns {Promise<ICrudResult<IViewClient[]>>}
    * @memberof ClientController
    */
   public async getAllByName(
     authenticatedUser: ObjectId,
     name: string,
-    options?: QueryOptions
+    options?: IQueryOptions
   ): Promise<ICrudResult<IViewClient[]>> {
     if (
       this.validateReadPermissions(await this.getUser(authenticatedUser), null)
     ) {
       let query = this.Client.find({
-        name: new RegExp(escapeRegExp(name), "i")
+        name: new RegExp(escapeRegExp(name), "i"),
       });
       query = this.applyQueryOptions(query, options);
       const result = await query;

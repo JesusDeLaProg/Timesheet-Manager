@@ -13,28 +13,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Debug API",
+            "name": "Debug",
             "cwd": "${workspaceFolder}/node",
-            "runtimeExecutable": "npm",
+            "runtimeExecutable": "node",
             "runtimeArgs": [
-                "run-script",
-                "debug"
+                "--inspect-brk",
+                "./bin/www"
             ],
             "port": 9229,
+            "env": {
+                "NODE_ENV": "development"
+            },
             "outFiles": ["${workspaceFolder}/node/out/**/*.js"],
             "console": "integratedTerminal",
             "sourceMaps": true,
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "nodemon",
-            "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/nodemon",
-            "cwd": "${workspaceFolder}/node",
-            "program": "${workspaceFolder}/node/bin/www",
-            "restart": true,
-            "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         },
         {

@@ -1,21 +1,22 @@
-import { Router } from "express-serve-static-core";
 import { ObjectId } from "bson";
+import { Router } from "express-serve-static-core";
 
 import { IUserRole } from "../../../types/datamodels";
 
-export interface JWTPayload {
-  user: string
+export interface IJWTPayload {
+  user: string;
 }
 
 declare module "express-serve-static-core" {
+  // tslint:disable-next-line
   interface Request {
     user?: {
-      _id: ObjectId,
-      role: IUserRole
-    }
+      _id: ObjectId;
+      role: IUserRole;
+    };
   }
 }
 
-export interface HasRouter {
+export interface IHasRouter {
   readonly router: Router;
 }

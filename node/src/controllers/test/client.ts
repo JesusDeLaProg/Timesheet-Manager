@@ -1,31 +1,31 @@
-import "reflect-metadata";
 import { Container } from "inversify";
 import { Types } from "mongoose";
+import "reflect-metadata";
 import should from "should";
 
+import { IViewClient } from "../../../../types/viewmodels";
+import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
-import { ClientController } from "../client";
 import { ClientModel, UserModel } from "../../interfaces/models";
-import { IViewClient } from "../../../../types/viewmodels";
+import { ClientController } from "../client";
 import {
+  compareIds,
   createClients,
-  setupDatabase,
-  defaultUsers,
   createControllerTests,
-  compareIds
+  defaultUsers,
+  setupDatabase,
 } from "./abstract";
-import { UserRole, AllUserRoles } from "../../constants/enums/user-role";
 
 export default function buildTestSuite() {
-  describe(ClientController.name, function() {
+  describe(ClientController.name, function ClientControllerTest() {
     let User: UserModel;
     let Client: ClientModel;
     let controller: ClientController;
 
     let clients: IViewClient[];
 
-    this.beforeAll(function() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       container.bind<ClientController>(ClientController).toSelf();
@@ -34,7 +34,7 @@ export default function buildTestSuite() {
       Client = container.get(Models.Client);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       clients = createClients(Array(6).fill({}));
       clients = clients.map((act) => {
         act._id = new Types.ObjectId();
@@ -43,19 +43,19 @@ export default function buildTestSuite() {
       await setupDatabase(
         {
           users: defaultUsers,
-          clients
+          clients,
         },
         false
       );
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       await Client.deleteMany({});
       await User.deleteMany({});
     });
 
-    for (let user of defaultUsers) {
-      describe(`Logged in as ${user.username}`, function() {
+    for (const user of defaultUsers) {
+      describe(`Logged in as ${user.username}`, () => {
         const inputValidateCreate = createClients([{}])[0];
         delete inputValidateCreate._id;
         const inputSaveCreate = createClients([{}])[0];
@@ -67,10 +67,10 @@ export default function buildTestSuite() {
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, clients[1], {
-                  _id: compareIds(clients[1]._id)
+                  _id: compareIds(clients[1]._id),
                 })
               ),
-            allowedRoles: AllUserRoles
+            allowedRoles: AllUserRoles,
           }),
           getAll: () => ({
             options: {},
@@ -80,64 +80,64 @@ export default function buildTestSuite() {
                   Object.assign({}, c, { _id: compareIds(c._id) })
                 )
               ),
-            allowedRoles: AllUserRoles
+            allowedRoles: AllUserRoles,
           }),
           count: () => ({
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).equal(clients.length)
+            verify: (res) => should(res.result).equal(clients.length),
           }),
           validateCreate: () => ({
             input: inputValidateCreate,
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(clients[2])),
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           saveCreate: () => ({
             input: inputSaveCreate,
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
-            verify: (res) => should(res.result).match(inputSaveCreate)
+            verify: (res) => should(res.result).match(inputSaveCreate),
           }),
           saveUpdate: () => ({
             input: JSON.parse(JSON.stringify(clients[2])),
             allowedRoles: [
               UserRole.Subadmin,
               UserRole.Admin,
-              UserRole.Superadmin
+              UserRole.Superadmin,
             ],
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, clients[2], {
-                  _id: compareIds(clients[2]._id)
+                  _id: compareIds(clients[2]._id),
                 })
-              )
-          })
+              ),
+          }),
         });
 
         /* Special read methods */
-        it("getAllByName", async function() {
+        it("getAllByName", async () => {
           await Client.deleteMany({});
           const tempClients = createClients(
             Array(20)
               .fill({})
               .map((v, i) => ({ name: "client" + i }))
           );
-          for (let client of tempClients) {
+          for (const client of tempClients) {
             await new Client(client).save();
           }
           const result = await controller.getAllByName(user._id, "client1");

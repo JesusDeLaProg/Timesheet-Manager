@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { ICrudResult } from "../../../types/viewmodels";
 import { CrudResult } from "../infrastructure/utils/crud-result";
-import { QueryOptions } from "../interfaces/controllers";
+import { IQueryOptions } from "../interfaces/controllers";
 
 export default {
   sendResultOrGiveToErrorHandler(
@@ -11,10 +11,7 @@ export default {
     next: NextFunction
   ) {
     if (result.success) {
-      res
-        .type("json")
-        .status(200)
-        .send(result);
+      res.type("json").status(200).send(result);
     } else {
       next(result);
     }
@@ -28,11 +25,11 @@ export default {
     }
   },
 
-  buildQueryOptionsFromRequest(req: Request): QueryOptions {
+  buildQueryOptionsFromRequest(req: Request): IQueryOptions {
     return {
       limit: +((req.query || {}).limit || 0),
       skip: +((req.query || {}).skip || 0),
-      sort: (req.query || {}).sort || ""
+      sort: (req.query || {}).sort || "",
     };
-  }
+  },
 };
