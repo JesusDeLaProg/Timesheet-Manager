@@ -8,7 +8,7 @@
     "build": "tsc --build src/tsconfig.json",
     "build-watch": "tsc -b --watch ./src",
     "debug": "node --inspect=9229 ./bin/www",
-    "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts -require ts-node/register"
+    "test": "export TS_NODE_PROJECT=./src/test/tsconfig.json && mocha --exit --timeout 60000 --colors ./src/test/index.ts --require ts-node/register"
   },
   "dependencies": {
     "base64url": "^3.0.1",
