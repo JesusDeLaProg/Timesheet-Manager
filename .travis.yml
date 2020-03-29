@@ -10,9 +10,10 @@ install:
   - npm ci
   - cd ../angular
   - npm ci
+  - cd ..
 script:
-  - cd angular
-  - npm run lint
-  - cd ../node
+  - cd node
   - npm run lint
   - npm run test
+  - cd ../angular
+  - npm run lint
