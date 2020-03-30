@@ -4,7 +4,11 @@ import { Document, Error as MongooseError } from "mongoose";
 import { ICrudResult, IViewUser } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
-import { IUserController, ObjectId } from "../interfaces/controllers";
+import {
+  IQueryOptions,
+  IUserController,
+  ObjectId,
+} from "../interfaces/controllers";
 import { UserDocument, UserModel } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 
@@ -16,6 +20,27 @@ export class UserController extends AbstractController<IViewUser>
     @inject(Models.User) User2: UserModel
   ) {
     super(User, User2);
+  }
+
+  public async getById(
+    authenticatedUserId: ObjectId,
+    id: string
+  ): Promise<ICrudResult<IViewUser>> {
+    const result = await super.getById(authenticatedUserId, id);
+    delete result.result?.password;
+    return result;
+  }
+
+  public async getAll(
+    authenticatedUserId: ObjectId,
+    options?: IQueryOptions
+  ): Promise<ICrudResult<IViewUser[]>> {
+    const result = await super.getAll(authenticatedUserId, options);
+    result.result = result.result!.map((u) => {
+      delete u.password;
+      return u;
+    });
+    return result;
   }
 
   public async save(

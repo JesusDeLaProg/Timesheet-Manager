@@ -79,11 +79,12 @@ export class AuthRouter implements IHasRouter {
       this.authenticationMiddlewares,
       async (req, res, next) => {
         try {
-          utils.sendResultOrGiveToErrorHandler(
-            await this._userController.getById(req.user!._id, req.user!._id),
-            res,
-            next
+          const result = await this._userController.getById(
+            req.user!._id,
+            req.user!._id
           );
+          delete result.result?.password;
+          utils.sendResultOrGiveToErrorHandler(result, res, next);
         } catch (err) {
           next(utils.buildErrorCrudResultFromError(err));
         }

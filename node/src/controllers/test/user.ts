@@ -55,18 +55,25 @@ export default function buildTestSuite() {
         delete inputSaveCreate._id;
 
         createControllerTests(() => controller, user, {
-          getById: () => ({
-            id: otherUser._id,
-            allowedRoles: [
-              UserRole.Subadmin,
-              UserRole.Admin,
-              UserRole.Superadmin,
-            ],
-            verify: (res) =>
-              should(res.result).match(
-                Object.assign({}, otherUser, { _id: compareIds(otherUser._id) })
-              ),
-          }),
+          getById: () => {
+            const expected = JSON.parse(JSON.stringify(otherUser)) as IViewUser;
+            delete expected.password;
+            return {
+              id: otherUser._id,
+              allowedRoles: [
+                UserRole.Subadmin,
+                UserRole.Admin,
+                UserRole.Superadmin,
+              ],
+              verify: (res) =>
+                should(res.result).match(
+                  Object.assign({}, expected, {
+                    _id: compareIds(otherUser._id),
+                    billingGroups: otherUser.billingGroups,
+                  })
+                ),
+            };
+          },
           getAll: () => ({
             options: {},
             allowedRoles: [

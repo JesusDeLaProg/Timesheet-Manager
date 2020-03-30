@@ -97,9 +97,11 @@ export default function buildTestSuite(
     });
 
     it("should have GET /", async () => {
-      const user = new User(validUser());
+      let user = new User(validUser());
       await user.setPassword("password");
       await user.save();
+      user = JSON.parse(JSON.stringify(user));
+      delete user.password;
       const response = await agent
         .get(baseUrl + "/")
         .set("Accept", "application/json")
@@ -109,26 +111,32 @@ export default function buildTestSuite(
         message: "",
         result: [
           { username: "admin", isActive: true, role: UserRole.Superadmin },
-          JSON.parse(JSON.stringify(user)),
+          user,
         ],
         success: true,
       });
+      for (const u of response.body.result as IViewUser[]) {
+        should(u.password).be.undefined();
+      }
     });
 
     it("should have GET /:id", async () => {
-      const user = new User(validUser());
+      let user = new User(validUser());
       await user.setPassword("password");
       await user.save();
+      user = JSON.parse(JSON.stringify(user));
+      delete user.password;
       const response = await agent
-        .get(baseUrl + `/${user.id}`)
+        .get(baseUrl + `/${user._id}`)
         .set("Accept", "application/json")
         .send()
         .expect(200);
       should(response.body).match({
         message: "",
-        result: JSON.parse(JSON.stringify(user)),
+        result: user,
         success: true,
       });
+      should(response.body.result.password).be.undefined();
     });
 
     it("should have POST /validate", async () => {

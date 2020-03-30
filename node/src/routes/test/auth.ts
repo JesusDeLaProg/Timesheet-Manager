@@ -119,5 +119,23 @@ export default function buildTestSuite(
       });
       should(cookies.SESSIONID.value).be.empty();
     });
+
+    it("should have GET /whoami", async () => {
+      const user = new User(validUser());
+      await user.setPassword("password");
+      await user.save();
+      await agent
+        .post(baseUrl + "/login")
+        .set("Accept", "application/json")
+        .send({ username: "test", password: "password" })
+        .expect(200);
+      const response = await agent.get(baseUrl + "/whoami").expect(200);
+      should(response.body).match({
+        message: "",
+        success: true,
+        result: { username: "test" },
+      });
+      should(response.body.result.password).be.undefined();
+    });
   });
 }
