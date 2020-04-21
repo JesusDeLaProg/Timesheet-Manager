@@ -1,0 +1,6 @@
+<mat-card class="root mat-elevation-z5">
+    <h1>Feuilles de temps</h1>
+    <nav mat-tab-nav-bar></nav>
+    <tm-timesheet-list-table [timesheets]="timesheets$ | async"></tm-timesheet-list-table>
+    <mat-paginator [length]="100" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</mat-card>

@@ -1,0 +1,6 @@
+@import "variables";
+
+mat-card.root {
+    margin: $tm-spacing * 5 $tm-spacing * 3;
+    padding: $tm-spacing * 3;
+}

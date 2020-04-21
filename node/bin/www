@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 const envResult = require("../out/infrastructure/environment/setup").default();
-const app = require("../out/app").app;
+const { app, server } = require("../out/app").application;
 const debug = require("debug")("node:server");
 const http = require("http");
 
@@ -14,12 +14,6 @@ const http = require("http");
 
 const port = normalizePort(process.env.HTTPPORT || "3000");
 app.set("port", port);
-
-/**
- * Create HTTP server.
- */
-
-const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.

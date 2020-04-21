@@ -1,0 +1,29 @@
+h1 {
+    margin-bottom: 0;
+}
+
+#login-form {
+    height: 175px;
+    display: flex;
+    flex-direction: column;
+
+    mat-form-field {
+        width: 100%;
+    }
+
+    small {
+        margin-top: auto;
+    }
+
+    small.error {
+        color: red;
+    }
+}
+
+#footer-buttons {
+    display: flex;
+
+    button {
+        margin-left: auto;
+    }
+}

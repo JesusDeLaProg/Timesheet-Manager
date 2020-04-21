@@ -14,7 +14,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug",
-            "cwd": "${workspaceFolder}/node",
+            "cwd": "${workspaceFolder}\\node",
             "runtimeExecutable": "node",
             "runtimeArgs": [
                 "--inspect-brk",

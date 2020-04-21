@@ -1,0 +1,52 @@
+<table mat-table [dataSource]="timesheets" class="mat-elevation-z2">
+
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let timesheet">
+            <button mat-icon-button color="primary">
+                <mat-icon>print</mat-icon>
+            </button>
+            <button mat-icon-button color="primary">
+                <mat-icon>edit</mat-icon>
+            </button>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="begin">
+        <th mat-header-cell *matHeaderCellDef>Début</th>
+        <td mat-cell *matCellDef="let timesheet" class="capitalize">
+            {{timesheet.begin | date : 'fullDate'}}
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="end">
+        <th mat-header-cell *matHeaderCellDef>Fin</th>
+        <td mat-cell *matCellDef="let timesheet" class="capitalize">
+            {{timesheet.end | date : 'fullDate'}}
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalHours">
+        <th mat-header-cell *matHeaderCellDef>Heures</th>
+        <td mat-cell *matCellDef="let timesheet">
+            {{getTotalHours(timesheet)}} heures
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalDistance">
+        <th mat-header-cell *matHeaderCellDef>Déplacements</th>
+        <td mat-cell *matCellDef="let timesheet">
+            {{getTotalDistance(timesheet)}} km
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalExpenses">
+        <th mat-header-cell *matHeaderCellDef>Dépenses</th>
+        <td mat-cell *matCellDef="let timesheet">
+            {{getTotalExpenses(timesheet)}} $
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

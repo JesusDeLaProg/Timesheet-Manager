@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
+import http from "http";
 import httpProxy from "http-proxy";
 import logger from "morgan";
 import path from "path";
@@ -17,6 +18,7 @@ import { RouterModule } from "./routes";
 
 export function createExpressApp() {
   const app = express();
+  const server = http.createServer(app);
 
   const iocContainer = initializeContainer([
     ModelModule,
@@ -41,18 +43,22 @@ export function createExpressApp() {
   );
 
   if (process.env.NODE_ENV?.toLowerCase() === "development") {
-    const proxy = httpProxy.createProxyServer({});
+    const proxy = httpProxy.createProxyServer({
+      target: { host: "localhost", port: "4200" }
+    });
     app.use((req, res, next) => {
       try {
         proxy.web(
-          req,
-          res,
-          { target: { host: "localhost", port: "4200" } },
+          req, res, {},
           (err) => process.stderr.write(err.message)
         );
       } catch (err) {
         next(err);
       }
+    });
+    server.on("upgrade", (req, socket, head) => {
+      proxy.ws(req, socket, head, {},
+        (err) => process.stderr.write(err.message));
     });
   }
 
@@ -76,5 +82,5 @@ export function createExpressApp() {
     }
   });
 
-  return app;
+  return { app, server };
 }

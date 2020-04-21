@@ -9,5 +9,5 @@ setup();
 
 describe("Timesheet-Manager app", function AppTest() {
   controllersTestSuite();
-  routersTestSuite(createExpressApp, "/api");
+  routersTestSuite(() => createExpressApp().app, "/api");
 });

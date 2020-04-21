@@ -23,6 +23,7 @@ export abstract class BaseDataService {
   protected get<T>(
     path: string,
     options?: IQueryOptions,
+    errorMapper?: (err: any) => any,
     isErrorExpected?: (err: any) => boolean
   ): Observable<T> {
     let httpParams = new HttpParams();
@@ -43,12 +44,13 @@ export abstract class BaseDataService {
         params: httpParams,
         withCredentials: true,
       })
-      .pipe(catchError(this.handleError(isErrorExpected)));
+      .pipe(catchError(this.handleError(errorMapper, isErrorExpected)));
   }
 
   protected post<T>(
     path: string,
     body: any,
+    errorMapper?: (err: any) => any,
     isErrorExpected?: (err: any) => boolean
   ): Observable<T> {
     const headers = new HttpHeaders({ application: 'application/json' });
@@ -58,21 +60,29 @@ export abstract class BaseDataService {
         headers,
         withCredentials: true,
       })
-      .pipe(catchError(this.handleError(isErrorExpected)));
+      .pipe(catchError(this.handleError(errorMapper, isErrorExpected)));
   }
 
-  protected handleError(isErrorExpected?: (err: any) => boolean) {
+  protected handleError(
+    errorMapper?: (err: any) => any,
+    isErrorExpected?: (err: any) => boolean) {
+    if(!errorMapper) {
+      errorMapper = (err) => err.error;
+    }
+
     if (!isErrorExpected) {
       isErrorExpected = conforms({
-        result: (res) => res !== undefined,
-        message: (mes) => mes !== undefined,
-        success: (success) => success !== undefined,
+        error: (err) => conforms({
+          result: (res) => res !== undefined,
+          message: (mes) => mes !== undefined,
+          success: (success) => success !== undefined,
+        })
       });
     }
 
     return (err) => {
       if (isErrorExpected(err)) {
-        return of(err);
+        return of(errorMapper(err));
       }
       return throwError(err);
     };
