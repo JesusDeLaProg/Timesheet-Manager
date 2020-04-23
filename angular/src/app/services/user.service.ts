@@ -4,10 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { IViewUser, ICrudResult } from '../../../../types/viewmodels';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService extends BaseDataService {
-
   constructor(http: HttpClient) {
     super('user', http);
   }

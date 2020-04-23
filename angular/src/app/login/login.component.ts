@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { ICrudResult } from '../../../../types/viewmodels';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -7,19 +7,22 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 @Component({
   selector: 'tm-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-
-  private login: (usr: string, pwd: string) => Observable<ICrudResult<null>> = null;
+  private login: (
+    usr: string,
+    pwd: string
+  ) => Observable<ICrudResult<null>> = null;
 
   public loginForm: FormGroup;
   public error = false;
   public errorMessage = '';
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) data: {
-      login: (usr: string, pwd: string) => Observable<ICrudResult<null>>
+    @Inject(MAT_DIALOG_DATA)
+    data: {
+      login: (usr: string, pwd: string) => Observable<ICrudResult<null>>;
     },
     private dialogRef: MatDialogRef<LoginComponent, boolean>,
     fb: FormBuilder
@@ -27,12 +30,11 @@ export class LoginComponent implements OnInit {
     this.login = data.login;
     this.loginForm = fb.group({
       username: '',
-      password: ''
+      password: '',
     });
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   async submit() {
     const { username, password } = this.loginForm.value;
@@ -40,10 +42,10 @@ export class LoginComponent implements OnInit {
       const result = await this.login(username, password).toPromise();
       this.error = !result.success;
       this.errorMessage = result.message;
-      if(!this.error) {
+      if (!this.error) {
         this.dialogRef.close(true);
       }
-    } catch(err) {
+    } catch (err) {
       alert(err.stack);
     }
   }
@@ -51,5 +53,4 @@ export class LoginComponent implements OnInit {
   cancel() {
     this.dialogRef.close(false);
   }
-
 }

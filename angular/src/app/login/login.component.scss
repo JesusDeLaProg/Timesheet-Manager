@@ -1,29 +1,29 @@
 h1 {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #login-form {
-    height: 175px;
-    display: flex;
-    flex-direction: column;
+  height: 175px;
+  display: flex;
+  flex-direction: column;
 
-    mat-form-field {
-        width: 100%;
-    }
+  mat-form-field {
+    width: 100%;
+  }
 
-    small {
-        margin-top: auto;
-    }
+  small {
+    margin-top: auto;
+  }
 
-    small.error {
-        color: red;
-    }
+  small.error {
+    color: red;
+  }
 }
 
 #footer-buttons {
-    display: flex;
+  display: flex;
 
-    button {
-        margin-left: auto;
-    }
+  button {
+    margin-left: auto;
+  }
 }

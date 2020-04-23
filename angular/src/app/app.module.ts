@@ -28,7 +28,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, TimesheetListComponent, TimesheetListTableComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    TimesheetListComponent,
+    TimesheetListTableComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -50,8 +55,8 @@ registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
     }),
   ],
   providers: [
-    { provide: LOCALE_ID, useValue: 'fr-FR'},
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

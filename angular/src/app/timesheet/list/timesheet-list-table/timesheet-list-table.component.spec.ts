@@ -8,9 +8,8 @@ describe('TimesheetTableComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimesheetListTableComponent ]
-    })
-    .compileComponents();
+      declarations: [TimesheetListTableComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

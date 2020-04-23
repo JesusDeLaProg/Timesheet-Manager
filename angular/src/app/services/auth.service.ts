@@ -12,7 +12,6 @@ import { shareReplay, map, tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AuthService extends BaseDataService {
-
   private loginModalObs: Observable<boolean> = null;
   private loginModalRef: MatDialogRef<LoginComponent, boolean> = null;
   private whoami$: Observable<IViewUser> = null;
@@ -22,28 +21,27 @@ export class AuthService extends BaseDataService {
   }
 
   public requestLogin(): Promise<boolean> {
-    if(this.loginModalObs === null) {
-      this.loginModalRef = this.dialogService.open(LoginComponent,
-        {
-          width: '30%',
-          minWidth: '500px',
-          disableClose: true,
-          restoreFocus: true,
-          hasBackdrop: true,
-          autoFocus: true,
-          data: {
-            login: (usr: string, pwd: string) => this.login(usr, pwd)
-          }
-        }
-      );
+    if (this.loginModalObs === null) {
+      this.loginModalRef = this.dialogService.open(LoginComponent, {
+        width: '30%',
+        minWidth: '500px',
+        disableClose: true,
+        restoreFocus: true,
+        hasBackdrop: true,
+        autoFocus: true,
+        data: {
+          login: (usr: string, pwd: string) => this.login(usr, pwd),
+        },
+      });
       this.loginModalObs = this.loginModalRef.afterClosed();
     }
     return this.loginModalObs.toPromise();
   }
 
   public login(username: string, password: string) {
-    return this.post<ICrudResult<null>>('/login', { username, password })
-      .pipe(tap(res => this.whoami$ = res.success ? null : this.whoami$));
+    return this.post<ICrudResult<null>>('/login', { username, password }).pipe(
+      tap((res) => (this.whoami$ = res.success ? null : this.whoami$))
+    );
   }
 
   public logout() {
@@ -52,9 +50,11 @@ export class AuthService extends BaseDataService {
   }
 
   public whoami() {
-    if(this.whoami$ === null) {
-      this.whoami$ = this.get<ICrudResult<IViewUser>>('/whoami')
-        .pipe(map(res => res.result), shareReplay(1));
+    if (this.whoami$ === null) {
+      this.whoami$ = this.get<ICrudResult<IViewUser>>('/whoami').pipe(
+        map((res) => res.result),
+        shareReplay(1)
+      );
     }
     return this.whoami$;
   }

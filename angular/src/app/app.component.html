@@ -1,11 +1,11 @@
 <mat-toolbar color="primary" class="mat-elevation-z8">
-
-    <span class="left">Timesheet-Manager</span>
-    <span class="middle"></span>
-    <span class="right">
-        <small *ngIf="whoami | async as user">{{user.firstName}} {{user.lastName}}</small>
-    </span>
-
+  <span class="left">Timesheet-Manager</span>
+  <span class="middle"></span>
+  <span class="right">
+    <small *ngIf="whoami | async as user"
+      >{{ user.firstName }} {{ user.lastName }}</small
+    >
+  </span>
 </mat-toolbar>
 
 <router-outlet></router-outlet>

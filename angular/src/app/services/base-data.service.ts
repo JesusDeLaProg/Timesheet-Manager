@@ -65,18 +65,20 @@ export abstract class BaseDataService {
 
   protected handleError(
     errorMapper?: (err: any) => any,
-    isErrorExpected?: (err: any) => boolean) {
-    if(!errorMapper) {
+    isErrorExpected?: (err: any) => boolean
+  ) {
+    if (!errorMapper) {
       errorMapper = (err) => err.error;
     }
 
     if (!isErrorExpected) {
       isErrorExpected = conforms({
-        error: (err) => conforms({
-          result: (res) => res !== undefined,
-          message: (mes) => mes !== undefined,
-          success: (success) => success !== undefined,
-        })
+        error: (err) =>
+          conforms({
+            result: (res) => res !== undefined,
+            message: (mes) => mes !== undefined,
+            success: (success) => success !== undefined,
+          }),
       });
     }
 
