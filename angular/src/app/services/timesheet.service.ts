@@ -4,15 +4,21 @@ import { HttpClient } from '@angular/common/http';
 import { IViewTimesheet, ICrudResult } from '../../../../types/viewmodels';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TimesheetService extends BaseDataService {
-
   constructor(http: HttpClient) {
     super('timesheet', http);
   }
 
-  getAllByUser(userId: string, options?: IQueryOptions) {
-    return this.get<ICrudResult<IViewTimesheet[]>>('/byUserId/' + userId, options);
+  getAllByUserId(userId: string, options?: IQueryOptions) {
+    return this.get<ICrudResult<IViewTimesheet[]>>(
+      '/byUserId/' + userId,
+      options
+    );
+  }
+
+  countByUserId(userId: string) {
+    return this.get<ICrudResult<number>>('/countByUserId/' + userId);
   }
 }
