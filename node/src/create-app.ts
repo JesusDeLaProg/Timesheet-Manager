@@ -44,21 +44,19 @@ export function createExpressApp() {
 
   if (process.env.NODE_ENV?.toLowerCase() === "development") {
     const proxy = httpProxy.createProxyServer({
-      target: { host: "localhost", port: "4200" }
+      target: { host: "localhost", port: "4200" },
     });
     app.use((req, res, next) => {
       try {
-        proxy.web(
-          req, res, {},
-          (err) => process.stderr.write(err.message)
-        );
+        proxy.web(req, res, {}, (err) => process.stderr.write(err.message));
       } catch (err) {
         next(err);
       }
     });
     server.on("upgrade", (req, socket, head) => {
-      proxy.ws(req, socket, head, {},
-        (err) => process.stderr.write(err.message));
+      proxy.ws(req, socket, head, {}, (err) =>
+        process.stderr.write(err.message)
+      );
     });
   }
 
