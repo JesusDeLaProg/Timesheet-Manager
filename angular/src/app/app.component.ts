@@ -9,9 +9,11 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
   title = 'tm-app';
 
-  get whoami() {
-    return this.authService.whoami();
-  }
+  whoami = this.authService.whoami();
 
   constructor(private authService: AuthService) {}
+
+  async logout() {
+    await this.authService.logout().toPromise();
+  }
 }

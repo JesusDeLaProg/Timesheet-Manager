@@ -1,1 +1,13 @@
-<p>timesheet-edit works!</p>
+<mat-card class="root">
+  <h1>
+    <span *ngIf="timesheetId">Modification</span>
+    <span *ngIf="!timesheetId">Création</span>
+    de feuille de temps
+  </h1>
+  <mat-tab-group dynamicHeight>
+    <mat-tab label="Feuille de temps">
+      <tm-timesheet-edit-table></tm-timesheet-edit-table>
+    </mat-tab>
+    <mat-tab label="Feuille de route"> </mat-tab>
+  </mat-tab-group>
+</mat-card>

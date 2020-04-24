@@ -5,9 +5,12 @@
   </span>
   <span class="middle"></span>
   <span class="right">
-    <small *ngIf="whoami | async as user"
-      >{{ user.firstName }} {{ user.lastName }}</small
-    >
+    <small *ngIf="whoami | async as user">
+      {{ user.firstName }} {{ user.lastName }}
+    </small>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon matTooltip="Déconnexion">meeting_room</mat-icon>
+    </button>
   </span>
 </mat-toolbar>
 

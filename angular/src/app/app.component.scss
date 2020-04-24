@@ -11,6 +11,12 @@ mat-toolbar {
     flex: 1 1 auto;
   }
 
+  span.right {
+    small {
+      vertical-align: text-top;
+    }
+  }
+
   a {
     color: white;
     text-decoration: none;

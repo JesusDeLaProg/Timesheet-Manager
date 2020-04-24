@@ -44,6 +44,13 @@ export class AuthInterceptor implements HttpInterceptor {
           tap((event) => {
             if (
               event instanceof HttpResponse &&
+              request.url.endsWith('auth/logout')
+            ) {
+              localStorage.removeItem('TokenExpiration');
+              return;
+            }
+            if (
+              event instanceof HttpResponse &&
               event.headers.get('X-Token-Expiration')
             ) {
               localStorage.setItem(

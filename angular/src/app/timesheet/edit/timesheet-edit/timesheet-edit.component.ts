@@ -7,8 +7,10 @@ import { ActivatedRouteSnapshot, ActivatedRoute } from '@angular/router';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent implements OnInit {
+  timesheetId: string;
+
   constructor(route: ActivatedRoute) {
-    console.log(route.snapshot.params);
+    this.timesheetId = route.snapshot.params.id;
   }
 
   ngOnInit(): void {}

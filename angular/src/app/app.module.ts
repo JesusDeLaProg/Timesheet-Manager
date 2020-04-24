@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -25,6 +26,7 @@ import { TimesheetListTableComponent } from './timesheet/list/timesheet-list-tab
 import { registerLocaleData } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { TimesheetEditComponent } from './timesheet/edit/timesheet-edit/timesheet-edit.component';
+import { TimesheetEditTableComponent } from './timesheet/edit/timesheet-edit-table/timesheet-edit-table.component';
 
 registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
 
@@ -35,6 +37,7 @@ registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
     TimesheetListComponent,
     TimesheetListTableComponent,
     TimesheetEditComponent,
+    TimesheetEditTableComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,6 +52,7 @@ registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
     MatTableModule,
     MatTabsModule,
     MatToolbarModule,
+    MatTooltipModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
