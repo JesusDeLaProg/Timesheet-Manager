@@ -2,12 +2,16 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let timesheet">
-      <button mat-icon-button color="primary">
+      <a mat-icon-button color="primary">
         <mat-icon>print</mat-icon>
-      </button>
-      <button mat-icon-button color="primary">
+      </a>
+      <a
+        mat-icon-button
+        color="primary"
+        [routerLink]="'/timesheet/edit/' + timesheet._id"
+      >
         <mat-icon>edit</mat-icon>
-      </button>
+      </a>
     </td>
   </ng-container>
 

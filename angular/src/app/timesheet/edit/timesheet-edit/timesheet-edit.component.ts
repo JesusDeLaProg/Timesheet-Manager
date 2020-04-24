@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRouteSnapshot, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'tm-timesheet-edit',
@@ -6,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent implements OnInit {
-  constructor() {}
+  constructor(route: ActivatedRoute) {
+    console.log(route.snapshot.params);
+  }
 
   ngOnInit(): void {}
 }

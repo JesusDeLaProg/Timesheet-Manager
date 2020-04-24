@@ -1,5 +1,8 @@
 <mat-toolbar color="primary" class="mat-elevation-z8">
-  <span class="left">Timesheet-Manager</span>
+  <span class="left">
+    <span class="brand">Timesheet-Manager</span>
+    <a routerLink="/">Accueil</a>
+  </span>
   <span class="middle"></span>
   <span class="right">
     <small *ngIf="whoami | async as user"
