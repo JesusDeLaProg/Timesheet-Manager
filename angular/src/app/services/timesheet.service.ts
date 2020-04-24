@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BaseDataService, IQueryOptions } from './base-data.service';
 import { HttpClient } from '@angular/common/http';
-import { IViewTimesheet, ICrudResult } from '../../../../types/viewmodels';
+import {
+  IViewTimesheet,
+  ICrudResult,
+  IViewProject,
+} from '../../../../types/viewmodels';
+import { ITimesheetLine } from '../../../../types/datamodels';
 
 @Injectable({
   providedIn: 'root',
@@ -20,5 +25,15 @@ export class TimesheetService extends BaseDataService {
 
   countByUserId(userId: string) {
     return this.get<ICrudResult<number>>('/countByUserId/' + userId);
+  }
+
+  getByIdPopulated(id: string) {
+    return this.get<
+      ICrudResult<IViewTimesheet<string, ITimesheetLine<IViewProject>>>
+    >('/populated/' + id);
+  }
+
+  getById(id: string) {
+    return this.get<ICrudResult<IViewTimesheet>>(id);
   }
 }

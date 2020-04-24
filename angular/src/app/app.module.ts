@@ -24,6 +24,7 @@ import { TimesheetListComponent } from './timesheet/list/timesheet-list/timeshee
 import { TimesheetListTableComponent } from './timesheet/list/timesheet-list-table/timesheet-list-table.component';
 import { registerLocaleData } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { TimesheetEditComponent } from './timesheet/edit/timesheet-edit/timesheet-edit.component';
 
 registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
 
@@ -33,6 +34,7 @@ registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
     LoginComponent,
     TimesheetListComponent,
     TimesheetListTableComponent,
+    TimesheetEditComponent,
   ],
   imports: [
     BrowserModule,
