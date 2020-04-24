@@ -26,7 +26,9 @@ export class TimesheetListComponent implements OnInit, OnDestroy {
 
   private _selectedUser: IViewUser;
   set selectedUser(user: IViewUser) {
-    if (this._selectedUser === user) return;
+    if (this._selectedUser === user) {
+      return;
+    }
     this._selectedUser = user;
     this.updateTimesheetsQuery();
   }

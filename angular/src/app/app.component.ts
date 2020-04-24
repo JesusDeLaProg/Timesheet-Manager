@@ -2,7 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 
 @Component({
-  selector: 'app-root',
+  selector: 'tm-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
