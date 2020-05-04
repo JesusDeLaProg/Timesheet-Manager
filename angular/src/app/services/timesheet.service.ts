@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import joinPath from 'join-path';
 import { BaseDataService, IQueryOptions } from './base-data.service';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -11,29 +12,25 @@ import { ITimesheetLine } from '../../../../types/datamodels';
 @Injectable({
   providedIn: 'root',
 })
-export class TimesheetService extends BaseDataService {
+export class TimesheetService extends BaseDataService<IViewTimesheet> {
   constructor(http: HttpClient) {
     super('timesheet', http);
   }
 
   getAllByUserId(userId: string, options?: IQueryOptions) {
     return this.get<ICrudResult<IViewTimesheet[]>>(
-      '/byUserId/' + userId,
+      joinPath('byUserId', userId),
       options
     );
   }
 
   countByUserId(userId: string) {
-    return this.get<ICrudResult<number>>('/countByUserId/' + userId);
+    return this.get<ICrudResult<number>>(joinPath('countByUserId', userId));
   }
 
   getByIdPopulated(id: string) {
     return this.get<
       ICrudResult<IViewTimesheet<string, ITimesheetLine<IViewProject>>>
-    >('/populated/' + id);
-  }
-
-  getById(id: string) {
-    return this.get<ICrudResult<IViewTimesheet>>(id);
+    >(joinPath('populated', id));
   }
 }

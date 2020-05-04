@@ -94,13 +94,4 @@ export interface ITimesheetController extends IController<IViewTimesheet> {
   ): Promise<ICrudResult<number>>;
 }
 
-export interface IUserController extends IController<IViewUser> {
-  save(
-    authenticatedUserId: ObjectId,
-    input: IViewUser
-  ): Promise<ICrudResult<IViewUser | Error.ValidationError>>;
-  validate(
-    authenticatedUserId: ObjectId,
-    input: IViewUser
-  ): Promise<ICrudResult<Error.ValidationError>>;
-}
+export interface IUserController extends IController<IViewUser> {}

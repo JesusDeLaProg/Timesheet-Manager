@@ -11,7 +11,7 @@ import { shareReplay, map, tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService extends BaseDataService {
+export class AuthService extends BaseDataService<null> {
   private loginModalObs: Observable<boolean> = null;
   private loginModalRef: MatDialogRef<LoginComponent, boolean> = null;
   private whoami$: Observable<IViewUser> = null;

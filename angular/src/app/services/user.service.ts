@@ -6,16 +6,8 @@ import { IViewUser, ICrudResult } from '../../../../types/viewmodels';
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends BaseDataService {
+export class UserService extends BaseDataService<IViewUser> {
   constructor(http: HttpClient) {
     super('user', http);
-  }
-
-  getById(id: string) {
-    return this.get<ICrudResult<IViewUser>>(id);
-  }
-
-  getAll(options?: IQueryOptions) {
-    return this.get<ICrudResult<IViewUser[]>>('', options);
   }
 }

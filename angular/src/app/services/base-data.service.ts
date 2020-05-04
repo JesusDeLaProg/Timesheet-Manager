@@ -1,9 +1,12 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import joinPath from 'join-path';
 import conforms from 'lodash.conforms';
+import { Error as MongooseError } from 'mongoose';
 import { throwError, of, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
+import { ICrudResult } from '../../../../types/viewmodels';
 
 export interface IQueryOptions {
   sort?: string;
@@ -11,21 +14,27 @@ export interface IQueryOptions {
   limit?: number;
 }
 
-export abstract class BaseDataService {
+export interface IDataService<T> {
+  getById(id: string): Observable<ICrudResult<T>>;
+  getAll(options: IQueryOptions): Observable<ICrudResult<T[]>>;
+  count(): Observable<ICrudResult<number>>;
+  validate(input: T): Observable<ICrudResult<MongooseError.ValidationError>>;
+  save(input: T): Observable<ICrudResult<T | MongooseError.ValidationError>>;
+}
+
+export abstract class BaseDataService<T> implements IDataService<T> {
   protected readonly baseUrl;
 
   constructor(baseUrl: string, protected http: HttpClient) {
-    if (environment.apiUrl.slice(-1)[0] === '/') {
-    }
-    this.baseUrl = this.joinPath(environment.apiUrl, baseUrl);
+    this.baseUrl = joinPath(environment.apiUrl, baseUrl);
   }
 
-  protected get<T>(
+  protected get<U>(
     path: string,
     options?: IQueryOptions,
     errorMapper?: (err: any) => any,
     isErrorExpected?: (err: any) => boolean
-  ): Observable<T> {
+  ): Observable<U> {
     let httpParams = new HttpParams();
     if (options) {
       if (options.limit) {
@@ -40,23 +49,23 @@ export abstract class BaseDataService {
     }
 
     return this.http
-      .get<T>(this.joinPath(this.baseUrl, path), {
+      .get<U>(joinPath(this.baseUrl, path), {
         params: httpParams,
         withCredentials: true,
       })
       .pipe(catchError(this.handleError(errorMapper, isErrorExpected)));
   }
 
-  protected post<T>(
+  protected post<U>(
     path: string,
     body: any,
     errorMapper?: (err: any) => any,
     isErrorExpected?: (err: any) => boolean
-  ): Observable<T> {
+  ): Observable<U> {
     const headers = new HttpHeaders({ application: 'application/json' });
 
     return this.http
-      .post<T>(this.joinPath(this.baseUrl, path), body, {
+      .post<U>(joinPath(this.baseUrl, path), body, {
         headers,
         withCredentials: true,
       })
@@ -90,24 +99,29 @@ export abstract class BaseDataService {
     };
   }
 
-  protected joinPath(base: string, path: string) {
-    let result = '';
-    if (base.startsWith('http://')) {
-      result = 'http://';
-      base = base.substring(7);
-    } else if (base.startsWith('https://')) {
-      result = 'https://';
-      base = base.substring(8);
-    } else {
-      result = '/';
-    }
-    return (
-      result +
-      base
-        .split('/')
-        .concat(path.split('/'))
-        .filter((e) => !!e)
-        .join('/')
+  getById(id: string) {
+    return this.get<ICrudResult<T>>(joinPath(this.baseUrl, id));
+  }
+
+  getAll(options: IQueryOptions) {
+    return this.get<ICrudResult<T[]>>(this.baseUrl, options);
+  }
+
+  count() {
+    return this.get<ICrudResult<number>>(joinPath(this.baseUrl, '/count'));
+  }
+
+  save(input: T) {
+    return this.post<ICrudResult<T | MongooseError.ValidationError>>(
+      joinPath(this.baseUrl, '/save'),
+      input
+    );
+  }
+
+  validate(input: T) {
+    return this.post<ICrudResult<MongooseError.ValidationError>>(
+      joinPath(this.baseUrl, '/validate'),
+      input
     );
   }
 }
