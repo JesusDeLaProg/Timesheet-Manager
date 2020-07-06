@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import joinPath from 'join-path';
+import { join as joinPath } from 'path-browserify';
 import { BaseDataService, IQueryOptions } from './base-data.service';
 import { IViewClient, ICrudResult } from '../../../../types/viewmodels';
 import { HttpClient } from '@angular/common/http';

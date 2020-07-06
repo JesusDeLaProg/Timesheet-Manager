@@ -22,9 +22,9 @@
     "@angular/platform-browser-dynamic": "~9.1.4",
     "@angular/router": "~9.1.4",
     "@angular/service-worker": "~9.1.4",
-    "join-path": "^1.1.1",
     "lodash.conforms": "^4.5.0",
     "moment": "^2.24.0",
+    "path-browserify": "^1.0.1",
     "rxjs": "~6.5.5",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

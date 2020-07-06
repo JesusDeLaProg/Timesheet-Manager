@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import joinPath from 'join-path';
+import { join as joinPath } from 'path-browserify';
 import conforms from 'lodash.conforms';
 import { Error as MongooseError } from 'mongoose';
 import { throwError, of, Observable } from 'rxjs';
@@ -26,7 +26,11 @@ export abstract class BaseDataService<T> implements IDataService<T> {
   protected readonly baseUrl;
 
   constructor(baseUrl: string, protected http: HttpClient) {
-    this.baseUrl = joinPath(environment.apiUrl, baseUrl);
+    this.baseUrl = joinPath('api', baseUrl);
+  }
+
+  private buildPath(path: string) {
+    return new URL(joinPath(this.baseUrl, path), environment.apiUrl).toString();
   }
 
   protected get<U>(
@@ -49,7 +53,7 @@ export abstract class BaseDataService<T> implements IDataService<T> {
     }
 
     return this.http
-      .get<U>(joinPath(this.baseUrl, path), {
+      .get<U>(this.buildPath(path), {
         params: httpParams,
         withCredentials: true,
       })
@@ -65,7 +69,7 @@ export abstract class BaseDataService<T> implements IDataService<T> {
     const headers = new HttpHeaders({ application: 'application/json' });
 
     return this.http
-      .post<U>(joinPath(this.baseUrl, path), body, {
+      .post<U>(this.buildPath(path), body, {
         headers,
         withCredentials: true,
       })
@@ -100,7 +104,7 @@ export abstract class BaseDataService<T> implements IDataService<T> {
   }
 
   getById(id: string) {
-    return this.get<ICrudResult<T>>(joinPath(this.baseUrl, id));
+    return this.get<ICrudResult<T>>(this.buildPath(id));
   }
 
   getAll(options: IQueryOptions) {
@@ -108,19 +112,19 @@ export abstract class BaseDataService<T> implements IDataService<T> {
   }
 
   count() {
-    return this.get<ICrudResult<number>>(joinPath(this.baseUrl, '/count'));
+    return this.get<ICrudResult<number>>(this.buildPath('count'));
   }
 
   save(input: T) {
     return this.post<ICrudResult<T | MongooseError.ValidationError>>(
-      joinPath(this.baseUrl, '/save'),
+      this.buildPath('save'),
       input
     );
   }
 
   validate(input: T) {
     return this.post<ICrudResult<MongooseError.ValidationError>>(
-      joinPath(this.baseUrl, '/validate'),
+      this.buildPath('validate'),
       input
     );
   }

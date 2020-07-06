@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BaseDataService, IQueryOptions } from './base-data.service';
+import { BaseDataService } from './base-data.service';
 import { HttpClient } from '@angular/common/http';
-import { IViewUser, ICrudResult } from '../../../../types/viewmodels';
+import { IViewUser } from '../../../../types/viewmodels';
 
 @Injectable({
   providedIn: 'root',

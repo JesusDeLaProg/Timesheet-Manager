@@ -17,7 +17,7 @@ export class AuthService extends BaseDataService<null> {
   private whoami$: Observable<IViewUser> = null;
 
   constructor(http: HttpClient, private dialogService: MatDialog) {
-    super('/auth', http);
+    super('auth', http);
   }
 
   public requestLogin(): Promise<boolean> {
@@ -39,19 +39,19 @@ export class AuthService extends BaseDataService<null> {
   }
 
   public login(username: string, password: string) {
-    return this.post<ICrudResult<null>>('/login', { username, password }).pipe(
+    return this.post<ICrudResult<null>>('login', { username, password }).pipe(
       tap((res) => (this.whoami$ = res.success ? null : this.whoami$))
     );
   }
 
   public logout() {
     this.whoami$ = null;
-    return this.get<ICrudResult<null>>('/logout');
+    return this.get<ICrudResult<null>>('logout');
   }
 
   public whoami() {
     if (this.whoami$ === null) {
-      this.whoami$ = this.get<ICrudResult<IViewUser>>('/whoami').pipe(
+      this.whoami$ = this.get<ICrudResult<IViewUser>>('whoami').pipe(
         map((res) => res.result),
         shareReplay(1)
       );
