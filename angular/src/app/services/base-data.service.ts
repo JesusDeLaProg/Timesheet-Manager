@@ -108,23 +108,23 @@ export abstract class BaseDataService<T> implements IDataService<T> {
   }
 
   getAll(options: IQueryOptions) {
-    return this.get<ICrudResult<T[]>>(this.baseUrl, options);
+    return this.get<ICrudResult<T[]>>('', options);
   }
 
   count() {
-    return this.get<ICrudResult<number>>(this.buildPath('count'));
+    return this.get<ICrudResult<number>>('count');
   }
 
   save(input: T) {
     return this.post<ICrudResult<T | MongooseError.ValidationError>>(
-      this.buildPath('save'),
+      'save',
       input
     );
   }
 
   validate(input: T) {
     return this.post<ICrudResult<MongooseError.ValidationError>>(
-      this.buildPath('validate'),
+      'validate',
       input
     );
   }
