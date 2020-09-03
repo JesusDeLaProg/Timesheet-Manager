@@ -1,8 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import localeFr from '@angular/common/locales/fr';
-import localeFrExtra from '@angular/common/locales/extra/fr';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -23,12 +21,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { TimesheetListComponent } from './timesheet/list/timesheet-list/timesheet-list.component';
 import { TimesheetListTableComponent } from './timesheet/list/timesheet-list-table/timesheet-list-table.component';
-import { registerLocaleData } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { TimesheetEditComponent } from './timesheet/edit/timesheet-edit/timesheet-edit.component';
 import { TimesheetEditTableComponent } from './timesheet/edit/timesheet-edit-table/timesheet-edit-table.component';
 
-registerLocaleData(localeFr, 'fr-FR', localeFrExtra);
+import '@angular/common/locales/global/fr';
 
 @NgModule({
   declarations: [

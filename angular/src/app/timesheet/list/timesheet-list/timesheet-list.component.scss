@@ -8,3 +8,23 @@ mat-card.root {
 a.new-timesheet-button {
   margin-bottom: $tm-spacing * 2;
 }
+
+a.user-active > mat-icon,
+a.user-inactive > mat-icon {
+  font-size: 10px;
+  padding-top: 12px;
+}
+
+a.user-active {
+  opacity: 0.8;
+
+  mat-icon {
+    color: green;
+  }
+}
+
+a.user-inactive {
+  mat-icon {
+    color: red;
+  }
+}

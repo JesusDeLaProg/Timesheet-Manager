@@ -10,11 +10,16 @@
   </a>
   <nav mat-tab-nav-bar>
     <a
+      [ngClass]="{
+        'user-active': user.isActive,
+        'user-inactive': !user.isActive
+      }"
       mat-tab-link
       *ngFor="let user of users$ | async"
       (click)="selectedUser = user"
-      [active]="selectedUser._id === user._id"
+      [active]="selectedUser?._id === user._id"
     >
+      <mat-icon>stop_circle</mat-icon>
       {{ user.firstName }} {{ user.lastName }}
     </a>
   </nav>
