@@ -104,7 +104,7 @@ export abstract class BaseDataService<T> implements IDataService<T> {
   }
 
   getById(id: string) {
-    return this.get<ICrudResult<T>>(this.buildPath(id));
+    return this.get<ICrudResult<T>>(id);
   }
 
   getAll(options: IQueryOptions) {

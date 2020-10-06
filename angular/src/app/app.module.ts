@@ -58,7 +58,7 @@ import '@angular/common/locales/global/fr';
     }),
   ],
   providers: [
-    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    { provide: LOCALE_ID, useValue: 'fr-CA' },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],

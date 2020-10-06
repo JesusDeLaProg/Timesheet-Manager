@@ -1,1 +1,73 @@
-<p>timesheet-edit-table works!</p>
+<div class="container">
+  <table mat-table [dataSource]="timesheet.lines">
+    <ng-container matColumnDef="project" [sticky]="columnsShouldStick">
+      <th mat-header-cell *matHeaderCellDef>Projet</th>
+      <td mat-cell *matCellDef="let line">{{ line.project }}</td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <ng-container matColumnDef="phase" [sticky]="columnsShouldStick">
+      <th mat-header-cell *matHeaderCellDef>Phase</th>
+      <td mat-cell *matCellDef="let line">{{ line.phase }}</td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <ng-container matColumnDef="activity" [sticky]="columnsShouldStick">
+      <th mat-header-cell *matHeaderCellDef>Activité</th>
+      <td mat-cell *matCellDef="let line">{{ line.activity }}</td>
+      <td mat-footer-cell *matFooterCellDef><b>Total:</b></td>
+    </ng-container>
+
+    <ng-template
+      ngFor
+      let-entry
+      [ngForOf]="timesheet.lines[0].entries"
+      let-i="index"
+    >
+      <ng-container [matColumnDef]="'day' + i">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ dateForColumn(i) | date: "EEE d LLL" }}
+        </th>
+        <td mat-cell *matCellDef="let line" class="entry-cell">
+          <mat-form-field appearance="outline" class="entry">
+            <input
+              matInput
+              min="0"
+              type="number"
+              matInput
+              [(value)]="line.entries[i].time"
+            />
+          </mat-form-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>{{ totalForColumn(i) }}</td>
+      </ng-container>
+
+      <ng-container
+        *ngIf="i % 7 === 6"
+        [matColumnDef]="'week' + weekNumberForIndex(i)"
+      >
+        <th mat-header-cell *matHeaderCellDef>
+          Semaine {{ weekNumberForIndex(i) + 1 }}
+        </th>
+        <td mat-cell *matCellDef="let line">
+          {{ totalForLineAndWeek(line, weekNumberForIndex(i)) }}
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+          {{ totalForWeek(weekNumberForIndex(i)) }}
+        </td>
+      </ng-container>
+    </ng-template>
+
+    <ng-container matColumnDef="total">
+      <th mat-header-cell *matHeaderCellDef><b>Total</b></th>
+      <td mat-cell *matCellDef="let line">{{ totalForLine(line) }}</td>
+      <td mat-footer-cell *matFooterCellDef>{{ total() }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="tableColumns; sticky: true"></tr>
+
+    <tr mat-row *matRowDef="let row; columns: tableColumns"></tr>
+
+    <tr mat-footer-row *matFooterRowDef="tableColumns; sticky: true"></tr>
+  </table>
+</div>

@@ -15,5 +15,6 @@ export class AppComponent {
 
   async logout() {
     await this.authService.logout().toPromise();
+    location.reload();
   }
 }

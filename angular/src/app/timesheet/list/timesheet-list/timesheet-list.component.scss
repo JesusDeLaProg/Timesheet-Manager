@@ -9,10 +9,13 @@ a.new-timesheet-button {
   margin-bottom: $tm-spacing * 2;
 }
 
-a.user-active > mat-icon,
-a.user-inactive > mat-icon {
-  font-size: 10px;
-  padding-top: 12px;
+a.user-active,
+a.user-inactive {
+  user-select: none;
+  mat-icon {
+    font-size: 10px;
+    padding-top: 12px;
+  }
 }
 
 a.user-active {

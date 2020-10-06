@@ -3,14 +3,9 @@
 mat-toolbar {
   margin-bottom: $tm-spacing * 2;
 
-  a,
-  span {
-    margin-right: 1em;
-  }
-
   span.spacer {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 15px;
+    margin-right: 15px;
   }
 
   span.brand {
@@ -20,6 +15,7 @@ mat-toolbar {
   span.label {
     font-size: 0.75em;
     color: #dddddd;
+    margin-right: 1em;
   }
 
   span.middle {
@@ -33,8 +29,6 @@ mat-toolbar {
   }
 
   a {
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
     font-size: 0.75em;
     color: white;
     text-decoration: none;
