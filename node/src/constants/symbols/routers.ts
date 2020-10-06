@@ -6,5 +6,5 @@ export default {
   PhaseRouter: Symbol.for("PhaseRouter"),
   ProjectRouter: Symbol.for("ProjectRouter"),
   TimesheetRouter: Symbol.for("TimesheetRouter"),
-  UserRouter: Symbol.for("UserRouter")
+  UserRouter: Symbol.for("UserRouter"),
 };

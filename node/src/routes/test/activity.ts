@@ -6,10 +6,10 @@ import should from "should";
 import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
-import { ActivityRouter } from "../activity";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ActivityModel } from "../../interfaces/models";
+import { ActivityRouter } from "../activity";
 
 export default function buildTestSuite(
   appFactory: () => Express,
@@ -21,14 +21,14 @@ export default function buildTestSuite(
 
   let Activity: ActivityModel;
 
-  describe(ActivityRouter.name, function() {
-    this.beforeAll(function() {
+  describe(ActivityRouter.name, function ActivityRouterTest() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       Activity = container.get(Models.Activity);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -38,14 +38,14 @@ export default function buildTestSuite(
       agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       if (server) {
         server.close();
       }
       await Activity.deleteMany({});
     });
 
-    it("should have GET /", async function() {
+    it("should have GET /", async () => {
       await new Activity({ code: "ACT1", name: "Activity1" }).save();
       const response = await agent
         .get(baseUrl + "/")
@@ -57,17 +57,17 @@ export default function buildTestSuite(
         result: [
           {
             code: "ACT1",
-            name: "Activity1"
-          }
+            name: "Activity1",
+          },
         ],
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /:id", async function() {
+    it("should have GET /:id", async () => {
       const activity = await new Activity({
         code: "ACT1",
-        name: "Activity1"
+        name: "Activity1",
       }).save();
       const response = await agent
         .get(baseUrl + `/${activity.id}`)
@@ -79,13 +79,13 @@ export default function buildTestSuite(
         result: {
           _id: activity.id,
           code: "ACT1",
-          name: "Activity1"
+          name: "Activity1",
         },
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /validate", async function() {
+    it("should have POST /validate", async () => {
       const response = await agent
         .post(baseUrl + "/validate")
         .set("Accept", "application/json")
@@ -94,11 +94,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: null,
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /save", async function() {
+    it("should have POST /save", async () => {
       const response = await agent
         .post(baseUrl + "/save")
         .set("Accept", "application/json")
@@ -108,9 +108,9 @@ export default function buildTestSuite(
         message: "",
         result: {
           code: "ACT1",
-          name: "Activity1"
+          name: "Activity1",
         },
-        success: true
+        success: true,
       });
     });
   });

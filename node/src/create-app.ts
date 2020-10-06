@@ -1,7 +1,8 @@
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
+import http from "http";
+import httpProxy from "http-proxy";
 import logger from "morgan";
 import path from "path";
 
@@ -12,15 +13,17 @@ import { ModelModule } from "./infrastructure/database/models";
 import initializeContainer from "./infrastructure/ioc/init";
 import { CrudResult } from "./infrastructure/utils/crud-result";
 import { HasHttpCode } from "./infrastructure/utils/has-http-code";
-import { HasRouter } from "./interfaces/routers";
+import { IHasRouter } from "./interfaces/routers";
 import { RouterModule } from "./routes";
 
 export function createExpressApp() {
   const app = express();
+  const server = http.createServer(app);
+
   const iocContainer = initializeContainer([
     ModelModule,
     ControllerModule,
-    RouterModule
+    RouterModule,
   ]);
   iocContainer
     .bind(SERVER_KEY_OR_SECRET)
@@ -30,16 +33,33 @@ export function createExpressApp() {
     );
 
   app.use(logger("dev"));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser());
   app.use(express.static(path.join(__dirname, "public")));
-  app.options("*", cors({ origin: true, credentials: true }));
   app.use(
     "/api",
-    cors({ origin: true, credentials: true }),
-    iocContainer.get<HasRouter>(Routers.ApiRouter).router
+    express.json(),
+    express.urlencoded({ extended: false }),
+    cookieParser(),
+    iocContainer.get<IHasRouter>(Routers.ApiRouter).router
   );
+
+  if (process.env.NODE_ENV?.toLowerCase() === "development") {
+    const proxy = httpProxy.createProxyServer({
+      target: { host: "localhost", port: "4200" },
+    });
+    app.use((req, res, next) => {
+      try {
+        proxy.web(req, res, {}, (err) => process.stderr.write(err.message));
+      } catch (err) {
+        next(err);
+      }
+    });
+    server.on("upgrade", (req, socket, head) => {
+      proxy.ws(req, socket, head, {}, (err) =>
+        process.stderr.write(err.message)
+      );
+    });
+  }
+
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof CrudResult) {
       res.status((err.result as HasHttpCode).code || 500);
@@ -60,5 +80,5 @@ export function createExpressApp() {
     }
   });
 
-  return app;
+  return { app, server };
 }

@@ -3,11 +3,11 @@ import { inject, injectable } from "inversify";
 
 import Controllers from "../constants/symbols/controllers";
 import { IUserController } from "../interfaces/controllers";
-import { HasRouter } from "../interfaces/routers";
+import { IHasRouter } from "../interfaces/routers";
 import utils from "./abstract";
 
 @injectable()
-export class UserRouter implements HasRouter {
+export class UserRouter implements IHasRouter {
   public readonly router = Router();
 
   constructor(

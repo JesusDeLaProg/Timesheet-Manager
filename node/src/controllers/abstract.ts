@@ -3,17 +3,21 @@ import {
   Document,
   DocumentQuery,
   Error as MongooseError,
-  Model as ModelType
+  Model as ModelType,
 } from "mongoose";
 
 import {
   ICrudResult,
   IViewInterface,
-  IViewUser
+  IViewUser,
 } from "../../../types/viewmodels";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
-import { IController, ObjectId, QueryOptions } from "../interfaces/controllers";
+import {
+  IController,
+  IQueryOptions,
+  ObjectId,
+} from "../interfaces/controllers";
 import { UserDocument, UserModel } from "../interfaces/models";
 
 @injectable()
@@ -58,7 +62,7 @@ export abstract class AbstractController<T extends IViewInterface>
   /**
    * Returns all the documents from a collection. Paged with {@link QueryOptions}.
    * @param {ObjectId} authenticatedUserId
-   * @param {QueryOptions} [options]
+   * @param {IQueryOptions} [options]
    * @returns {Promise<ICrudResult<T[]>>}
    * @throws 401 Error if there is no authenticated user.
    * @throws 403 Error if the authenticated user doesn't have permissions to read that collection.
@@ -66,7 +70,7 @@ export abstract class AbstractController<T extends IViewInterface>
    */
   public async getAll(
     authenticatedUserId: ObjectId,
-    options?: QueryOptions
+    options?: IQueryOptions
   ): Promise<ICrudResult<T[]>> {
     if (
       this.validateReadPermissions(
@@ -124,7 +128,7 @@ export abstract class AbstractController<T extends IViewInterface>
     const {
       document,
       originalObject,
-      resourceOwner: originalResourceOwner
+      resourceOwner: originalResourceOwner,
     } = await this.objectToDocument(input);
     let authorized = false;
     if (originalObject) {
@@ -183,7 +187,7 @@ export abstract class AbstractController<T extends IViewInterface>
     const {
       document,
       originalObject,
-      resourceOwner
+      resourceOwner,
     } = await this.objectToDocument(input);
     let authorized = false;
     if (originalObject) {
@@ -219,7 +223,7 @@ export abstract class AbstractController<T extends IViewInterface>
 
   protected applyQueryOptions<U, V extends Document>(
     query: DocumentQuery<U, V>,
-    options?: QueryOptions
+    options?: IQueryOptions
   ): DocumentQuery<U, V> {
     if (options) {
       if (options.limit) {
@@ -271,7 +275,7 @@ export abstract class AbstractController<T extends IViewInterface>
       return {
         resourceOwner,
         originalObject,
-        document: result
+        document: result,
       };
     } else {
       delete input._id;
@@ -279,7 +283,7 @@ export abstract class AbstractController<T extends IViewInterface>
       return {
         resourceOwner: await this.getResourceOwner(result),
         originalObject: null,
-        document: result
+        document: result,
       };
     }
   }

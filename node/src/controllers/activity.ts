@@ -7,7 +7,7 @@ import { IActivityController } from "../interfaces/controllers";
 import {
   ActivityDocument,
   ActivityModel,
-  UserModel
+  UserModel,
 } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 

@@ -6,14 +6,14 @@ import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import {
   IPhaseController,
+  IQueryOptions,
   ObjectId,
-  QueryOptions
 } from "../interfaces/controllers";
 import {
   ActivityDocument,
   PhaseDocument,
   PhaseModel,
-  UserModel
+  UserModel,
 } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 
@@ -30,13 +30,13 @@ export class PhaseController extends AbstractController<IViewPhase>
   /**
    * Returns all phases, with linked activities as documents instead of IDs.
    * @param {ObjectId} authenticatedUserId
-   * @param {QueryOptions} [options]
+   * @param {IQueryOptions} [options]
    * @returns {Promise<CrudResult<PhaseDocument[]>>}
    * @memberof PhaseController
    */
   public async getAllPopulated(
     authenticatedUserId: ObjectId,
-    options?: QueryOptions
+    options?: IQueryOptions
   ) {
     if (
       this.validateReadPermissions(

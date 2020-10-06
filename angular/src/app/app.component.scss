@@ -1,0 +1,36 @@
+@import "variables";
+
+mat-toolbar {
+  margin-bottom: $tm-spacing * 2;
+
+  span.spacer {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+
+  span.brand {
+    margin-right: $tm-spacing * 2;
+  }
+
+  span.label {
+    font-size: 0.75em;
+    color: #dddddd;
+    margin-right: 1em;
+  }
+
+  span.middle {
+    flex: 1 1 auto;
+  }
+
+  span.right {
+    small {
+      vertical-align: text-top;
+    }
+  }
+
+  a {
+    font-size: 0.75em;
+    color: white;
+    text-decoration: none;
+  }
+}

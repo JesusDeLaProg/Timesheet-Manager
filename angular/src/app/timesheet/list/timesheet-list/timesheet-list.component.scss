@@ -1,0 +1,33 @@
+@import "variables";
+
+mat-card.root {
+  margin: $tm-spacing * 5 $tm-spacing * 3;
+  padding: $tm-spacing * 3;
+}
+
+a.new-timesheet-button {
+  margin-bottom: $tm-spacing * 2;
+}
+
+a.user-active,
+a.user-inactive {
+  user-select: none;
+  mat-icon {
+    font-size: 10px;
+    padding-top: 12px;
+  }
+}
+
+a.user-active {
+  opacity: 0.8;
+
+  mat-icon {
+    color: green;
+  }
+}
+
+a.user-inactive {
+  mat-icon {
+    color: red;
+  }
+}

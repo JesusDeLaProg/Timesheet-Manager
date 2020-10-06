@@ -6,10 +6,10 @@ import should from "should";
 import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
-import { ClientRouter } from "../client";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ClientModel } from "../../interfaces/models";
+import { ClientRouter } from "../client";
 
 export default function buildTestSuite(
   appFactory: () => Express,
@@ -20,14 +20,14 @@ export default function buildTestSuite(
   let agent: SuperAgent<Test>;
   let Client: ClientModel;
 
-  describe(ClientRouter.name, function() {
-    this.beforeAll(function() {
+  describe(ClientRouter.name, function ClientRouterTest() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       Client = container.get(Models.Client);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -37,14 +37,14 @@ export default function buildTestSuite(
       agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       if (server) {
         server.close();
       }
       await Client.deleteMany({});
     });
 
-    it("should have GET /", async function() {
+    it("should have GET /", async () => {
       await new Client({ name: "Client1" }).save();
       const response = await agent
         .get(baseUrl + "/")
@@ -54,11 +54,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: [{ name: "Client1" }],
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /:id", async function() {
+    it("should have GET /:id", async () => {
       const client = await new Client({ name: "Client1" }).save();
       const response = await agent
         .get(baseUrl + `/${client.id}`)
@@ -68,11 +68,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: { name: "Client1", _id: client.id },
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /byName/:name", async function() {
+    it("should have GET /byName/:name", async () => {
       for (let i = 1; i <= 20; ++i) {
         await new Client({ name: `Client${i}` }).save();
       }
@@ -86,7 +86,7 @@ export default function buildTestSuite(
       should(response.body.success).be.true();
     });
 
-    it("should have POST /validate", async function() {
+    it("should have POST /validate", async () => {
       const response1 = await agent
         .post(baseUrl + "/validate")
         .set("Accept", "application/json")
@@ -108,7 +108,7 @@ export default function buildTestSuite(
       should(response2.body.success).be.true();
     });
 
-    it("should have POST /save", async function() {
+    it("should have POST /save", async () => {
       const response1 = await agent
         .post(baseUrl + "/save")
         .set("Accept", "application/json")

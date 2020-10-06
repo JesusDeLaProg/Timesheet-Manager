@@ -13,7 +13,7 @@ export default function unique(
         throw new Error(`modelName "${modelName}" does not exist.`);
       }
       const filter = {
-        [fieldName]: value
+        [fieldName]: value,
       };
       if (this._id) {
         filter._id = { $ne: this._id };
@@ -21,6 +21,6 @@ export default function unique(
 
       const result = await mongoose.model(modelName).countDocuments(filter);
       return result === 0;
-    }
+    },
   };
 }

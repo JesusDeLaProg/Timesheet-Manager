@@ -5,21 +5,21 @@ import { ITimesheetLine, StringId } from "../../../types/datamodels";
 import {
   IViewProject,
   IViewTimesheet,
-  IViewUser
+  IViewUser,
 } from "../../../types/viewmodels";
 import { UserRole } from "../constants/enums/user-role";
 import Models from "../constants/symbols/models";
 import { CrudResult } from "../infrastructure/utils/crud-result";
 import { HasHttpCode } from "../infrastructure/utils/has-http-code";
 import {
+  IQueryOptions,
   ITimesheetController,
   ObjectId,
-  QueryOptions
 } from "../interfaces/controllers";
 import {
   TimesheetDocument,
   TimesheetModel,
-  UserModel
+  UserModel,
 } from "../interfaces/models";
 import { AbstractController } from "./abstract";
 
@@ -37,14 +37,14 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
    * Returns all timesheets from owned by a given user.
    * @param {ObjectId} authenticatedUserId
    * @param {ObjectId} userId
-   * @param {QueryOptions} [options]
+   * @param {IQueryOptions} [options]
    * @returns {Promise<CrudResult<TimesheetDocument[]>>}
    * @memberof TimesheetController
    */
   public async getAllByUserId(
     authenticatedUserId: ObjectId,
     userId: ObjectId,
-    options?: QueryOptions
+    options?: IQueryOptions
   ) {
     if (
       this.validateReadPermissions(
@@ -53,7 +53,7 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
       )
     ) {
       let query = this.Timesheet.find({
-        user: userId
+        user: userId,
       });
       query = this.applyQueryOptions(query, options);
       const result = await query;
@@ -74,8 +74,8 @@ export class TimesheetController extends AbstractController<IViewTimesheet>
     const query = this.Timesheet.findById(id);
     const result = ((await query.populate(
       "lines.project"
-    )) as unknown) as (Document &
-      IViewTimesheet<StringId, ITimesheetLine<IViewProject>>);
+    )) as unknown) as Document &
+      IViewTimesheet<StringId, ITimesheetLine<IViewProject>>;
     if (!result) {
       const error = new Error(`Cannot find Timesheet with _id ${id}`);
       (error as HasHttpCode).code = 404;

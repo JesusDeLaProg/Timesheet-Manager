@@ -15,11 +15,11 @@ export const ClientSchema = new Schema(
           "Client",
           "name",
           "Vous devez entrer un nom unique pour ce client."
-        )
-      ]
-    }
+        ),
+      ],
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );

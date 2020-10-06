@@ -17,6 +17,6 @@ export default function arrayLength(
         test = test && value.length <= max;
       }
       return test;
-    }
+    },
   };
 }

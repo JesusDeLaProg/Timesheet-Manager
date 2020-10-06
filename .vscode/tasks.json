@@ -4,13 +4,49 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "npm: build-watch - node",
       "type": "npm",
-      "script": "build",
+      "script": "build-watch",
       "path": "node/",
+      "isBackground": true,
       "group": {
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "path": "angular/",
+      "problemMatcher": [
+        "$tsc-watch",
+        {
+          "owner": "typescript",
+          "source": "ts",
+          "applyTo": "closedDocuments",
+          "fileLocation": [
+            "relative",
+            "${cwd}"
+          ],
+          "pattern": "$tsc",
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": {
+              "regexp": "(.*?)"
+            },
+            "endsPattern": {
+              "regexp": "Compiled |Failed to compile."
+            }
+          }
+        }
+      ],
+      "label": "npm: start - angular",
+      "detail": "ng serve",
+      "isBackground": true
+    },
+    {
+      "label": "Build dev full stack",
+      "dependsOn": ["npm: build-watch - node", "npm: start - angular"]
     }
   ]
 }

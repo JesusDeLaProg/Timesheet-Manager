@@ -1,0 +1,15 @@
+table {
+  width: 100%;
+}
+
+td.capitalize {
+  text-transform: capitalize;
+}
+
+th:first-of-type {
+  text-align: center;
+}
+
+tr > td:first-of-type {
+  text-align: center;
+}

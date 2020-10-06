@@ -1,0 +1,25 @@
+<mat-toolbar color="primary" class="mat-elevation-z8">
+  <span class="left">
+    <span class="brand">Timesheet-Manager</span>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/">Feuille de temps</a>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/">Rapports</a>
+    <span class="spacer"></span>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/">Phases et Activités</a>
+    <a mat-button routerLink="/">Projets</a>
+    <a mat-button routerLink="/">Employés</a>
+  </span>
+  <span class="middle"></span>
+  <span class="right">
+    <small *ngIf="whoami | async as user">
+      {{ user.firstName }} {{ user.lastName }}
+    </small>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon matTooltip="Déconnexion">meeting_room</mat-icon>
+    </button>
+  </span>
+</mat-toolbar>
+
+<router-outlet></router-outlet>

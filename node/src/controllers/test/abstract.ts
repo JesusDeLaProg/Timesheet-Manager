@@ -1,32 +1,32 @@
+import { Container } from "inversify";
+import moment from "moment";
+import { Error as MongooseError } from "mongoose";
+import { IController, IQueryOptions } from "node/src/interfaces/controllers";
+import should from "should";
+import { IRoadsheetLine, ITimesheetLine, IUserRole } from "types/datamodels";
 import {
-  IViewUser,
+  ICrudResult,
   IViewActivity,
+  IViewClient,
+  IViewInterface,
   IViewPhase,
   IViewProject,
   IViewTimesheet,
-  IViewClient,
-  IViewInterface,
-  ICrudResult
+  IViewUser,
 } from "types/viewmodels";
-import { Container } from "inversify";
-import { ModelModule } from "../../infrastructure/database/models";
+import { ProjectType } from "../../constants/enums/project-type";
+import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
+import { ModelModule } from "../../infrastructure/database/models";
 import {
   ActivityModel,
   ClientModel,
   PhaseModel,
   ProjectModel,
   TimesheetModel,
+  UserDocument,
   UserModel,
-  UserDocument
 } from "../../interfaces/models";
-import { UserRole } from "../../constants/enums/user-role";
-import { ProjectType } from "../../constants/enums/project-type";
-import moment from "moment";
-import { Error as MongooseError } from "mongoose";
-import { ITimesheetLine, IRoadsheetLine, IUserRole } from "types/datamodels";
-import { IController, QueryOptions } from "node/src/interfaces/controllers";
-import should from "should";
 
 const container = new Container();
 container.load(ModelModule);
@@ -53,7 +53,7 @@ export async function clearDatabase() {
     Phase.deleteMany({}),
     Project.deleteMany({}),
     Timesheet.deleteMany({}),
-    User.deleteMany({})
+    User.deleteMany({}),
   ]);
 }
 
@@ -133,15 +133,15 @@ export async function setupDatabase(
               begin: new Date(1970, 0, 1),
               end: new Date(2000, 0, 1),
               jobTitle: "Ingénieur junior",
-              rate: 100
+              rate: 100,
             },
             {
               begin: new Date(2000, 0, 2),
               end: undefined,
               jobTitle: "Ingénieur",
-              rate: 125
-            }
-          ]
+              rate: 125,
+            },
+          ],
         },
         {
           projectType: ProjectType.Prive,
@@ -150,17 +150,17 @@ export async function setupDatabase(
               begin: new Date(1970, 0, 1),
               end: new Date(2000, 0, 1),
               jobTitle: "Ingénieur junior",
-              rate: 200
+              rate: 200,
             },
             {
               begin: new Date(2000, 0, 2),
               end: undefined,
               jobTitle: "Ingénieur",
-              rate: 250
-            }
-          ]
-        }
-      ]
+              rate: 250,
+            },
+          ],
+        },
+      ],
     });
     await admin.save();
     return admin;
@@ -177,30 +177,36 @@ function generateRandomString(length: number) {
     .join("");
 }
 
-export function createActivities(activities: Partial<IViewActivity>[]) {
+export function createActivities(activities: Array<Partial<IViewActivity>>) {
   return activities.map((act) => {
     const base = {} as IViewActivity;
-    if (act._id) base._id = act._id;
+    if (act._id) {
+      base._id = act._id;
+    }
     base.code = act.code === undefined ? generateRandomString(4) : act.code;
     base.name = act.name === undefined ? generateRandomString(8) : act.name;
     return new Activity(base).toJSON() as IViewActivity;
   });
 }
 
-export function createClients(clients: Partial<IViewClient>[]) {
+export function createClients(clients: Array<Partial<IViewClient>>) {
   return clients.map((client) => {
     const base = {} as IViewClient;
-    if (client._id) base._id = client._id;
+    if (client._id) {
+      base._id = client._id;
+    }
     base.name =
       client.name === undefined ? generateRandomString(8) : client.name;
     return new Client(base).toJSON() as IViewClient;
   });
 }
 
-export function createPhases(phases: Partial<IViewPhase>[]) {
+export function createPhases(phases: Array<Partial<IViewPhase>>) {
   return phases.map((phase) => {
     const base = {} as IViewPhase;
-    if (phase._id) base._id = phase._id;
+    if (phase._id) {
+      base._id = phase._id;
+    }
     base.code = phase.code === undefined ? generateRandomString(4) : phase.code;
     base.name = phase.name === undefined ? generateRandomString(8) : phase.name;
     base.activities = phase.activities || [];
@@ -208,10 +214,12 @@ export function createPhases(phases: Partial<IViewPhase>[]) {
   });
 }
 
-export function createProjects(projects: Partial<IViewProject>[]) {
+export function createProjects(projects: Array<Partial<IViewProject>>) {
   return projects.map((project) => {
     const base = {} as IViewProject;
-    if (project._id) base._id = project._id;
+    if (project._id) {
+      base._id = project._id;
+    }
     base.code =
       project.code === undefined ? generateRandomString(4) : project.code;
     base.client = project.client as string;
@@ -233,22 +241,19 @@ export function createProjects(projects: Partial<IViewProject>[]) {
   });
 }
 
-export function createTimesheets(timesheets: Partial<IViewTimesheet>[]) {
+export function createTimesheets(timesheets: Array<Partial<IViewTimesheet>>) {
   return timesheets.map((timesheet) => {
     const base = {} as IViewTimesheet;
-    if (timesheet._id) base._id = timesheet._id;
+    if (timesheet._id) {
+      base._id = timesheet._id;
+    }
     base.begin =
       timesheet.begin === undefined
-        ? moment(new Date())
-            .startOf("week")
-            .toDate()
+        ? moment(new Date()).startOf("week").toDate()
         : timesheet.begin;
     base.end =
       timesheet.end === undefined
-        ? moment(new Date())
-            .startOf("week")
-            .add(6, "days")
-            .toDate()
+        ? moment(new Date()).startOf("week").add(6, "days").toDate()
         : timesheet.end;
     base.user = timesheet.user as string;
     base.lines = timesheet.lines as ITimesheetLine[];
@@ -257,10 +262,12 @@ export function createTimesheets(timesheets: Partial<IViewTimesheet>[]) {
   });
 }
 
-export function createUsers(users: Partial<IViewUser>[]) {
+export function createUsers(users: Array<Partial<IViewUser>>) {
   return users.map((user) => {
     const base = {} as IViewUser;
-    if (user._id) base._id = user._id;
+    if (user._id) {
+      base._id = user._id;
+    }
     base.username =
       user.username === undefined ? generateRandomString(10) : user.username;
     base.firstName =
@@ -291,9 +298,9 @@ export function createUsers(users: Partial<IViewUser>[]) {
             {
               begin: new Date(1970, 0, 1),
               jobTitle: generateRandomString(10),
-              rate: +(Math.random() * 100).toFixed(2)
-            }
-          ]
+              rate: +(Math.random() * 100).toFixed(2),
+            },
+          ],
         },
         {
           projectType: ProjectType.Public,
@@ -301,10 +308,10 @@ export function createUsers(users: Partial<IViewUser>[]) {
             {
               begin: new Date(1970, 0, 1),
               jobTitle: generateRandomString(10),
-              rate: +(Math.random() * 100).toFixed(2)
-            }
-          ]
-        }
+              rate: +(Math.random() * 100).toFixed(2),
+            },
+          ],
+        },
       ];
     }
     return new User(base).toJSON() as IViewUser;
@@ -315,56 +322,56 @@ export const defaultUsers = createUsers([
   { username: "Everyone", role: UserRole.Everyone },
   { username: "Subadmin", role: UserRole.Subadmin },
   { username: "Admin", role: UserRole.Admin },
-  { username: "Superadmin", role: UserRole.Superadmin }
+  { username: "Superadmin", role: UserRole.Superadmin },
 ]);
 
-interface Authorization {
+interface IAuthorization {
   allowedRoles: UserRole[];
 }
 
-interface VerifyCallbacks<T> {
+interface IVerifyCallbacks<T> {
   verify: (res: ICrudResult<T>) => void;
   verifyFail?: (res: ICrudResult<Error>) => void;
 }
 
-export interface ControllerTestOptions<T> {
+export interface IControllerTestOptions<T> {
   getById: () => {
     // ID to get
     id: string;
-  } & VerifyCallbacks<T> &
-    Authorization;
+  } & IVerifyCallbacks<T> &
+    IAuthorization;
   getAll: () => {
     // Options to give to getAll
-    options: QueryOptions;
-  } & VerifyCallbacks<T[]> &
-    Authorization;
-  count: () => VerifyCallbacks<number> & Authorization;
+    options: IQueryOptions;
+  } & IVerifyCallbacks<T[]> &
+    IAuthorization;
+  count: () => IVerifyCallbacks<number> & IAuthorization;
   validateUpdate: () => {
     input: T;
-  } & VerifyCallbacks<MongooseError.ValidationError> &
-    Authorization;
+  } & IVerifyCallbacks<MongooseError.ValidationError> &
+    IAuthorization;
   validateCreate: () => {
     input: T;
-  } & VerifyCallbacks<MongooseError.ValidationError> &
-    Authorization;
+  } & IVerifyCallbacks<MongooseError.ValidationError> &
+    IAuthorization;
   saveUpdate: () => {
     input: T;
-  } & VerifyCallbacks<T | MongooseError.ValidationError> &
-    Authorization;
+  } & IVerifyCallbacks<T | MongooseError.ValidationError> &
+    IAuthorization;
   saveCreate: () => {
     input: T;
-  } & VerifyCallbacks<T | MongooseError.ValidationError> &
-    Authorization;
+  } & IVerifyCallbacks<T | MongooseError.ValidationError> &
+    IAuthorization;
 }
 
 export function createControllerTests<T extends IViewInterface>(
   controller: () => IController<T>,
   user: IViewUser,
-  options: Partial<ControllerTestOptions<T>>
+  options: Partial<IControllerTestOptions<T>>
 ) {
-  describe("Controllers tests", function() {
+  describe("Controllers tests", () => {
     if (options.getById) {
-      it("getById", async function() {
+      it("getById", async () => {
         const opt = options.getById!();
         let result;
         try {
@@ -379,7 +386,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.getAll) {
-      it("getAll", async function() {
+      it("getAll", async () => {
         const opt = options.getAll!();
         try {
           const result = await controller().getAll(user._id, opt.options);
@@ -393,7 +400,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.count) {
-      it("count", async function() {
+      it("count", async () => {
         const opt = options.count!();
         try {
           const result = await controller().count(user._id);
@@ -407,7 +414,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.validateCreate) {
-      it("validate create", async function() {
+      it("validate create", async () => {
         const opt = options.validateCreate!();
         try {
           const result = await controller().validate(user._id, opt.input);
@@ -421,7 +428,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.validateUpdate) {
-      it("validate update", async function() {
+      it("validate update", async () => {
         const opt = options.validateUpdate!();
         try {
           const result = await controller().validate(user._id, opt.input);
@@ -435,7 +442,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.saveCreate) {
-      it("save create", async function() {
+      it("save create", async () => {
         const opt = options.saveCreate!();
         try {
           const result = await controller().save(user._id, opt.input);
@@ -449,7 +456,7 @@ export function createControllerTests<T extends IViewInterface>(
     }
 
     if (options.saveUpdate) {
-      it("save update", async function() {
+      it("save update", async () => {
         const opt = options.saveUpdate!();
         try {
           const result = await controller().save(user._id, opt.input);
@@ -466,11 +473,13 @@ export function createControllerTests<T extends IViewInterface>(
 
 function handleTestError<T>(
   user: IViewUser,
-  testOptions: Authorization & VerifyCallbacks<T>,
+  testOptions: IAuthorization & IVerifyCallbacks<T>,
   error: any
 ) {
   // Unexpected error
-  if (error.success === undefined) throw error;
+  if (error.success === undefined) {
+    throw error;
+  }
 
   should(error.success).be.false();
   if (testOptions.allowedRoles.indexOf(user.role) === -1) {

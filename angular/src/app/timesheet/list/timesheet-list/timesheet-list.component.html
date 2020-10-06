@@ -1,0 +1,35 @@
+<mat-card class="root mat-elevation-z5">
+  <h1>Feuilles de temps</h1>
+  <a
+    mat-raised-button
+    class="new-timesheet-button"
+    color="primary"
+    routerLink="/timesheet/edit"
+  >
+    Nouvelle feuille de temps
+  </a>
+  <nav mat-tab-nav-bar>
+    <a
+      [ngClass]="{
+        'user-active': user.isActive,
+        'user-inactive': !user.isActive
+      }"
+      mat-tab-link
+      *ngFor="let user of users$ | async"
+      (click)="selectedUser = user"
+      [active]="selectedUser?._id === user._id"
+    >
+      <mat-icon>stop_circle</mat-icon>
+      {{ user.firstName }} {{ user.lastName }}
+    </a>
+  </nav>
+  <tm-timesheet-list-table
+    [timesheets]="timesheets$ | async"
+  ></tm-timesheet-list-table>
+  <mat-paginator
+    [length]="timesheetCount$ | async"
+    [pageSize]="DEFAULT_PAGE_SIZE"
+    [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+    (page)="pageEvent = $event"
+  ></mat-paginator>
+</mat-card>

@@ -2,30 +2,30 @@ import { Container } from "inversify";
 import "reflect-metadata";
 import should from "should";
 
-import Models from "../../constants/symbols/models";
-import { ModelModule } from "../../infrastructure/database/testing";
-import { ActivityController } from "../activity";
-import { ActivityModel, UserModel } from "../../interfaces/models";
 import { Types } from "mongoose";
 import { IViewActivity } from "../../../../types/viewmodels";
+import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
+import Models from "../../constants/symbols/models";
+import { ModelModule } from "../../infrastructure/database/testing";
+import { ActivityModel, UserModel } from "../../interfaces/models";
+import { ActivityController } from "../activity";
 import {
+  compareIds,
   createActivities,
+  createControllerTests,
   defaultUsers,
   setupDatabase,
-  createControllerTests,
-  compareIds
 } from "./abstract";
-import { UserRole, AllUserRoles } from "../../constants/enums/user-role";
 
 export default function buildTestSuite() {
-  describe(ActivityController.name, function() {
+  describe(ActivityController.name, function ActivityControllerTest() {
     let User: UserModel;
     let Activity: ActivityModel;
     let controller: ActivityController;
 
     let activities: IViewActivity[];
 
-    this.beforeAll(function() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       container.bind<ActivityController>(ActivityController).toSelf();
@@ -34,7 +34,7 @@ export default function buildTestSuite() {
       Activity = container.get(Models.Activity);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       activities = createActivities(Array(6).fill({}));
       activities = activities.map((act) => {
         act._id = new Types.ObjectId();
@@ -43,19 +43,19 @@ export default function buildTestSuite() {
       await setupDatabase(
         {
           users: defaultUsers,
-          activities
+          activities,
         },
         false
       );
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       await Activity.deleteMany({});
       await User.deleteMany({});
     });
 
-    for (let user of defaultUsers) {
-      describe(`Logged in as ${user.username}`, function() {
+    for (const user of defaultUsers) {
+      describe(`Logged in as ${user.username}`, () => {
         const inputValidateCreate = createActivities([{}])[0];
         delete inputValidateCreate._id;
         const inputSaveCreate = createActivities([{}])[0];
@@ -67,10 +67,10 @@ export default function buildTestSuite() {
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, activities[3], {
-                  _id: compareIds(activities[3]._id)
+                  _id: compareIds(activities[3]._id),
                 })
               ),
-            allowedRoles: AllUserRoles
+            allowedRoles: AllUserRoles,
           }),
           getAll: () => ({
             options: {},
@@ -80,26 +80,26 @@ export default function buildTestSuite() {
                   Object.assign({}, a, { _id: compareIds(a._id) })
                 )
               ),
-            allowedRoles: AllUserRoles
+            allowedRoles: AllUserRoles,
           }),
           count: () => ({
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).equal(activities.length)
+            verify: (res) => should(res.result).equal(activities.length),
           }),
           validateCreate: () => ({
             input: inputValidateCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(activities[4])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           saveCreate: () => ({
             input: inputSaveCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).match(inputSaveCreate)
+            verify: (res) => should(res.result).match(inputSaveCreate),
           }),
           saveUpdate: () => ({
             input: JSON.parse(JSON.stringify(activities[4])),
@@ -107,10 +107,10 @@ export default function buildTestSuite() {
             verify: (res) =>
               should(res.result).match(
                 Object.assign({}, activities[4], {
-                  _id: compareIds(activities[4]._id)
+                  _id: compareIds(activities[4]._id),
                 })
-              )
-          })
+              ),
+          }),
         });
       });
     }

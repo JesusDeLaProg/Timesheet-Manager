@@ -6,10 +6,10 @@ import should from "should";
 import { SuperAgent } from "superagent";
 import supertest, { Test } from "supertest";
 
-import { PhaseRouter } from "../phase";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
 import { ActivityModel, PhaseModel } from "../../interfaces/models";
+import { PhaseRouter } from "../phase";
 
 export default function buildTestSuite(
   appFactory: () => Express,
@@ -21,15 +21,15 @@ export default function buildTestSuite(
   let Activity: ActivityModel;
   let Phase: PhaseModel;
 
-  describe(PhaseRouter.name, function() {
-    this.beforeAll(function() {
+  describe(PhaseRouter.name, function PhaseRouterTest() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       Activity = container.get(Models.Activity);
       Phase = container.get(Models.Phase);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       app = appFactory();
       server = app.listen(3000);
       agent = supertest.agent(app);
@@ -39,7 +39,7 @@ export default function buildTestSuite(
       agent.jar.setCookies(authResponse.get("Set-Cookie"));
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       if (server) {
         server.close();
       }
@@ -47,28 +47,28 @@ export default function buildTestSuite(
       await Activity.deleteMany({});
     });
 
-    it("should have GET /", async function() {
+    it("should have GET /", async () => {
       const activities = [
         await new Activity({
           code: "ACT1",
-          name: "Activity1"
+          name: "Activity1",
         }).save(),
         await new Activity({
           code: "ACT2",
-          name: "Activity2"
-        }).save()
+          name: "Activity2",
+        }).save(),
       ];
       const phases = [
         await new Phase({
           code: "PH1",
           name: "Phase1",
-          activities: activities.map((act) => act.id)
+          activities: activities.map((act) => act.id),
         }).save(),
         await new Phase({
           code: "PH2",
           name: "Phase2",
-          activities: activities.map((act) => act.id)
-        }).save()
+          activities: activities.map((act) => act.id),
+        }).save(),
       ];
       const response = await agent
         .get(baseUrl + "/")
@@ -78,11 +78,11 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: phases.map((ph) => JSON.parse(JSON.stringify(ph))),
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /:id", async function() {
+    it("should have GET /:id", async () => {
       const phase = await new Phase({ code: "PH1", name: "Phase1" }).save();
       const response = await agent
         .get(baseUrl + `/${phase.id}`)
@@ -92,32 +92,32 @@ export default function buildTestSuite(
       should(response.body).match({
         message: "",
         result: JSON.parse(JSON.stringify(phase)),
-        success: true
+        success: true,
       });
     });
 
-    it("should have GET /populated", async function() {
+    it("should have GET /populated", async () => {
       const activities = [
         await new Activity({
           code: "ACT1",
-          name: "Activity1"
+          name: "Activity1",
         }).save(),
         await new Activity({
           code: "ACT2",
-          name: "Activity2"
-        }).save()
+          name: "Activity2",
+        }).save(),
       ];
       const phases = [
         await new Phase({
           code: "PH1",
           name: "Phase1",
-          activities: activities.map((act) => act.id)
+          activities: activities.map((act) => act.id),
         }).save(),
         await new Phase({
           code: "PH2",
           name: "Phase2",
-          activities: activities.map((act) => act.id)
-        }).save()
+          activities: activities.map((act) => act.id),
+        }).save(),
       ];
       const response = await agent
         .get(baseUrl + "/populated")
@@ -133,35 +133,35 @@ export default function buildTestSuite(
           );
           return ph;
         }),
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /validate", async function() {
+    it("should have POST /validate", async () => {
       const response = await agent
         .post(baseUrl + "/validate")
         .set("Accept", "application/json")
         .send({
           code: "PH1",
           name: "Phase1",
-          activities: []
+          activities: [],
         })
         .expect(200);
       should(response.body).match({
         message: "",
         result: null,
-        success: true
+        success: true,
       });
     });
 
-    it("should have POST /save", async function() {
+    it("should have POST /save", async () => {
       const response = await agent
         .post(baseUrl + "/save")
         .set("Accept", "application/json")
         .send({
           code: "PH1",
           name: "Phase1",
-          activities: []
+          activities: [],
         })
         .expect(200);
       should(response.body).match({
@@ -169,9 +169,9 @@ export default function buildTestSuite(
         result: {
           code: "PH1",
           name: "Phase1",
-          activities: []
+          activities: [],
         },
-        success: true
+        success: true,
       });
     });
   });

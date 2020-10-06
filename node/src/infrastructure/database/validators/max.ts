@@ -14,7 +14,7 @@ export default function max(
         return equal
           ? moment(value).isSameOrBefore(maximum)
           : moment(value).isBefore(maximum);
-      }
+      },
     };
   } else {
     return {
@@ -22,7 +22,7 @@ export default function max(
       type: "NumberMaximumValidator",
       validator(value: number) {
         return equal ? value >= maximum : value > maximum;
-      }
+      },
     };
   }
 }

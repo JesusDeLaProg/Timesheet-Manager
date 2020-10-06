@@ -1,32 +1,30 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended"],
+  "linterOptions": {
+    "exclude": ["bin/www"]
+  },
+  "jsRules": {},
+  "rules": {
+    "trailing-comma": {
+      "severity": "off"
+    },
+    "variable-name": {
+      "options": [
+        "check-format",
+        "allow-leading-underscore",
+        "allow-pascal-case",
+        "ban-keywords"
+      ]
+    },
+    "only-arrow-functions": [
+      true,
+      "allow-declarations",
+      "allow-named-functions"
     ],
-    "linterOptions": {
-        "exclude": ["bin/www"]
-    },
-    "jsRules": {},
-    "rules": {
-        "trailing-comma": {
-            "severity": "off"
-        },
-        "variable-name": {
-            "options": [
-                "check-format",
-                "allow-leading-underscore",
-                "allow-pascal-case",
-                "ban-keywords"
-            ]
-        },
-        "only-arrow-functions": [
-            true,
-            "allow-declarations",
-            "allow-named-functions"
-        ],
-        "object-literal-sort-keys": {
-            "severity": "off"
-        }
-    },
-    "rulesDirectory": []
+    "object-literal-sort-keys": {
+      "severity": "off"
+    }
+  },
+  "rulesDirectory": []
 }

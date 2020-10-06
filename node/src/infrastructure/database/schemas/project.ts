@@ -18,19 +18,19 @@ export const ProjectSchema = new Schema(
           "Project",
           "code",
           "Vous devez entrer un code unique pour ce projet."
-        )
-      ]
+        ),
+      ],
     },
     name: {
       type: String,
       required: [true, "Vous devez entrer un nom pour ce projet."],
-      trim: true
+      trim: true,
     },
     client: {
       type: Schema.Types.ObjectId,
       ref: "Client",
       required: [true, "Vous devez entrer un client."],
-      validate: [idexists("Client", "Ce client n'existe pas.")]
+      validate: [idexists("Client", "Ce client n'existe pas.")],
     },
     type: {
       type: String,
@@ -39,16 +39,16 @@ export const ProjectSchema = new Schema(
         values: $enum(ProjectType).getValues(),
         message: `Le type de projet doit être dans [${$enum(
           ProjectType
-        ).getValues()}].`
-      }
+        ).getValues()}].`,
+      },
     },
     isActive: {
       type: Boolean,
       required: [true, "Vous devez entrer un statut pour ce projet."],
-      default: true
-    }
+      default: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );

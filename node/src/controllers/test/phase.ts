@@ -2,23 +2,23 @@ import { Container } from "inversify";
 import "reflect-metadata";
 import should from "should";
 
+import { IViewActivity, IViewPhase } from "../../../../types/viewmodels";
+import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/testing";
+import { ActivityModel, PhaseModel } from "../../interfaces/models";
 import { PhaseController } from "../phase";
-import { PhaseModel, ActivityModel } from "../../interfaces/models";
-import { IViewPhase, IViewActivity } from "../../../../types/viewmodels";
 import {
-  createPhases,
+  compareIds,
   createActivities,
+  createControllerTests,
+  createPhases,
   defaultUsers,
   setupDatabase,
-  createControllerTests,
-  compareIds
 } from "./abstract";
-import { AllUserRoles, UserRole } from "../../constants/enums/user-role";
 
 export default function buildTestSuite() {
-  describe(PhaseController.name, function() {
+  describe(PhaseController.name, function PhaseControllerTest() {
     let Activity: ActivityModel;
     let Phase: PhaseModel;
     let controller: PhaseController;
@@ -26,7 +26,7 @@ export default function buildTestSuite() {
     let activities: IViewActivity[];
     let phases: IViewPhase[];
 
-    this.beforeAll(function() {
+    this.beforeAll(() => {
       const container = new Container();
       container.load(ModelModule);
       container.bind<PhaseController>(PhaseController).toSelf();
@@ -35,7 +35,7 @@ export default function buildTestSuite() {
       Phase = container.get(Models.Phase);
     });
 
-    this.beforeEach(async function() {
+    this.beforeEach(async () => {
       activities = createActivities(Array(6).fill({}));
       phases = createPhases(Array(6).fill({})).map((ph, i, arr) => {
         const j = i <= arr.length / 2 ? 0 : 3;
@@ -48,19 +48,19 @@ export default function buildTestSuite() {
         {
           users: defaultUsers,
           activities,
-          phases
+          phases,
         },
         false
       );
     });
 
-    this.afterEach(async function() {
+    this.afterEach(async () => {
       await Phase.deleteMany({});
       await Activity.deleteMany({});
     });
 
     for (const user of defaultUsers) {
-      describe(`Logged in as ${user.username}`, function() {
+      describe(`Logged in as ${user.username}`, () => {
         const inputValidateCreate = createPhases([{}])[0];
         delete inputValidateCreate._id;
         const inputSaveCreate = createPhases([{}])[0];
@@ -75,10 +75,10 @@ export default function buildTestSuite() {
                 Object.assign({}, phases[4], {
                   _id: compareIds(phases[4]._id),
                   activities: phases[4].activities.map((a) => ({
-                    _id: compareIds(a)
-                  }))
+                    _id: compareIds(a),
+                  })),
                 })
-              )
+              ),
           }),
           getAll: () => ({
             options: {},
@@ -89,25 +89,25 @@ export default function buildTestSuite() {
                   Object.assign({}, p, {
                     _id: compareIds(p._id),
                     activities: p.activities.map((a) => ({
-                      _id: compareIds(a)
-                    }))
+                      _id: compareIds(a),
+                    })),
                   })
                 )
-              )
+              ),
           }),
           count: () => ({
             allowedRoles: AllUserRoles,
-            verify: (res) => should(res.result).equals(phases.length)
+            verify: (res) => should(res.result).equals(phases.length),
           }),
           validateCreate: () => ({
             input: inputValidateCreate,
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           validateUpdate: () => ({
             input: JSON.parse(JSON.stringify(phases[3])),
             allowedRoles: [UserRole.Admin, UserRole.Superadmin],
-            verify: (res) => should(res.result).be.null()
+            verify: (res) => should(res.result).be.null(),
           }),
           saveCreate: () => ({
             input: inputSaveCreate,
@@ -116,10 +116,10 @@ export default function buildTestSuite() {
               should(res.result).match(
                 Object.assign({}, inputSaveCreate, {
                   activities: inputSaveCreate.activities.map((a) => ({
-                    _id: compareIds(a)
-                  }))
+                    _id: compareIds(a),
+                  })),
                 })
-              )
+              ),
           }),
           saveUpdate: () => ({
             input: JSON.parse(JSON.stringify(phases[3])),
@@ -129,19 +129,19 @@ export default function buildTestSuite() {
                 Object.assign({}, phases[3], {
                   _id: compareIds(phases[3]._id),
                   activities: phases[3].activities.map((a) => ({
-                    _id: compareIds(a)
-                  }))
+                    _id: compareIds(a),
+                  })),
                 })
-              )
-          })
+              ),
+          }),
         });
 
-        it("getAllPopulated", async function() {
+        it("getAllPopulated", async () => {
           const objectsToMatch = phases.map((ph) => {
             const phase: IViewPhase<IViewActivity> = Object.assign({}, ph, {
               activities: ph.activities.map((actId) =>
                 activities.find((a) => a._id === actId)
-              )
+              ),
             } as { activities: IViewActivity[] });
             return phase;
           });
@@ -153,7 +153,7 @@ export default function buildTestSuite() {
                 _id: compareIds(p._id),
                 activities: p.activities.map((a) =>
                   Object.assign({}, a, { _id: compareIds(a._id) })
-                )
+                ),
               })
             )
           );
