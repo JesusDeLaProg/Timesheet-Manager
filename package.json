@@ -35,13 +35,13 @@
     }
   },
   "lint-staged": {
-    "node/src/{,**/}!(*.d.ts.map|*.json)": [
-      "tslint --fix -c ./node/tslint.json",
+    "server/src/{,**/}!(*.d.ts.map|*.json)": [
+      "tslint --fix -c ./server/tslint.json",
       "prettier --arrow-parens always --write",
       "git add"
     ],
-    "angular/{,**/}{*.ts,*.html,*.scss}": [
-      "prettier --config angular/.prettierrc --write",
+    "client/{,**/}{*.ts,*.html,*.scss}": [
+      "prettier --config client/.prettierrc --write",
       "git add"
     ]
   }
