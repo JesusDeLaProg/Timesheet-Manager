@@ -14,9 +14,10 @@
             "type": "node",
             "request": "launch",
             "name": "Debug",
-            "cwd": "${workspaceFolder}\\node",
+            "cwd": "${workspaceFolder}\\server",
             "runtimeExecutable": "node",
             "runtimeArgs": [
+                "--trace-warnings",
                 "--inspect-brk",
                 "./bin/www"
             ],
@@ -24,7 +25,7 @@
             "env": {
                 "NODE_ENV": "development"
             },
-            "outFiles": ["${workspaceFolder}/node/out/**/*.js"],
+            "outFiles": ["${workspaceFolder}/server/out/**/*.js"],
             "console": "integratedTerminal",
             "sourceMaps": true,
             "internalConsoleOptions": "neverOpen"
@@ -33,8 +34,8 @@
             "type": "node",
             "request": "launch",
             "name": "Mocha On Project",
-            "runtimeExecutable": "${workspaceFolder}/node/node_modules/.bin/mocha",
-            "cwd": "${workspaceFolder}/node",
+            "runtimeExecutable": "${workspaceFolder}/server/node_modules/.bin/mocha",
+            "cwd": "${workspaceFolder}/server",
             "args": [
               "--timeout",
               "60000",
@@ -44,7 +45,7 @@
               "ts-node/register"
             ],
             "env": {
-                "TS_NODE_PROJECT": "${workspaceFolder}/node/src/test/tsconfig.json",
+                "TS_NODE_PROJECT": "${workspaceFolder}/server/src/test/tsconfig.json",
                 "JWTSECRET": "SECRET"
             },
             "console": "integratedTerminal",

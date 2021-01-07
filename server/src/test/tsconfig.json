@@ -6,5 +6,8 @@
     { "path": "../infrastructure/environment" },
     { "path": "../routes/test" },
     { "path": "../" }
-  ]
+  ],
+  "compilerOptions": {
+    "esModuleInterop": true
+  }
 }

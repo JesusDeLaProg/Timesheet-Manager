@@ -1,9 +1,12 @@
 import { Container } from "inversify";
 import moment from "moment";
 import { Error as MongooseError } from "mongoose";
-import { IController, IQueryOptions } from "node/src/interfaces/controllers";
 import should from "should";
-import { IRoadsheetLine, ITimesheetLine, IUserRole } from "types/datamodels";
+import {
+  IRoadsheetLine,
+  ITimesheetLine,
+  IUserRole,
+} from "../../../../types/datamodels";
 import {
   ICrudResult,
   IViewActivity,
@@ -13,11 +16,12 @@ import {
   IViewProject,
   IViewTimesheet,
   IViewUser,
-} from "types/viewmodels";
+} from "../../../../types/viewmodels";
 import { ProjectType } from "../../constants/enums/project-type";
 import { UserRole } from "../../constants/enums/user-role";
 import Models from "../../constants/symbols/models";
 import { ModelModule } from "../../infrastructure/database/models";
+import { IController, IQueryOptions } from "../../interfaces/controllers";
 import {
   ActivityModel,
   ClientModel,
