@@ -296,7 +296,7 @@ export abstract class AbstractController<T extends IViewInterface>
     return user;
   }
 
-  protected abstract async getResourceOwner(
+  protected abstract getResourceOwner(
     resource: T
   ): Promise<UserDocument | null>;
   protected abstract validateReadPermissions(
