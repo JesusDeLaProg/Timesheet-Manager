@@ -6,14 +6,14 @@ env:
   - SALTSIZE=256 ENCFUNC=sha512 ITERCOUNT=100000 OUTLENGTH=64 APPNAME="Timesheet Manager" JWTALGO=RS256 JWTSECRET=Secret SESSIONTIMEOUT=1h ROADSHEET_DISTANCE_RATE=0.48
 install:
   - npm ci
-  - cd node
+  - cd server
   - npm ci
-  - cd ../angular
+  - cd ../client
   - npm ci
   - cd ..
 script:
-  - cd node
+  - cd server
   - npm run lint
   - npm run test
-  - cd ../angular
+  - cd ../client
   - npm run lint
