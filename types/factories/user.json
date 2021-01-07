@@ -1,0 +1,30 @@
+{
+    "isActive": true,
+    "role": 1,
+    "username": "",
+    "firstname": "",
+    "password": "",
+    "email": "",
+    "billingGroups": [
+        {
+            "projectType": "Public",
+            "timeline": [
+                {
+                    "begin": "1970-01-01T05:00:00.000+00:00",
+                    "rate": 0.01,
+                    "jobTitle": "Employé(e)"
+                }
+            ]
+        },
+        {
+            "projectType": "Privé",
+            "timeline": [
+                {
+                    "begin": "1970-01-01T05:00:00.000+00:00",
+                    "rate": 0.01,
+                    "jobTitle": "Employé(e)"
+                }
+            ]
+        }
+    ]
+}
