@@ -19,7 +19,7 @@
     "express": "~4.16.1",
     "http-proxy": "^1.18.0",
     "inversify": "^5.0.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash.escaperegexp": "^4.1.2",
     "lodash.sortby": "^4.7.0",
     "moment": "^2.24.0",
